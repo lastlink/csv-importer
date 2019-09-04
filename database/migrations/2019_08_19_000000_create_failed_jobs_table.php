@@ -21,6 +21,7 @@
  * along with Firefly III CSV Importer. If not, see
  * <http://www.gnu.org/licenses/>.
  */
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

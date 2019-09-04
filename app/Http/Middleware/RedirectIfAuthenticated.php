@@ -21,6 +21,7 @@
  * along with Firefly III CSV Importer. If not, see
  * <http://www.gnu.org/licenses/>.
  */
+declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
@@ -33,9 +34,9 @@ class RedirectIfAuthenticated
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     * @param Closure                  $next
-     * @param string|null              $guard
+     * @param Request     $request
+     * @param Closure     $next
+     * @param string|null $guard
      *
      * @return mixed
      */

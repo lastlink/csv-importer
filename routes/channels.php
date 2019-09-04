@@ -21,8 +21,7 @@
  * along with Firefly III CSV Importer. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-
-/*
+declare(strict_types=1);/*
 |--------------------------------------------------------------------------
 | Broadcast Channels
 |--------------------------------------------------------------------------
