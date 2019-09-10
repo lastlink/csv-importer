@@ -4,9 +4,8 @@
 namespace App\Http\Controllers;
 
 
-use App\Exceptions\ApiException;
+use App\Exceptions\ApiHttpException;
 use App\Services\FireflyIIIApi\Request\SystemInformationRequest;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -22,9 +21,8 @@ class TokenController extends Controller
         $response = ['result' => 'OK', 'message' => null];
         $request  = new SystemInformationRequest();
         try {
-            $result = $request->authenticatedGet();
-        } catch (ApiException $e) {
-        } catch (GuzzleException $e) {
+            $request->get();
+        } catch (ApiHttpException $e) {
             $response = ['result' => 'NOK', 'message' => $e->getMessage()];
         }
 
@@ -40,9 +38,8 @@ class TokenController extends Controller
         $errorMessage = 'No error message.';
         $isError      = false;
         try {
-            $request->authenticatedGet();
-        } catch (ApiException $e) {
-        } catch (GuzzleException $e) {
+            $request->get();
+        } catch (ApiHttpException $e) {
             $errorMessage = $e->getMessage();
             $isError      = true;
         }

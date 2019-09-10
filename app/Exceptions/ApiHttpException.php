@@ -3,8 +3,10 @@
 
 namespace App\Exceptions;
 
+use Exception;
 
-class ApiHttpException
+
+class ApiHttpException extends Exception
 {
 
 }

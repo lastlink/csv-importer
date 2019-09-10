@@ -4,13 +4,14 @@
 namespace App\Services\FireflyIIIApi\Request;
 
 use App\Exceptions\ApiException;
+use App\Services\FireflyIIIApi\Response\Response;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * Class Request
  */
-class Request
+abstract class Request
 {
     /** @var string */
     private $base;
@@ -20,11 +21,16 @@ class Request
     private $uri;
 
     /**
+     * @return Response
+     */
+    abstract public function get(): Response;
+
+    /**
      * @return array
      * @throws ApiException
      * @throws GuzzleException
      */
-    public function authenticatedGet(): array
+    protected function authenticatedGet(): array
     {
         $fullUri = sprintf('%s/api/v1/%s', $this->getBase(), $this->getUri());
         $client  = $this->getClient();
@@ -32,17 +38,23 @@ class Request
         $res = $client->request(
             'GET', $fullUri, [
                      'headers' => [
+                         'Accept'        => 'application/json',
                          'Authorization' => sprintf('Bearer %s', $this->getToken()),
                      ],
                      'verify'  => resource_path('certs/ca.cert.pem'),
                  ]
         );
+
         if (200 !== $res->getStatusCode()) {
             throw new ApiException('Status code is %d', $res->getStatusCode());
         }
+
         $body = $res->getBody();
         $json = json_decode($body, true);
 
+        if (null === $json) {
+            throw new ApiException(sprintf('Body is empty. Status code is %d.', $res->getStatusCode()));
+        }
         // do something with body.
 
         return $json;
