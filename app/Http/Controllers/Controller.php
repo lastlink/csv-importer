@@ -57,6 +57,12 @@ class Controller extends BaseController
                 exit;
             }
         }
+        $path     = config('csv_importer.upload_path');
+        $writable = is_dir($path) && is_writable($path);
+        if (false === $writable) {
+            echo sprintf('Make sure that directory "%s" exists and is writeable.', $path);
+            exit;
+        }
 
         app('view')->share('version', config('csv_importer.version'));
     }

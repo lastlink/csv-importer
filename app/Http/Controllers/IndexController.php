@@ -33,6 +33,15 @@ namespace App\Http\Controllers;
 class IndexController extends Controller
 {
     /**
+     * IndexController constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        app('view')->share('pageTitle', 'Index');
+    }
+
+    /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index()

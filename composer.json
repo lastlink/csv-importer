@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
+        "ext-json": "*",
         "barryvdh/laravel-debugbar": "^3.2",
         "barryvdh/laravel-ide-helper": "^2.6",
         "doctrine/dbal": "^2.9",
@@ -16,10 +17,12 @@
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "^6.0",
         "laravel/tinker": "^1.0",
-        "rcrowe/twigbridge": "^0.11.0",
-        "ext-json": "*"
+        "league/csv": "^9.3",
+        "rcrowe/twigbridge": "^0.11.0"
     },
     "require-dev": {
+        "roave/security-advisories": "dev-master"
+        ,
         "filp/whoops": "^2.0",
         "fzaninotto/faker": "^1.4",
         "mockery/mockery": "^1.0",

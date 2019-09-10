@@ -15,6 +15,9 @@ use GuzzleHttp\Exception\GuzzleException;
  */
 class SystemInformationRequest extends Request
 {
+    /**
+     * SystemInformationRequest constructor.
+     */
     public function __construct()
     {
         $url   = config('csv_importer.uri');
