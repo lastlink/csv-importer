@@ -17,7 +17,7 @@
                             file <span class="text-info">(possibly, according to a pre-generated configuration file)</span> which
                             will be submitted to the API endpoints of your Firefly III installation.
                         </p>
-                        <a href="{{route('import.start') }}" class="card-link">Start here</a>
+                        <a class="btn btn-success disabled" id="start" href="{{ route('import.start') }}">...</a>
                     </div>
                 </div>
             </div>
@@ -26,4 +26,19 @@
     </div>
 <p>
 </p>
+{% endblock %}
+{% block scripts %}
+
+    <script type="text/javascript">
+        var uri = '{{ route('token.validate') }}';
+        var tokenPageUri = '{{ route('token.index') }}';
+        $.getJSON(uri).done(function (data) {
+            if ('OK' === data.result) {
+                $('#start').removeClass('disabled').text('Start here');
+            } else {
+                $('#start').hide();
+                window.location = tokenPageUri;
+            }
+        })
+    </script>
 {% endblock %}

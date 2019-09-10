@@ -30,7 +30,8 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use RuntimeException;
+use Illuminate\Support\Facades\Artisan;
+
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
@@ -44,15 +45,16 @@ class Controller extends BaseController
     {
 
         $variables = [
-            'FIREFLY_III_CLIENT_ID'     => 'csv_importer.client_id',
-            'FIREFLY_III_CLIENT_SECRET' => 'csv_importer.client_secret',
-            'FIREFLY_III_URI'           => 'csv_importer.uri',
+            'FIREFLY_III_ACCESS_TOKEN' => 'csv_importer.access_token',
+            'FIREFLY_III_URI'          => 'csv_importer.uri',
         ];
         foreach ($variables as $env => $config) {
 
             $value = (string)config($config);
             if ('' === $value) {
-                throw new RuntimeException(sprintf('Please set a valid value for "%s" in the env file.', $env));
+                echo sprintf('Please set a valid value for "%s" in the env file.', $env);
+                Artisan::call('config:clear');
+                exit;
             }
         }
 
