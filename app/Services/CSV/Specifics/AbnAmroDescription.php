@@ -1,7 +1,7 @@
 <?php
 /**
  * AbnAmroDescription.php
- * Copyright (c) 2019 thegrumpydictator@gmail.com
+ * Copyright (c) 2019 Robert Horlings
  *
  * This file is part of Firefly III CSV Importer.
  *
@@ -26,8 +26,6 @@ namespace App\Services\CSV\Specifics;
 
 /**
  * Class AbnAmroDescription.
- *
- * Robert Horlings
  *
  * Parses the description from txt files for ABN AMRO bank accounts.
  *

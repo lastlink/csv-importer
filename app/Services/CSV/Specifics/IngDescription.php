@@ -1,7 +1,7 @@
 <?php
 /**
  * IngDescription.php
- * Copyright (c) 2019 thegrumpydictator@gmail.com
+ * Copyright (c) 2019 https://github.com/tomwerf
  *
  * This file is part of Firefly III CSV Importer.
  *
@@ -26,7 +26,7 @@ namespace App\Services\CSV\Specifics;
 
 /**
  * Class IngDescription.
- * https://github.com/tomwerf.
+ *
  * Parses the description from CSV files for Ing bank accounts.
  *
  * With Mutation 'InternetBankieren', 'Overschrijving', 'Verzamelbetaling' and

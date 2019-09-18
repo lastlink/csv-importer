@@ -1,7 +1,7 @@
 <?php
 /**
  * SnsDescription.php
- * Copyright (c) 2019 thegrumpydictator@gmail.com
+ * Copyright (c) 2019 hugovanduijn@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
  *
@@ -31,7 +31,7 @@ class SnsDescription implements SpecificInterface
 {
     /**
      * Get description of specific.
-     * hugovanduijn@gmail.com.
+     *
      * @return string
      * @codeCoverageIgnore
      */

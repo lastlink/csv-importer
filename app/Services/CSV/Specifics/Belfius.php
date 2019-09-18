@@ -1,7 +1,7 @@
 <?php
 /**
  * Belfius.php
- * Copyright (c) 2019 thegrumpydictator@gmail.com
+ * Copyright (c) 2019 Sander Kleykens <sander@kleykens.com>
  *
  * This file is part of Firefly III CSV Importer.
  *
@@ -26,7 +26,6 @@ namespace App\Services\CSV\Specifics;
 
 /**
  * Class Belfius.
- * Sander Kleykens <sander@kleykens.com>
  *
  * Fixes Belfius CSV files to:
  *  - Correct descriptions for recurring transactions so doubles can be detected when the equivalent incoming

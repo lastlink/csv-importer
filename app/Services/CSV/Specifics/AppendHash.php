@@ -1,7 +1,7 @@
 <?php
 /**
  * AppendHash.php
- * Copyright (c) 2019 thegrumpydictator@gmail.com
+ * Copyright (c) 2019 https://github.com/viraptor
  *
  * This file is part of Firefly III CSV Importer.
  *
