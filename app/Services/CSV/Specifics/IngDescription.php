@@ -1,0 +1,113 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services\CSV\Specifics;
+
+/**
+ * Class IngDescription.
+ * https://github.com/tomwerf.
+ * Parses the description from CSV files for Ing bank accounts.
+ *
+ * With Mutation 'InternetBankieren', 'Overschrijving', 'Verzamelbetaling' and
+ * 'Incasso' the Name of Opposing account the Opposing IBAN number are in the
+ * Description. This class will remove them, and add Name in description by
+ * 'Betaalautomaat' so those are easily recognizable
+ */
+class IngDescription implements SpecificInterface
+{
+    /** @var array The current row. */
+    public $row;
+
+    /**
+     * Description of the current specific.
+     *
+     * @return string
+     * @codeCoverageIgnore
+     */
+    public static function getDescription(): string
+    {
+        return 'import.specific_ing_descr';
+    }
+
+    /**
+     * Name of the current specific.
+     *
+     * @return string
+     * @codeCoverageIgnore
+     */
+    public static function getName(): string
+    {
+        return 'import.specific_ing_name';
+    }
+
+    /**
+     * Run the specific code.
+     *
+     * @param array $row
+     *
+     * @return array
+     *
+     */
+    public function run(array $row): array
+    {
+        $this->row = array_values($row);
+        if (count($this->row) >= 8) {                    // check if the array is correct
+            switch ($this->row[4]) {                     // Get value for the mutation type
+                case 'GT':                               // InternetBankieren
+                case 'OV':                               // Overschrijving
+                case 'VZ':                               // Verzamelbetaling
+                case 'IC':                               // Incasso
+                    $this->removeIBANIngDescription();
+                    $this->removeNameIngDescription();
+                    // if "tegenrekening" empty, copy the description. Primitive, but it works.
+                    $this->copyDescriptionToOpposite();
+                    break;
+                case 'BA':                              // Betaalautomaat
+                    $this->addNameIngDescription();
+                    break;
+            }
+        }
+
+        return $this->row;
+    }
+
+    /**
+     * Add the Opposing name from cell 1 in the description for Betaalautomaten
+     * Otherwise the description is only: 'Pasvolgnr:<nr> <date> Transactie:<NR> Term:<nr>'.
+     */
+    protected function addNameIngDescription(): void
+    {
+        $this->row[8] = $this->row[1] . ' ' . $this->row[8];
+    }
+
+    /**
+     * Remove IBAN number out of the  description
+     * Default description of Description is: Naam: <OPPOS NAME> Omschrijving: <DESCRIPTION> IBAN: <OPPOS IBAN NR>.
+     */
+    protected function removeIBANIngDescription(): void
+    {
+        // Try replace the iban number with nothing. The IBAN nr is found in the third row
+        $this->row[8] = preg_replace('/\sIBAN:\s' . $this->row[3] . '/', '', $this->row[8]);
+    }
+
+    /**
+     * Remove name from the description (Remove everything before the description incl the word 'Omschrijving' ).
+     */
+    protected function removeNameIngDescription(): void
+    {
+        // Try remove everything before the 'Omschrijving'
+        $this->row[8] = preg_replace('/.+Omschrijving: /', '', $this->row[8]);
+    }
+
+    /**
+     * Copy description to name of opposite account.
+     */
+    private function copyDescriptionToOpposite(): void
+    {
+        $search = ['Naar Oranje Spaarrekening ', 'Afschrijvingen'];
+        if ('' === (string)$this->row[3]) {
+            $this->row[3] = trim(str_ireplace($search, '', $this->row[8]));
+        }
+    }
+}
