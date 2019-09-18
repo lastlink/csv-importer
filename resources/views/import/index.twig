@@ -18,26 +18,30 @@
                 <p>
                     Use the form elements below to upload your data.
                 </p>
-                {{ dump(errors) }}
+                <hr />
                 <div class="row">
-                    <div class="col-lg-6">
-                        <form method="post" action="{{ route('import.upload') }}" accept-charset="UTF-8" class="form-horizontal" id="store"
-                              enctype="multipart/form-data">
+                    <div class="col-lg-8">
+                        <form method="post" action="{{ route('import.upload') }}" accept-charset="UTF-8" id="store" enctype="multipart/form-data">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
-                            <div class="form-group">
-                                <label for="csv_file">CSV file</label>
-                                <input type="file" class="form-control{% if errors.has('csv_file') %} is-invalid{% endif %}" id="csv_file" name="csv_file"
-                                       placeholder="CSV file" />
-                                {% if errors.has('csv_file') %}
+                            <div class="form-group row">
+                                <label for="csv_file" class="col-sm-4 col-form-label">CSV file</label>
+                                <div class="col-sm-8">
+                                    <input type="file" class="form-control{% if errors.has('csv_file') %} is-invalid{% endif %}" id="csv_file" name="csv_file"
+                                           placeholder="CSV file"/>
+                                    {% if errors.has('csv_file') %}
                                     <div class="invalid-feedback">
                                         {{ errors.first('csv_file') }}
                                     </div>
                                 {% endif %}
-
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="formGroupExampleInput2">Optional configuration file</label>
-                                <input type="file" class="form-control" id="config_file" name="config_file" placeholder="Configuration file">
+
+
+                            <div class="form-group row">
+                                <label for="config_file" class="col-sm-4 col-form-label">Optional configuration file</label>
+                                <div class="col-sm-8">
+                                    <input type="file" class="form-control" id="config_file" name="config_file" placeholder="Configuration file" />
+                                </div>
                             </div>
                             <button type="submit" class="btn btn-primary">Upload</button>
                         </form>

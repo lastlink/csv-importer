@@ -1,0 +1,209 @@
+{% extends "./layout/default" %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                &nbsp;
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>{{ mainTitle }}</h1>
+                <h2>{{ subTitle }}</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="lead">Configure your import.</p>
+                <p>
+                    CSV files come in many shapes and forms. Some of the most important settings are below.
+                </p>
+                <hr/>
+                <div class="row">
+                    <div class="col-lg-10">
+                        <form method="post" action="{{ route('import.configure.post') }}" accept-charset="UTF-8" id="store">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
+                            <h4>File options</h4>
+                            <div class="form-group row">
+                                <div class="col-sm-3">Headers</div>
+                                <div class="col-sm-9">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="headers" name="headers" value="1" aria-describedby="headersHelp">
+                                        <label class="form-check-label" for="headers">
+                                            Yes
+                                        </label>
+                                        <small id="headersHelp" class="form-text text-muted">
+                                            Select this checkbox when your CSV file has headers on the first line of the file.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="delimiter" class="col-sm-3 col-form-label">CSV delimiter</label>
+                                <div class="col-sm-9">
+                                    <select id="delimiter" name="delimiter" class="form-control">
+                                        <option value="comma" label="A comma (,)">A comma (,)</option>
+                                        <option value="semicolon" label="A semicolon (;)">A semicolon (;)</option>
+                                        <option value="tab" label="A tab (invisible)">A tab (invisible)</option>
+                                    </select>
+                                    <small id="delimiterHelp" class="form-text text-muted">
+                                        Select the field separator of our CSV file. This is almost always a comma.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="date" class="col-sm-3 col-form-label">Date format</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="date" class="form-control" id="date" placeholder="Date format" value="Y-m-d">
+                                    <small id="dateHelp" class="form-text text-muted">
+                                        Use this box to set the date format as it can be found in your file. You can use the format as described
+                                        <a href="https://www.php.net/manual/en/function.date.php">on this page</a>.
+                                        Don't stop playing with this setting until <strong id="date_example">1984-09-17</strong> matches what you see in your
+                                        CSV file.
+                                    </small>
+                                </div>
+                            </div>
+
+
+                            <h4>Import options</h4>
+                            <div class="form-group row">
+                                <label for="default_account" class="col-sm-3 col-form-label">Default import account</label>
+                                <div class="col-sm-9">
+                                    <select id="default_account" name="default_account" class="form-control">
+                                        {% for account in accounts %}
+                                            <option value="{{ account.id }}" label="{{ account.name }}">{{ account.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <small id="defaultAccountHelp" class="form-text text-muted">
+                                        Select the asset account you want to link transactions to, if your CSV file doesn't have enough meta data
+                                        to determine this.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-sm-3">Rules</div>
+                                <div class="col-sm-9">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="rules" name="rules" value="1" aria-describedby="rulesHelp">
+                                        <label class="form-check-label" for="rules">
+                                            Yes
+                                        </label>
+                                        <small id="rulesHelp" class="form-text text-muted">
+                                            Select if you want Firefly III to apply your rules to the import.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="X" class="col-sm-3 col-form-label">Unique transactions</label>
+                                <div class="col-sm-9">
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="1" id="ignore_lines" name="ignore_lines">
+                                        <label class="form-check-label" for="ignore_lines">
+                                            Verification: Ignore duplicate lines in the CSV file.
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="1" id="ignore_duplicates" name="ignore_duplicates">
+                                        <label class="form-check-label" for="ignore_duplicates">
+                                            Validation: Ignore already existing duplicate transactions.
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="1" id="ignore_transfers" name="ignore_transfers">
+                                        <label class="form-check-label" for="ignore_transfers">
+                                            Analysis: Ignore existing transfers with reversed accounts.
+                                        </label>
+                                    </div>
+
+
+                                    <small id="dateHelp" class="form-text text-muted">
+                                        The import routine has several ways of checking if transactions are unique. Select how strict the import
+                                        routine must be. By selecting nothing, all duplicates will be imported if found.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <h4>Bank-specific options</h4>
+                            <div class="form-group row">
+                                <label for="default_account" class="col-sm-3 col-form-label">Bank specific options</label>
+                                <div class="col-sm-9">
+                                    <select id="default_account" name="default_account" class="form-control">
+                                        <option value="1" label="Checking Account">Some Account</option>
+                                    </select>
+                                    <small id="dateHelp" class="form-text text-muted">
+                                        In this dropdown you will find an (ever growing) list of bank&mdash; and system-specific options
+                                        that will be applied to the data in your CSV file. Select one that applies to you import file.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <h4>Other options</h4>
+                            <div class="form-group row">
+                                <div class="col-sm-3">Skip form</div>
+                                <div class="col-sm-9">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="rules" name="rules" value="1" aria-describedby="skipHelp">
+                                        <label class="form-check-label" for="rules">
+                                            Yes
+                                        </label>
+                                        <small id="rulesHelp" class="form-text text-muted">
+                                            Skip the options the next time you import and go straight to processing.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!--
+                            <div class="form-group">
+
+                                <label class="form-check-label" for="defaultCheck1">
+                                    Date format
+                                </label>
+                                <input type="text" id="inputPassword5" class="form-control" aria-describedby="passwordHelpBlock">
+                                <small id="passwordHelpBlock" class="form-text text-muted">
+                                    Use this box to set the date format as it can be found in your file. You can use the format as described on this page.
+                                    Don't stop playing with this setting until the date below matches what you see in your CSV file.
+                                </small>
+                                <small>
+                                    Live preview: <strong>2019/09/01</strong>
+                                </small>
+                            </div>
+
+
+                            -->
+                            <button type="submit" class="btn btn-primary">Submit</button>
+
+                        </form>
+                        <p>&nbsp;</p>
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript">
+
+        var phpFormatRoute = '{{ route('import.configure.php_date') }}';
+
+        $('#date').on('change', function () {
+            $('#date_example').text('...');
+            var format = $('#date').val();
+            $.getJSON(phpFormatRoute, {format: format}).done(function (data) {
+                $('#date_example').text(data.result);
+            }).fail(function () {
+                $('#date_example').text(':(');
+            });
+        });
+    </script>
+{% endblock %}

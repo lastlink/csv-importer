@@ -31,4 +31,8 @@ Route::get('/token/validate', 'TokenController@doValidate')->name('token.validat
 // start import thing.
 Route::get('/import/start', ['uses' => 'Import\StartController@index', 'as' => 'import.start']);
 Route::post('/import/upload', ['uses' => 'Import\UploadController@upload', 'as' => 'import.upload']);
-Route::get('/import/configure', ['uses' => 'Import\ConfigurationController@index', 'as' => 'import.configuration.index']);
+Route::get('/import/configure', ['uses' => 'Import\ConfigurationController@index', 'as' => 'import.configure.index']);
+Route::post('/import/configure', ['uses' => 'Import\ConfigurationController@postIndex', 'as' => 'import.configure.post']);
+
+// helper
+Route::get('/import/php_date', ['uses' => 'Import\ConfigurationController@phpDate', 'as' => 'import.configure.php_date']);

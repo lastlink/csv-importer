@@ -4,9 +4,11 @@
 namespace App\Services\FireflyIIIApi\Request;
 
 use App\Exceptions\ApiException;
+use App\Exceptions\ApiHttpException;
 use App\Services\FireflyIIIApi\Response\Response;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Log;
 
 /**
  * Class Request
@@ -19,11 +21,31 @@ abstract class Request
     private $token;
     /** @var string */
     private $uri;
+    /** @var array */
+    private $parameters;
 
     /**
      * @return Response
+     * @throws ApiHttpException
      */
     abstract public function get(): Response;
+
+    /**
+     * @return array
+     */
+    public function getParameters(): array
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param array $parameters
+     */
+    public function setParameters(array $parameters): void
+    {
+        $this->parameters = $parameters;
+    }
+
 
     /**
      * @return array
@@ -32,10 +54,15 @@ abstract class Request
      */
     protected function authenticatedGet(): array
     {
+        Log::debug('Now in authenticatedGet()');
         $fullUri = sprintf('%s/api/v1/%s', $this->getBase(), $this->getUri());
-        $client  = $this->getClient();
+        if (null !== $this->parameters) {
+            $fullUri = sprintf('%s?%s', $fullUri, http_build_query($this->parameters));
+        }
+        Log::debug(sprintf('Full URI is %s', $fullUri));
 
-        $res = $client->request(
+        $client = $this->getClient();
+        $res    = $client->request(
             'GET', $fullUri, [
                      'headers' => [
                          'Accept'        => 'application/json',

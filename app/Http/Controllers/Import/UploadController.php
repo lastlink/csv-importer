@@ -60,7 +60,7 @@ class UploadController extends Controller
             return redirect(route('import.start'))->withErrors($errors);
         }
 
-        return redirect(route('import.configure'));
+        return redirect(route('import.configure.index'));
     }
 
     /**
