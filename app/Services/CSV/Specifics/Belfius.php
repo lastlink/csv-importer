@@ -42,7 +42,7 @@ class Belfius implements SpecificInterface
      */
     public static function getDescription(): string
     {
-        return 'import.specific_belfius_descr';
+        return 'specifics.belfius_descr';
     }
 
     /**
@@ -53,7 +53,7 @@ class Belfius implements SpecificInterface
      */
     public static function getName(): string
     {
-        return 'import.specific_belfius_name';
+        return 'specifics.belfius_name';
     }
 
     /**

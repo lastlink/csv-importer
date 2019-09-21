@@ -41,7 +41,7 @@ class AppendHash implements SpecificInterface
      */
     public static function getDescription(): string
     {
-        return 'import.specific_hash_descr';
+        return 'specifics.hash_descr';
     }
 
     /**
@@ -52,7 +52,7 @@ class AppendHash implements SpecificInterface
      */
     public static function getName(): string
     {
-        return 'import.specific_hash_name';
+        return 'specifics.hash_name';
     }
 
     /**

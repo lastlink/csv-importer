@@ -45,7 +45,7 @@ class AbnAmroDescription implements SpecificInterface
      */
     public static function getDescription(): string
     {
-        return 'import.specific_abn_descr';
+        return 'specifics.abn_descr';
     }
 
     /**
@@ -56,7 +56,7 @@ class AbnAmroDescription implements SpecificInterface
      */
     public static function getName(): string
     {
-        return 'import.specific_abn_name';
+        return 'specifics.abn_name';
     }
 
     /**

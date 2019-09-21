@@ -24,6 +24,7 @@
                         <form method="post" action="{{ route('import.configure.post') }}" accept-charset="UTF-8" id="store">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
                             <h4>File options</h4>
+
                             <div class="form-group row">
                                 <div class="col-sm-3">Headers</div>
                                 <div class="col-sm-9">
@@ -42,7 +43,7 @@
                             <div class="form-group row">
                                 <label for="delimiter" class="col-sm-3 col-form-label">CSV delimiter</label>
                                 <div class="col-sm-9">
-                                    <select id="delimiter" name="delimiter" class="form-control">
+                                    <select id="delimiter" name="delimiter" class="form-control" aria-describedby="delimiterHelp">
                                         <option value="comma" label="A comma (,)">A comma (,)</option>
                                         <option value="semicolon" label="A semicolon (;)">A semicolon (;)</option>
                                         <option value="tab" label="A tab (invisible)">A tab (invisible)</option>
@@ -56,7 +57,7 @@
                             <div class="form-group row">
                                 <label for="date" class="col-sm-3 col-form-label">Date format</label>
                                 <div class="col-sm-9">
-                                    <input type="text" name="date" class="form-control" id="date" placeholder="Date format" value="Y-m-d">
+                                    <input type="text" name="date" class="form-control" id="date" placeholder="Date format" value="Y-m-d" aria-describedby="dateHelp">
                                     <small id="dateHelp" class="form-text text-muted">
                                         Use this box to set the date format as it can be found in your file. You can use the format as described
                                         <a href="https://www.php.net/manual/en/function.date.php">on this page</a>.
@@ -71,7 +72,7 @@
                             <div class="form-group row">
                                 <label for="default_account" class="col-sm-3 col-form-label">Default import account</label>
                                 <div class="col-sm-9">
-                                    <select id="default_account" name="default_account" class="form-control">
+                                    <select id="default_account" name="default_account" class="form-control" aria-describedby="defaultAccountHelp">
                                         {% for account in accounts %}
                                             <option value="{{ account.id }}" label="{{ account.name }}">{{ account.name }}</option>
                                         {% endfor %}
@@ -103,28 +104,28 @@
                                 <div class="col-sm-9">
 
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="1" id="ignore_lines" name="ignore_lines">
+                                        <input class="form-check-input" type="checkbox" value="1" id="ignore_lines" name="ignore_lines" aria-describedby="duplicateHelp">
                                         <label class="form-check-label" for="ignore_lines">
                                             Verification: Ignore duplicate lines in the CSV file.
                                         </label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="1" id="ignore_duplicates" name="ignore_duplicates">
+                                        <input class="form-check-input" type="checkbox" value="1" id="ignore_duplicates" name="ignore_duplicates" aria-describedby="duplicateHelp">
                                         <label class="form-check-label" for="ignore_duplicates">
                                             Validation: Ignore already existing duplicate transactions.
                                         </label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="1" id="ignore_transfers" name="ignore_transfers">
+                                        <input class="form-check-input" type="checkbox" value="1" id="ignore_transfers" name="ignore_transfers" aria-describedby="duplicateHelp">
                                         <label class="form-check-label" for="ignore_transfers">
                                             Analysis: Ignore existing transfers with reversed accounts.
                                         </label>
                                     </div>
 
 
-                                    <small id="dateHelp" class="form-text text-muted">
+                                    <small class="form-text text-muted" id="duplicateHelp">
                                         The import routine has several ways of checking if transactions are unique. Select how strict the import
                                         routine must be. By selecting nothing, all duplicates will be imported if found.
                                     </small>
@@ -133,13 +134,19 @@
 
                             <h4>Bank-specific options</h4>
                             <div class="form-group row">
-                                <label for="default_account" class="col-sm-3 col-form-label">Bank specific options</label>
+                                <label for="specifics" class="col-sm-3 col-form-label">Bank specific options</label>
                                 <div class="col-sm-9">
-                                    <select id="default_account" name="default_account" class="form-control">
-                                        <option value="1" label="Checking Account">Some Account</option>
-                                    </select>
-                                    <small id="dateHelp" class="form-text text-muted">
-                                        In this dropdown you will find an (ever growing) list of bank&mdash; and system-specific options
+                                        {% for key, specific in specifics %}
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="1" id="{{ key }}" name="{{ key }}" aria-describedby="specificHelp">
+                                                <label class="form-check-label" for="{{key}}">
+                                                    {{ specific.name }}<br />
+                                                    <small>{{ specific.description }}</small>
+                                                </label>
+                                            </div>
+                                        {% endfor %}
+                                    <small class="form-text text-muted" id="specificHelp">
+                                        In this list you will find an (ever growing) list of bank&mdash; and system-specific options
                                         that will be applied to the data in your CSV file. Select one that applies to you import file.
                                     </small>
                                 </div>
@@ -154,7 +161,7 @@
                                         <label class="form-check-label" for="rules">
                                             Yes
                                         </label>
-                                        <small id="rulesHelp" class="form-text text-muted">
+                                        <small id="skipHelp" class="form-text text-muted">
                                             Skip the options the next time you import and go straight to processing.
                                         </small>
                                     </div>

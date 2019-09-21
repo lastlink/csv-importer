@@ -40,7 +40,7 @@ class IngBelgium implements SpecificInterface
      */
     public static function getDescription(): string
     {
-        return 'import.specific_ingbelgium_descr';
+        return 'specifics.ingbelgium_descr';
     }
 
     /**
@@ -51,7 +51,7 @@ class IngBelgium implements SpecificInterface
      */
     public static function getName(): string
     {
-        return 'import.specific_ingbelgium_name';
+        return 'specifics.ingbelgium_name';
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 /**
- * RabobankDescription.php
+ * SpecificService.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,52 +20,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace App\Services\CSV\Specifics;
 
+
 /**
- * Class RabobankDescription.
- *
- * @codeCoverageIgnore
- * @deprecated
+ * Class SpecificService
  */
-class RabobankDescription implements SpecificInterface
+class SpecificService
 {
     /**
-     * Description of this specific.
-     *
-     * @return string
-     * @codeCoverageIgnore
-     */
-    public static function getDescription(): string
-    {
-        return 'import.specific_rabo_descr';
-    }
-
-    /**
-     * Name of this specific.
-     *
-     * @return string
-     * @codeCoverageIgnore
-     */
-    public static function getName(): string
-    {
-        return 'import.specific_rabo_name';
-    }
-
-    /**
-     * Run the specific.
-     *
-     * @param array $row
-     *
      * @return array
-     *
      */
-    public function run(array $row): array
+    public static function getSpecifics(): array
     {
-        $row = array_values($row);
+        $specifics = [];
+        foreach (config('csv_importer.specifics') as $class) {
+            if (class_exists($class)) {
+                $parts           = explode('\\', $class);
+                $key             = $parts[count($parts) - 1];
+                $specifics[$key] = [
+                    'name'        => trans($class::getName()),
+                    'description' => trans($class::getDescription()),
+                ];
+            }
+        }
 
-        return $row;
+        return $specifics;
     }
+
 }

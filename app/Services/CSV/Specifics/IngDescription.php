@@ -47,7 +47,7 @@ class IngDescription implements SpecificInterface
      */
     public static function getDescription(): string
     {
-        return 'import.specific_ing_descr';
+        return 'specifics.ing_descr';
     }
 
     /**
@@ -58,7 +58,7 @@ class IngDescription implements SpecificInterface
      */
     public static function getName(): string
     {
-        return 'import.specific_ing_name';
+        return 'specifics.ing_name';
     }
 
     /**

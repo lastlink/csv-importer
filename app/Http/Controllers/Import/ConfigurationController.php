@@ -25,6 +25,7 @@ namespace App\Http\Controllers\Import;
 
 use App\Http\Controllers\Controller;
 use App\Http\Request\ConfigurationPostRequest;
+use App\Services\CSV\Specifics\SpecificService;
 use App\Services\FireflyIIIApi\Model\Account;
 use App\Services\FireflyIIIApi\Request\GetAccountsRequest;
 use Carbon\Carbon;
@@ -59,12 +60,15 @@ class ConfigurationController extends Controller
         $request->setType(GetAccountsRequest::ASSET);
         $response = $request->get();
 
+        // get list of specifics:
+        $specifics = SpecificService::getSpecifics();
+
         /** @var Account $account */
         foreach ($response as $account) {
             $accounts[$account->id] = $account;
         }
 
-        return view('import.configuration.index', compact('mainTitle', 'subTitle','accounts'));
+        return view('import.configuration.index', compact('mainTitle', 'subTitle','accounts','specifics'));
     }
 
     /**

@@ -37,7 +37,7 @@ class SnsDescription implements SpecificInterface
      */
     public static function getDescription(): string
     {
-        return 'import.specific_sns_descr';
+        return 'specifics.sns_descr';
     }
 
     /**
@@ -48,7 +48,7 @@ class SnsDescription implements SpecificInterface
      */
     public static function getName(): string
     {
-        return 'import.specific_sns_name';
+        return 'specifics.sns_name';
     }
 
     /**

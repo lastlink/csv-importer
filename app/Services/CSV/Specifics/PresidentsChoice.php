@@ -37,7 +37,7 @@ class PresidentsChoice implements SpecificInterface
      */
     public static function getDescription(): string
     {
-        return 'import.specific_pres_descr';
+        return 'specifics.pres_descr';
     }
 
     /**
@@ -48,7 +48,7 @@ class PresidentsChoice implements SpecificInterface
      */
     public static function getName(): string
     {
-        return 'import.specific_pres_name';
+        return 'specifics.pres_name';
     }
 
     /**

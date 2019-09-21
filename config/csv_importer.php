@@ -1,4 +1,6 @@
 <?php
+
+
 /**
  * csv_importer.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
@@ -19,8 +21,16 @@
  * along with Firefly III CSV Importer.If not, see
  * <http://www.gnu.org/licenses/>.
  */
-
 declare(strict_types=1);
+
+use App\Services\CSV\Specifics\AbnAmroDescription;
+use App\Services\CSV\Specifics\AppendHash;
+use App\Services\CSV\Specifics\Belfius;
+use App\Services\CSV\Specifics\IngBelgium;
+use App\Services\CSV\Specifics\IngDescription;
+use App\Services\CSV\Specifics\PresidentsChoice;
+use App\Services\CSV\Specifics\SnsDescription;
+
 
 return [
     'version'      => '0.1',
@@ -28,6 +38,12 @@ return [
     'uri'          => env('FIREFLY_III_URI'),
     'upload_path'  => storage_path('uploads'),
     'specifics' => [
-
+        AbnAmroDescription::class,
+        AppendHash::class,
+        Belfius::class,
+        IngBelgium::class,
+        IngDescription::class,
+        PresidentsChoice::class,
+        SnsDescription::class,
     ],
 ];
