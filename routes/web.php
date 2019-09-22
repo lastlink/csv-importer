@@ -37,5 +37,9 @@ Route::post('/import/upload', ['uses' => 'Import\UploadController@upload', 'as' 
 Route::get('/import/configure', ['uses' => 'Import\ConfigurationController@index', 'as' => 'import.configure.index']);
 Route::post('/import/configure', ['uses' => 'Import\ConfigurationController@postIndex', 'as' => 'import.configure.post']);
 
-// helper
+// import config helper
 Route::get('/import/php_date', ['uses' => 'Import\ConfigurationController@phpDate', 'as' => 'import.configure.php_date']);
+
+// roles
+Route::get('/import/roles', ['uses' => 'Import\RoleController@index', 'as' => 'import.roles.index']);
+Route::post('/import/roles', ['uses' => 'Import\RoleController@postIndex', 'as' => 'import.roles.post']);

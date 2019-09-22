@@ -62,19 +62,20 @@ class AppendHash implements SpecificInterface
      *
      * @return array
      *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function run(array $row): array
     {
-        $representation = join(",", array_values($row));
+        $representation = implode(',', array_values($row));
         if (array_key_exists($representation, $this->lines_counter)) {
-            $this->lines_counter[$representation] += 1;
-        } else {
+            ++$this->lines_counter[$representation];
+        }
+        if (!array_key_exists($representation, $this->lines_counter)) {
             $this->lines_counter[$representation] = 1;
         }
-        $to_hash = $representation . "," . $this->lines_counter[$representation];
+        $to_hash = sprintf('%s,%s', $representation, $this->lines_counter[$representation]);
 
-        array_push($row, hash("sha256", $to_hash));
+        $row[] = hash('sha256', $to_hash);
+
         return $row;
     }
 }

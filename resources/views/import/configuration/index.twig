@@ -19,7 +19,7 @@
                     CSV files come in many shapes and forms. Some of the most important settings are below.
                 </p>
                 {% if not errors.isEmpty %}
-                    <p class="text-danger">Some error occurred:</p>
+                    <p class="text-danger">Some error(s) occurred:</p>
                     <ul>
                         {% for error in errors.all %}
                         <li class="text-danger">{{ error }}</li>
@@ -31,6 +31,7 @@
                     <div class="col-lg-10">
                         <form method="post" action="{{ route('import.configure.post') }}" accept-charset="UTF-8" id="store">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="roles" value="{{ roles }}"/>
                             <h4>File options</h4>
 
                             <div class="form-group row">

@@ -48,4 +48,23 @@ class SpecificService
         return $specifics;
     }
 
+    /**
+     * @param array $row
+     * @param array $specifics
+     *
+     * @return array
+     */
+    public static function runSpecifics(array $row, array $specifics): array
+    {
+        foreach ($specifics as $name) {
+            $class = sprintf('App\\Services\\CSV\\Specifics\\%s', $name);
+            if (class_exists($class)) {
+                /** @var SpecificInterface $object */
+                $object = app($class);
+                $row    = $object->run($row);
+            }
+        }
+        return $row;
+    }
+
 }

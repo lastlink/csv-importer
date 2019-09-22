@@ -49,13 +49,32 @@ class Configuration
     private $skipForm;
     /** @var array */
     private $specifics;
+    /** @var array */
+    private $roles;
+
+    /**
+     * @param array $roles
+     */
+    public function setRoles(array $roles): void
+    {
+        $this->roles = $roles;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getRoles(): array
+    {
+        return $this->roles;
+    }
 
     /**
      * Configuration constructor.
      */
     private function __construct()
     {
-        $this->date = 'Y-m-d';
+        $this->date             = 'Y-m-d';
         $this->defaultAccount   = 1;
         $this->delimiter        = 'comma';
         $this->headers          = false;
@@ -65,6 +84,7 @@ class Configuration
         $this->rules            = true;
         $this->skipForm         = false;
         $this->specifics        = [];
+        $this->roles            = [];
     }
 
     /**
@@ -74,7 +94,7 @@ class Configuration
      */
     public static function fromArray(array $array): self
     {
-        $object = new self;
+        $object                   = new self;
         $object->headers          = $array['headers'];
         $object->date             = $array['date'];
         $object->defaultAccount   = $array['defaultAccount'];
@@ -85,6 +105,7 @@ class Configuration
         $object->rules            = $array['rules'];
         $object->skipForm         = $array['skipForm'];
         $object->specifics        = $array['specifics'];
+        $object->roles            = $array['roles'];
 
         return $object;
     }
@@ -96,7 +117,7 @@ class Configuration
      */
     public static function fromRequest(array $array): self
     {
-        $object = new self;
+        $object                   = new self;
         $object->headers          = $array['headers'];
         $object->date             = $array['date'];
         $object->defaultAccount   = $array['default_account'];
@@ -107,6 +128,7 @@ class Configuration
         $object->rules            = $array['rules'];
         $object->skipForm         = $array['skip_form'];
         $object->specifics        = $array['specifics'];
+        $object->roles            = $array['roles'];
 
         return $object;
     }
@@ -147,6 +169,15 @@ class Configuration
             }
         }
 
+        // loop roles:
+        $roles = $data['column-roles'] ?? [];
+        foreach ($roles as $role) {
+            // exists in new system?
+            $config = config(sprintf('csv_importer.import_roles.%s', $role));
+            if (null !== $config) {
+                $object->roles[] = $role;
+            }
+        }
         return $object;
     }
 
@@ -166,6 +197,7 @@ class Configuration
             'rules'            => $this->rules,
             'skipForm'         => $this->skipForm,
             'specifics'        => $this->specifics,
+            'roles'            => $this->roles,
         ];
     }
 

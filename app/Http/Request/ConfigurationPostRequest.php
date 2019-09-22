@@ -45,6 +45,12 @@ class ConfigurationPostRequest extends Request
      */
     public function getAll(): array
     {
+        $roles = $this->get('roles');
+        if (null !== $roles) {
+            $roles = json_decode(base64_decode($roles), true);
+        }
+
+
         $result = [
             'headers'           => $this->convertBoolean($this->get('headers')),
             'delimiter'         => $this->string('delimiter'),
@@ -56,6 +62,7 @@ class ConfigurationPostRequest extends Request
             'ignore_transfers'  => $this->convertBoolean($this->get('ignore_transfers')),
             'skip_form'         => $this->convertBoolean($this->get('skip_form')),
             'specifics'         => [],
+            'roles'             => $roles,
         ];
         // rules for specifics:
         $specifics = SpecificService::getSpecifics();

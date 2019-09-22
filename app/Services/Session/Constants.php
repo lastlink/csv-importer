@@ -33,8 +33,9 @@ class Constants
     public const UPLOAD_CONFIG_FILE = 'config_file_path';
     /** @var string  */
     public const CONFIGURATION = 'configuration';
-
     /** @var string  */
     public const CONFIG_COMPLETE_INDICATOR = 'config_complete';
+    /** @var string string */
+    public const ROLES_COMPLETE_INDICATOR = 'role_config_complete';
 
 }

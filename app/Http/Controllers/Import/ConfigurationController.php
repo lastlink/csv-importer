@@ -25,7 +25,6 @@ namespace App\Http\Controllers\Import;
 
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\ConfigComplete;
-use App\Http\Middleware\UploadedFiles;
 use App\Http\Request\ConfigurationPostRequest;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Specifics\SpecificService;
@@ -54,6 +53,7 @@ class ConfigurationController extends Controller
 
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \App\Exceptions\ApiHttpException
      */
     public function index()
     {
@@ -79,9 +79,11 @@ class ConfigurationController extends Controller
             $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
         }
 
+        // send roles through the form. A bit of a hack but OK.
+        $roles = base64_encode(json_encode($configuration->getRoles()));
         // update configuration with old values if present? TODO
 
-        return view('import.configuration.index', compact('mainTitle', 'subTitle', 'accounts', 'specifics', 'configuration'));
+        return view('import.configuration.index', compact('mainTitle', 'subTitle', 'accounts', 'specifics', 'configuration', 'roles'));
     }
 
     /**
@@ -105,8 +107,8 @@ class ConfigurationController extends Controller
         // store config on drive.
         $fromRequest   = $request->getAll();
         $configuration = Configuration::fromRequest($fromRequest);
-
         $config = StorageService::storeContent(json_encode($configuration));
+
         session()->put(Constants::CONFIGURATION, $configuration->toArray());
 
         // set config as complete.
