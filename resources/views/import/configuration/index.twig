@@ -18,6 +18,14 @@
                 <p>
                     CSV files come in many shapes and forms. Some of the most important settings are below.
                 </p>
+                {% if not errors.isEmpty %}
+                    <p class="text-danger">Some error occurred:</p>
+                    <ul>
+                        {% for error in errors.all %}
+                        <li class="text-danger">{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
                 <hr/>
                 <div class="row">
                     <div class="col-lg-10">
@@ -138,8 +146,8 @@
                                 <div class="col-sm-9">
                                         {% for key, specific in specifics %}
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="1" id="{{ key }}" name="{{ key }}" aria-describedby="specificHelp">
-                                                <label class="form-check-label" for="{{key}}">
+                                                <input class="form-check-input" type="checkbox" value="1" id="specific_{{ key }}" name="specific_{{ key }}" aria-describedby="specificHelp">
+                                                <label class="form-check-label" for="specific_{{key}}">
                                                     {{ specific.name }}<br />
                                                     <small>{{ specific.description }}</small>
                                                 </label>
@@ -157,8 +165,8 @@
                                 <div class="col-sm-3">Skip form</div>
                                 <div class="col-sm-9">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="rules" name="rules" value="1" aria-describedby="skipHelp">
-                                        <label class="form-check-label" for="rules">
+                                        <input class="form-check-input" type="checkbox" id="skip_form" name="skip_form" value="1" aria-describedby="skipHelp">
+                                        <label class="form-check-label" for="skip_form">
                                             Yes
                                         </label>
                                         <small id="skipHelp" class="form-text text-muted">

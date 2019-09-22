@@ -23,6 +23,8 @@
 namespace App\Http\Request;
 
 
+use App\Services\CSV\Specifics\SpecificService;
+
 /**
  * Class ConfigurationPostRequest
  */
@@ -41,10 +43,52 @@ class ConfigurationPostRequest extends Request
     /**
      * @return array
      */
+    public function getAll(): array
+    {
+        $result = [
+            'headers'           => $this->convertBoolean($this->get('headers')),
+            'delimiter'         => $this->string('delimiter'),
+            'date'              => $this->string('date'),
+            'default_account'   => $this->integer('default_account'),
+            'rules'             => $this->convertBoolean($this->get('rules')),
+            'ignore_lines'      => $this->convertBoolean($this->get('ignore_lines')),
+            'ignore_duplicates' => $this->convertBoolean($this->get('ignore_duplicates')),
+            'ignore_transfers'  => $this->convertBoolean($this->get('ignore_transfers')),
+            'skip_form'         => $this->convertBoolean($this->get('skip_form')),
+            'specifics'=> [],
+        ];
+        // rules for specifics:
+        $specifics = SpecificService::getSpecifics();
+        foreach (array_keys($specifics) as $specific) {
+            $result['specifics'][$specific] = $this->convertBoolean($this->get(sprintf('specific_%s', $specific)));
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
     public function rules(): array
     {
-        return [
-            'some_weird_field' => 'required',
+        $rules = [
+            //'some_weird_field' => 'required',
+            'headers'           => 'numeric|between:0,1',
+            'delimiter'         => 'required|in:comma,semicolon,tab',
+            'date'              => 'required|between:1,15',
+            'default_account'   => 'required|numeric|min:1|max:100000',
+            'rules'             => 'numeric|between:0,1',
+            'ignore_lines'      => 'numeric|between:0,1',
+            'ignore_duplicates' => 'numeric|between:0,1',
+            'ignore_transfers'  => 'numeric|between:0,1',
+            'skip_form'         => 'numeric|between:0,1',
         ];
+        // rules for specifics:
+        $specifics = SpecificService::getSpecifics();
+        foreach (array_keys($specifics) as $specific) {
+            $rules[sprintf('specific_%s', $specific)] = 'numeric|between:0,1';
+        }
+
+        return $rules;
     }
 }

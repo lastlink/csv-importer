@@ -89,7 +89,7 @@ class ConfigurationController extends Controller
      */
     public function postIndex(ConfigurationPostRequest $request)
     {
-        die('OK!');
+        //var_dump($request->getAll());exit;
     }
 
 }
