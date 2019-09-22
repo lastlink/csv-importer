@@ -46,4 +46,12 @@ class IndexController extends Controller
     {
         return view('index');
     }
+
+    public function flush()
+    {
+        session()->flush();
+
+        return redirect(route('index'));
+    }
+
 }

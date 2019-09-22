@@ -24,16 +24,26 @@ namespace App\Http\Controllers\Import;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\UploadedFiles;
+use App\Services\CSV\Configuration\ConfigFileProcessor;
+use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\MessageBag;
-use Illuminate\Support\Str;
 
 /**
  * Class UploadController
  */
 class UploadController extends Controller
 {
+    /**
+     * UploadController constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware(UploadedFiles::class);
+    }
 
     /**
      *
@@ -57,7 +67,7 @@ class UploadController extends Controller
         // upload the file to a temp directory and use it from there.
         if (null !== $csvFile && 0 === $errorNumber) {
             $csvFileName = StorageService::storeContent(file_get_contents($csvFile->getPathname()));
-            session()->put('csv_file_path', $csvFileName);
+            session()->put(Constants::UPLOAD_CSV_FILE, $csvFileName);
         }
 
         // if present, and no errors, upload the config file and store it in the session.
@@ -71,7 +81,11 @@ class UploadController extends Controller
             if (0 === $errorNumber) {
                 $configFileName = StorageService::storeContent(file_get_contents($configFile->getPathname()));
 
-                session()->put('config_file_path', $configFileName);
+                session()->put(Constants::UPLOAD_CONFIG_FILE, $configFileName);
+
+                // process the config file
+                $configuration = ConfigFileProcessor::convertConfigFile($configFileName);
+                session()->put(Constants::CONFIGURATION, $configuration->toArray());
             }
         }
 

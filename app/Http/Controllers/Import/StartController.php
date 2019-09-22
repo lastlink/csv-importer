@@ -24,6 +24,7 @@ namespace App\Http\Controllers\Import;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\UploadedFiles;
 
 /**
  * Class StartController
@@ -37,6 +38,7 @@ class StartController extends Controller
     {
         parent::__construct();
         app('view')->share('pageTitle', 'Import');
+        $this->middleware(UploadedFiles::class);
     }
 
     /**

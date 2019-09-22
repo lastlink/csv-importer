@@ -25,9 +25,12 @@ namespace App\Http\Controllers\Import;
 
 use App\Http\Controllers\Controller;
 use App\Http\Request\ConfigurationPostRequest;
+use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Specifics\SpecificService;
 use App\Services\FireflyIIIApi\Model\Account;
 use App\Services\FireflyIIIApi\Request\GetAccountsRequest;
+use App\Services\Session\Constants;
+use App\Services\Storage\StorageService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -68,7 +71,14 @@ class ConfigurationController extends Controller
             $accounts[$account->id] = $account;
         }
 
-        return view('import.configuration.index', compact('mainTitle', 'subTitle','accounts','specifics'));
+        $configuration = null;
+        if (session()->has(Constants::CONFIGURATION)) {
+            $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
+        }
+
+        // update configuration with old values if present? TODO
+
+        return view('import.configuration.index', compact('mainTitle', 'subTitle', 'accounts', 'specifics', 'configuration'));
     }
 
     /**
@@ -89,7 +99,18 @@ class ConfigurationController extends Controller
      */
     public function postIndex(ConfigurationPostRequest $request)
     {
-        //var_dump($request->getAll());exit;
+        // store config on drive.
+        $configuration = $request->getAll();
+
+        // make config object:
+
+
+        $config = StorageService::storeContent(json_encode($configuration));
+        //session()->put(Constants::CONFIGURATION, $config);
+        die('x');
+
+        // set config as complete.
+        session()->put(Constants::CONFIG_COMPLETE_INDICATOR, true);
     }
 
 }

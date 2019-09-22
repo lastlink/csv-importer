@@ -55,7 +55,7 @@ class ConfigurationPostRequest extends Request
             'ignore_duplicates' => $this->convertBoolean($this->get('ignore_duplicates')),
             'ignore_transfers'  => $this->convertBoolean($this->get('ignore_transfers')),
             'skip_form'         => $this->convertBoolean($this->get('skip_form')),
-            'specifics'=> [],
+            'specifics'         => [],
         ];
         // rules for specifics:
         $specifics = SpecificService::getSpecifics();

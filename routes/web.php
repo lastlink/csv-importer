@@ -28,6 +28,9 @@ Route::get('/', 'IndexController@index')->name('index');
 Route::get('/token', 'TokenController@index')->name('token.index');
 Route::get('/token/validate', 'TokenController@doValidate')->name('token.validate');
 
+// clear session
+Route::get('/flush','IndexController@flush')->name('flush');
+
 // start import thing.
 Route::get('/import/start', ['uses' => 'Import\StartController@index', 'as' => 'import.start']);
 Route::post('/import/upload', ['uses' => 'Import\UploadController@upload', 'as' => 'import.upload']);

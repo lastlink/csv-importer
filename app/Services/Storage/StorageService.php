@@ -22,6 +22,7 @@
 
 namespace App\Services\Storage;
 
+use RuntimeException;
 use Storage;
 use Str;
 
@@ -42,6 +43,15 @@ class StorageService
         $disk->put($fileName, $content);
 
         return $fileName;
+    }
+
+    public static function getContent(string $name): string
+    {
+        $disk = Storage::disk('uploads');
+        if ($disk->exists($name)) {
+            return $disk->get($name);
+        }
+        throw new RuntimeException(sprintf('No such file %s', $name));
     }
 
 }
