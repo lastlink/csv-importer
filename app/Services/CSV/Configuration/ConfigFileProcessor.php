@@ -24,6 +24,7 @@ namespace App\Services\CSV\Configuration;
 
 
 use App\Services\Storage\StorageService;
+use Log;
 
 class ConfigFileProcessor
 {
@@ -36,6 +37,7 @@ class ConfigFileProcessor
      */
     public static function convertConfigFile(string $fileName): Configuration
     {
+        Log::debug('Now in ConfigFileProcessor::convertConfigFile');
         $content = StorageService::getContent($fileName);
         $json    = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 

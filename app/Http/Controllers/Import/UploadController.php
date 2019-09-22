@@ -30,6 +30,7 @@ use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\MessageBag;
+use Log;
 
 /**
  * Class UploadController
@@ -73,12 +74,14 @@ class UploadController extends Controller
         // if present, and no errors, upload the config file and store it in the session.
 
         if (null !== $configFile) {
+            Log::debug('Config file is present.');
             $errorNumber = $configFile->getError();
             if (0 !== $errorNumber) {
                 $errors->add('config_file', $errorNumber);
             }
             // upload the file to a temp directory and use it from there.
             if (0 === $errorNumber) {
+                Log::debug('Config file uploaded.');
                 $configFileName = StorageService::storeContent(file_get_contents($configFile->getPathname()));
 
                 session()->put(Constants::UPLOAD_CONFIG_FILE, $configFileName);

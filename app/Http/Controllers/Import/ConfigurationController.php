@@ -24,6 +24,8 @@ namespace App\Http\Controllers\Import;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\ConfigComplete;
+use App\Http\Middleware\UploadedFiles;
 use App\Http\Request\ConfigurationPostRequest;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Specifics\SpecificService;
@@ -47,6 +49,7 @@ class ConfigurationController extends Controller
     {
         parent::__construct();
         app('view')->share('pageTitle', 'Import configuration');
+        $this->middleware(ConfigComplete::class);
     }
 
     /**
@@ -100,17 +103,17 @@ class ConfigurationController extends Controller
     public function postIndex(ConfigurationPostRequest $request)
     {
         // store config on drive.
-        $configuration = $request->getAll();
-
-        // make config object:
-
+        $fromRequest   = $request->getAll();
+        $configuration = Configuration::fromRequest($fromRequest);
 
         $config = StorageService::storeContent(json_encode($configuration));
-        //session()->put(Constants::CONFIGURATION, $config);
-        die('x');
+        session()->put(Constants::CONFIGURATION, $configuration->toArray());
 
         // set config as complete.
         session()->put(Constants::CONFIG_COMPLETE_INDICATOR, true);
+
+        // redirect to import things?
+        return redirect()->route('import.roles.index');
     }
 
 }

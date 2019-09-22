@@ -26,8 +26,6 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
-
-                {{ dump(configuration) }}
                 <hr/>
                 <div class="row">
                     <div class="col-lg-10">
@@ -54,9 +52,9 @@
                                 <label for="delimiter" class="col-sm-3 col-form-label">CSV delimiter</label>
                                 <div class="col-sm-9">
                                     <select id="delimiter" name="delimiter" class="form-control" aria-describedby="delimiterHelp">
-                                        <option value="comma" {% if old('delimiter') == 'comma' %}selected{% endif %} label="A comma (,)">A comma (,)</option>
-                                        <option value="semicolon" {% if old('delimiter') == 'semicolon' %}selected{% endif %} label="A semicolon (;)">A semicolon (;)</option>
-                                        <option value="tab" {% if old('delimiter') == 'tab' %}selected{% endif %} label="A tab (invisible)">A tab (invisible)</option>
+                                        <option value="comma" {% if configuration.getDelimiter == 'comma' %}selected{% endif %} label="A comma (,)">A comma (,)</option>
+                                        <option value="semicolon" {% if configuration.getDelimiter == 'semicolon' %}selected{% endif %} label="A semicolon (;)">A semicolon (;)</option>
+                                        <option value="tab" {% if configuration.getDelimiter == 'tab' %}selected{% endif %} label="A tab (invisible)">A tab (invisible)</option>
                                     </select>
                                     <small id="delimiterHelp" class="form-text text-muted">
                                         Select the field separator of our CSV file. This is almost always a comma.
@@ -67,7 +65,7 @@
                             <div class="form-group row">
                                 <label for="date" class="col-sm-3 col-form-label">Date format</label>
                                 <div class="col-sm-9">
-                                    <input type="text" name="date" class="form-control" id="date" placeholder="Date format" value="{{ old('date')|default('Y-m-d') }}" aria-describedby="dateHelp">
+                                    <input type="text" name="date" class="form-control" id="date" placeholder="Date format" value="{{ configuration.getDate|default('Y-m-d') }}" aria-describedby="dateHelp">
                                     <small id="dateHelp" class="form-text text-muted">
                                         Use this box to set the date format as it can be found in your file. You can use the format as described
                                         <a href="https://www.php.net/manual/en/function.date.php">on this page</a>.
@@ -83,9 +81,8 @@
                                 <label for="default_account" class="col-sm-3 col-form-label">Default import account</label>
                                 <div class="col-sm-9">
                                     <select id="default_account" name="default_account" class="form-control" aria-describedby="defaultAccountHelp">
-
                                         {% for account in accounts %}
-                                            <option {% if old('default_account') == account.id %}selected{% endif %} value="{{ account.id }}" label="{{ account.name }}">{{ account.name }}</option>
+                                            <option {% if configuration.getDefaultAccount == account.id %}selected{% endif %} value="{{ account.id }}" label="{{ account.name }}">{{ account.name }}</option>
                                         {% endfor %}
                                     </select>
                                     <small id="defaultAccountHelp" class="form-text text-muted">
@@ -99,7 +96,7 @@
                                 <div class="col-sm-3">Rules</div>
                                 <div class="col-sm-9">
                                     <div class="form-check">
-                                        <input class="form-check-input" {% if old('rules') == '1' %}checked{% endif %} type="checkbox" id="rules" name="rules" value="1" aria-describedby="rulesHelp">
+                                        <input class="form-check-input" {% if configuration.isRules %}checked{% endif %} type="checkbox" id="rules" name="rules" value="1" aria-describedby="rulesHelp">
                                         <label class="form-check-label" for="rules">
                                             Yes
                                         </label>
@@ -115,21 +112,21 @@
                                 <div class="col-sm-9">
 
                                     <div class="form-check">
-                                        <input class="form-check-input" {% if old('ignore_lines') == '1' %}checked{% endif %} type="checkbox" value="1" id="ignore_lines" name="ignore_lines" aria-describedby="duplicateHelp">
+                                        <input class="form-check-input" {% if configuration.isIgnoreLines %}checked{% endif %} type="checkbox" value="1" id="ignore_lines" name="ignore_lines" aria-describedby="duplicateHelp">
                                         <label class="form-check-label" for="ignore_lines">
                                             Verification: Ignore duplicate lines in the CSV file.
                                         </label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" {% if old('ignore_duplicates') == '1' %}checked{% endif %} type="checkbox" value="1" id="ignore_duplicates" name="ignore_duplicates" aria-describedby="duplicateHelp">
+                                        <input class="form-check-input" {% if configuration.isIgnoreDuplicates %}checked{% endif %} type="checkbox" value="1" id="ignore_duplicates" name="ignore_duplicates" aria-describedby="duplicateHelp">
                                         <label class="form-check-label" for="ignore_duplicates">
                                             Validation: Ignore already existing duplicate transactions.
                                         </label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" {% if old('ignore_transfers') == '1' %}checked{% endif %} type="checkbox" value="1" id="ignore_transfers" name="ignore_transfers" aria-describedby="duplicateHelp">
+                                        <input class="form-check-input" {% if configuration.isIgnoreTransfers %}checked{% endif %} type="checkbox" value="1" id="ignore_transfers" name="ignore_transfers" aria-describedby="duplicateHelp">
                                         <label class="form-check-label" for="ignore_transfers">
                                             Analysis: Ignore existing transfers with reversed accounts.
                                         </label>
@@ -149,7 +146,7 @@
                                 <div class="col-sm-9">
                                         {% for key, specific in specifics %}
                                             <div class="form-check">
-                                                <input class="form-check-input" {% if old('specific_'~key) == '1' %}checked{% endif %} type="checkbox" value="1" id="specific_{{ key }}" name="specific_{{ key }}" aria-describedby="specificHelp">
+                                                <input class="form-check-input" {% if configuration.hasSpecific(key) %}checked{% endif %} type="checkbox" value="1" id="specific_{{ key }}" name="specific_{{ key }}" aria-describedby="specificHelp">
                                                 <label class="form-check-label" for="specific_{{key}}">
                                                     {{ specific.name }}<br />
                                                     <small>{{ specific.description }}</small>
@@ -168,7 +165,7 @@
                                 <div class="col-sm-3">Skip form</div>
                                 <div class="col-sm-9">
                                     <div class="form-check">
-                                        <input class="form-check-input" {% if old('skip_form') == '1' %}checked{% endif %} type="checkbox" id="skip_form" name="skip_form" value="1" aria-describedby="skipHelp">
+                                        <input class="form-check-input" {% if configuration.isSkipForm %}checked{% endif %} type="checkbox" id="skip_form" name="skip_form" value="1" aria-describedby="skipHelp">
                                         <label class="form-check-label" for="skip_form">
                                             Yes
                                         </label>
@@ -179,27 +176,7 @@
                                 </div>
                             </div>
 
-
-                            <!--
-                            <div class="form-group">
-
-                                <label class="form-check-label" for="defaultCheck1">
-                                    Date format
-                                </label>
-                                <input type="text" id="inputPassword5" class="form-control" aria-describedby="passwordHelpBlock">
-                                <small id="passwordHelpBlock" class="form-text text-muted">
-                                    Use this box to set the date format as it can be found in your file. You can use the format as described on this page.
-                                    Don't stop playing with this setting until the date below matches what you see in your CSV file.
-                                </small>
-                                <small>
-                                    Live preview: <strong>2019/09/01</strong>
-                                </small>
-                            </div>
-
-
-                            -->
                             <button type="submit" class="btn btn-primary">Submit</button>
-
                         </form>
                         <p>&nbsp;</p>
                         <p>&nbsp;</p>

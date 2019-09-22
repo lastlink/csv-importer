@@ -22,6 +22,8 @@
 
 namespace App\Services\CSV\Configuration;
 
+use Log;
+
 /**
  * Class Configuration
  */
@@ -53,7 +55,7 @@ class Configuration
      */
     private function __construct()
     {
-        $this->date             = 'Y-m-d';
+        $this->date = 'Y-m-d';
         $this->defaultAccount   = 1;
         $this->delimiter        = 'comma';
         $this->headers          = false;
@@ -73,7 +75,7 @@ class Configuration
     public static function fromArray(array $array): self
     {
         $object = new self;
-
+        $object->headers          = $array['headers'];
         $object->date             = $array['date'];
         $object->defaultAccount   = $array['defaultAccount'];
         $object->delimiter        = $array['delimiter'];
@@ -88,6 +90,28 @@ class Configuration
     }
 
     /**
+     * @param array $array
+     *
+     * @return $this
+     */
+    public static function fromRequest(array $array): self
+    {
+        $object = new self;
+        $object->headers          = $array['headers'];
+        $object->date             = $array['date'];
+        $object->defaultAccount   = $array['default_account'];
+        $object->delimiter        = $array['delimiter'];
+        $object->ignoreDuplicates = $array['ignore_duplicates'];
+        $object->ignoreLines      = $array['ignore_lines'];
+        $object->ignoreTransfers  = $array['ignore_transfers'];
+        $object->rules            = $array['rules'];
+        $object->skipForm         = $array['skip_form'];
+        $object->specifics        = $array['specifics'];
+
+        return $object;
+    }
+
+    /**
      * TODO: column count and column roles. column mapping / do-mapping.
      *
      * @param array $data
@@ -96,6 +120,7 @@ class Configuration
      */
     public static function fromClassic(array $data): self
     {
+        Log::debug('Now in Configuration::fromClassic', $data);
         $validDelimiters = [
             ','   => 'comma',
             ';'   => 'semicolon',
@@ -111,6 +136,8 @@ class Configuration
         $object->headers        = $data['has-headers'] ?? false;
         $object->rules          = $data['apply-rules'] ?? true;
         $object->specifics      = [];
+
+        Log::debug(sprintf('Has headers: %s', var_export($object->headers, true)));
 
         $specifics = array_keys($data['specifics'] ?? []);
         foreach ($specifics as $name) {
@@ -164,6 +191,16 @@ class Configuration
     public function getDelimiter(): string
     {
         return $this->delimiter;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasSpecific(string $name): bool
+    {
+        return in_array($name, $this->specifics, true);
     }
 
     /**
