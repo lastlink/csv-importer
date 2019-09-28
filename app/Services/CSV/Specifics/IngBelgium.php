@@ -117,6 +117,11 @@ class IngBelgium implements SpecificInterface
         return IngBelgium::convertStructuredDescriptionToProperFormat($description);
     }
 
+    /**
+     * @param string $description
+     *
+     * @return string
+     */
     private static function convertStructuredDescriptionToProperFormat(string $description): string
     {
         preg_match('/^\*\*\*(\d{3}\/\d{4}\/\d{5})\*\*\*$/', $description, $matches);
@@ -126,6 +131,12 @@ class IngBelgium implements SpecificInterface
         return $description;
     }
 
+    /**
+     * @param string $transactionDetails
+     * @param string $regex
+     *
+     * @return string
+     */
     private static function parseInformationFromTransactionDetails(string $transactionDetails, string $regex): string
     {
         if(isset($transactionDetails)) {
@@ -136,5 +147,18 @@ class IngBelgium implements SpecificInterface
         }
 
         return '';
+    }
+
+    /**
+     * If the fix(es) in your file add or remove columns from the CSV content, this must be reflected on the header row
+     * as well.
+     *
+     * @param array $headers
+     *
+     * @return array
+     */
+    public function runOnHeaders(array $headers): array
+    {
+        return $headers;
     }
 }

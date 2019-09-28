@@ -22,7 +22,9 @@
 
 namespace App\Services\FireflyIIIApi\Model;
 
-
+/**
+ * Class Account
+ */
 class Account
 {
     /** @var int */
@@ -31,6 +33,8 @@ class Account
     public $name;
     /** @var string */
     public $type;
+    /** @var string */
+    public $iban;
 
     /**
      * Account constructor.
@@ -52,6 +56,7 @@ class Account
         $account->id   = (int)$array['id'];
         $account->name = $array['attributes']['name'];
         $account->type = $array['attributes']['type'];
+        $account->iban = $array['attributes']['iban'];
 
         return $account;
 

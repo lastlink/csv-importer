@@ -36,6 +36,12 @@ class GetAccountsRequest extends Request
 {
     /** @var string */
     public const ASSET = 'asset';
+    /** @var string  */
+    public const LIABILITIES = 'liabilities';
+
+    /** @var string  */
+    public const ALL = 'all';
+
     /** @var string */
     private $type;
 
@@ -85,5 +91,7 @@ class GetAccountsRequest extends Request
         $this->type = $type;
         $this->setParameters(['type' => $type]);
     }
+
+
 
 }

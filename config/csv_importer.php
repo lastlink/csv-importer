@@ -91,8 +91,6 @@ return [
             'field'           => 'ignored',
             'converter'       => 'Ignore',
             'mapper'          => null,
-
-
         ],
         'bill-id'               => [
             'mappable'        => true,
@@ -162,43 +160,43 @@ return [
             'converter'       => 'Description',
             'field'           => 'description',
         ],
-        'date-transaction'     => [
+        'date_transaction'     => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date',
         ],
-        'date-interest'        => [
+        'date_interest'        => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date-interest',
         ],
-        'date-book'            => [
+        'date_book'            => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date-book',
         ],
-        'date-process'         => [
+        'date_process'         => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date-process',
         ],
-        'date-due'             => [
+        'date_due'             => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date-due',
         ],
-        'date-payment'         => [
+        'date_payment'         => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date-payment',
         ],
-        'date-invoice'         => [
+        'date_invoice'         => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
@@ -423,7 +421,7 @@ return [
             'field'           => 'sepa_batch',
         ],
         // Internal reference
-        'internal-reference'   => [
+        'internal_reference'   => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',

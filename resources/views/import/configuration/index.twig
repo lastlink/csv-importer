@@ -32,6 +32,8 @@
                         <form method="post" action="{{ route('import.configure.post') }}" accept-charset="UTF-8" id="store">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
                             <input type="hidden" name="roles" value="{{ roles }}"/>
+                            <input type="hidden" name="do_mapping" value="{{ doMapping }}"/>
+                            <input type="hidden" name="mapping" value="{{ mapping }}"/>
                             <h4>File options</h4>
 
                             <div class="form-group row">

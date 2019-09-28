@@ -79,11 +79,16 @@ class ConfigurationController extends Controller
             $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
         }
 
-        // send roles through the form. A bit of a hack but OK.
-        $roles = base64_encode(json_encode($configuration->getRoles()));
+        // send other values through the form. A bit of a hack but OK.
+        $roles     = base64_encode(json_encode($configuration->getRoles()));
+        $doMapping = base64_encode(json_encode($configuration->getDoMapping()));
+        $mapping   = base64_encode(json_encode($configuration->getMapping()));
         // update configuration with old values if present? TODO
 
-        return view('import.configuration.index', compact('mainTitle', 'subTitle', 'accounts', 'specifics', 'configuration', 'roles'));
+        return view(
+            'import.configuration.index',
+            compact('mainTitle', 'subTitle', 'accounts', 'specifics', 'configuration', 'roles', 'mapping', 'doMapping')
+        );
     }
 
     /**

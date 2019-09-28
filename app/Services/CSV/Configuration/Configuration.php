@@ -22,6 +22,7 @@
 
 namespace App\Services\CSV\Configuration;
 
+use App\Services\CSV\Specifics\SpecificService;
 use Log;
 
 /**
@@ -52,6 +53,12 @@ class Configuration
     /** @var array */
     private $roles;
 
+    /** @var array */
+    private $doMapping;
+
+    /** @var array */
+    private $mapping;
+
     /**
      * @param array $roles
      */
@@ -60,6 +67,21 @@ class Configuration
         $this->roles = $roles;
     }
 
+    /**
+     * @param array $doMapping
+     */
+    public function setDoMapping(array $doMapping): void
+    {
+        $this->doMapping = $doMapping;
+    }
+
+    /**
+     * @param array $mapping
+     */
+    public function setMapping(array $mapping): void
+    {
+        $this->mapping = $mapping;
+    }
 
     /**
      * @return array
@@ -85,6 +107,8 @@ class Configuration
         $this->skipForm         = false;
         $this->specifics        = [];
         $this->roles            = [];
+        $this->mapping          = [];
+        $this->doMapping        = [];
     }
 
     /**
@@ -106,6 +130,8 @@ class Configuration
         $object->skipForm         = $array['skipForm'];
         $object->specifics        = $array['specifics'];
         $object->roles            = $array['roles'];
+        $object->mapping          = $array['mapping'];
+        $object->doMapping        = $array['do_mapping'];
 
         return $object;
     }
@@ -129,13 +155,13 @@ class Configuration
         $object->skipForm         = $array['skip_form'];
         $object->specifics        = $array['specifics'];
         $object->roles            = $array['roles'];
+        $object->mapping          = $array['mapping'];
+        $object->doMapping        = $array['do_mapping'];
 
         return $object;
     }
 
     /**
-     * TODO: column count and column roles. column mapping / do-mapping.
-     *
      * @param array $data
      *
      * @return $this
@@ -143,10 +169,32 @@ class Configuration
     public static function fromClassic(array $data): self
     {
         Log::debug('Now in Configuration::fromClassic', $data);
+
+        // todo move to config file
         $validDelimiters = [
             ','   => 'comma',
             ';'   => 'semicolon',
             'tab' => 'tab',
+        ];
+        // todo move to config file
+        $replaceOldRoles = [
+            'original-source'    => 'original_source',
+            'sepa-cc'            => 'sepa_cc',
+            'sepa-ct-op'         => 'sepa_ct_op',
+            'sepa-ct-id'         => 'sepa_ct_id',
+            'sepa-db'            => 'sepa_db',
+            'sepa-country'       => 'sepa_country',
+            'sepa-ep'            => 'sepa_ep',
+            'sepa-ci'            => 'sepa_ci',
+            'sepa-batch-id'      => 'sepa_batch_id',
+            'internal-reference' => 'internal_reference',
+            'date-interest'      => 'date_interest',
+            'date-invoice'       => 'date_invoice',
+            'date-book'          => 'date_book',
+            'date-payment'       => 'date_payment',
+            'date-process'       => 'date_process',
+            'date-due'           => 'date_due',
+            'date-transaction'   => 'date_transaction',
         ];
 
 
@@ -163,7 +211,7 @@ class Configuration
 
         $specifics = array_keys($data['specifics'] ?? []);
         foreach ($specifics as $name) {
-            $class = sprintf('App\\Services\\CSV\\Specifics\\%s', $name);
+            $class = SpecificService::fullClass($name);
             if (class_exists($class)) {
                 $object->specifics[] = $name;
             }
@@ -172,12 +220,28 @@ class Configuration
         // loop roles:
         $roles = $data['column-roles'] ?? [];
         foreach ($roles as $role) {
-            // exists in new system?
+
+            // some roles have been given a new name some time in the past.
+            $role = $replaceOldRoles[$role] ?? $role;
+
             $config = config(sprintf('csv_importer.import_roles.%s', $role));
             if (null !== $config) {
                 $object->roles[] = $role;
             }
         }
+
+        // loop do mapping
+        $doMapping = $data['column-do-mapping'] ?? [];
+        foreach ($doMapping as $index => $map) {
+            $object->doMapping[$index] = $map;
+        }
+
+        // loop mapping
+        $mapping = $data['column-mapping-config'] ?? [];
+        foreach ($mapping as $index => $map) {
+            $object->mapping[$index] = $map;
+        }
+
         return $object;
     }
 
@@ -198,6 +262,8 @@ class Configuration
             'skipForm'         => $this->skipForm,
             'specifics'        => $this->specifics,
             'roles'            => $this->roles,
+            'do_mapping'       => $this->doMapping,
+            'mapping'          => $this->mapping,
         ];
     }
 
@@ -266,6 +332,23 @@ class Configuration
     {
         return $this->ignoreTransfers;
     }
+
+    /**
+     * @return array
+     */
+    public function getDoMapping(): array
+    {
+        return $this->doMapping;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMapping(): array
+    {
+        return $this->mapping;
+    }
+
 
     /**
      * @return bool

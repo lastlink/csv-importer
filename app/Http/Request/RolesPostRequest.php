@@ -41,9 +41,16 @@ class RolesPostRequest extends Request
 
     public function getAll(): array
     {
-        return [
-            'roles' => $this->get('roles') ?? [],
+        $data = [
+            'roles'      => $this->get('roles') ?? [],
+            'do_mapping' => $this->get('do_mapping') ?? [],
         ];
+        foreach (array_keys($data['roles']) as $index) {
+
+            $data['do_mapping'][$index] = $this->convertBoolean($data['do_mapping'][$index] ?? false);
+        }
+
+        return $data;
     }
 
 
@@ -55,7 +62,9 @@ class RolesPostRequest extends Request
         $keys = implode(',', array_keys(config('csv_importer.import_roles')));
 
         return [
-            'roles.*' => sprintf('required|in:%s', $keys),
+            'roles.*'      => sprintf('required|in:%s', $keys),
+            'do_mapping.*' => 'numeric|between:0,1',
         ];
     }
+
 }

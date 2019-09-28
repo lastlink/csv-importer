@@ -239,4 +239,17 @@ class AbnAmroDescription implements SpecificInterface
 
         return false;
     }
+
+    /**
+     * If the fix(es) in your file add or remove columns from the CSV content, this must be reflected on the header row
+     * as well.
+     *
+     * @param array $headers
+     *
+     * @return array
+     */
+    public function runOnHeaders(array $headers): array
+    {
+        return $headers;
+    }
 }

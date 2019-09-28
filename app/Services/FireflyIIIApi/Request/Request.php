@@ -25,6 +25,7 @@ namespace App\Services\FireflyIIIApi\Request;
 use App\Exceptions\ApiException;
 use App\Exceptions\ApiHttpException;
 use App\Services\FireflyIIIApi\Response\Response;
+use Cache;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Log;
@@ -65,6 +66,16 @@ abstract class Request
         $this->parameters = $parameters;
     }
 
+    /**
+     * @return string
+     */
+    public function getCacheKey(): string
+    {
+        $cacheKey = hash('sha256', sprintf('%s-%s-%s-%s', $this->base, $this->token, $this->uri, json_encode($this->parameters)));
+
+        return $cacheKey;
+    }
+
 
     /**
      * @return array
@@ -73,12 +84,33 @@ abstract class Request
      */
     protected function authenticatedGet(): array
     {
-        Log::debug('Now in authenticatedGet()');
-        $fullUri = sprintf('%s/api/v1/%s', $this->getBase(), $this->getUri());
+        $cacheKey = $this->getCacheKey();
+        if (Cache::has($cacheKey)) {
+            Log::debug(sprintf('%s is present in cache.', substr($cacheKey, 0, 5)));
+
+            return Cache::get($cacheKey);
+        }
+
+        Log::debug(sprintf('%s is NOT present in cache.', substr($cacheKey, 0, 5)));
+
+        $this->freshAuthenticatedGet();
+    }
+
+    /**
+     * @return array
+     * @throws ApiException
+     * @throws GuzzleException
+     */
+    private function freshAuthenticatedGet(): array
+    {
+        Log::debug('freshAuthenticatedGet()');
+        $fullUri  = sprintf('%s/api/v1/%s', $this->getBase(), $this->getUri());
+        $cacheKey = $this->getCacheKey();
         if (null !== $this->parameters) {
             $fullUri = sprintf('%s?%s', $fullUri, http_build_query($this->parameters));
         }
-        Log::debug(sprintf('Full URI is %s', $fullUri));
+        //Log::debug(sprintf('Full URI is %s', $fullUri));
+        //Log::debug(sprintf('Now in freshAuthenticatedGet(%s): %s', $cacheKey, $fullUri));
 
         $client = $this->getClient();
         $res    = $client->request(
@@ -101,7 +133,8 @@ abstract class Request
         if (null === $json) {
             throw new ApiException(sprintf('Body is empty. Status code is %d.', $res->getStatusCode()));
         }
-        // do something with body.
+
+        Cache::put($cacheKey, $json, 604800);
 
         return $json;
     }

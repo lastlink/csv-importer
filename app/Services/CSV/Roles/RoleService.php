@@ -22,8 +22,8 @@
 
 namespace App\Services\CSV\Roles;
 
+use App\Services\CSV\Specifics\SpecificInterface;
 use App\Services\CSV\Specifics\SpecificService;
-use FireflyIII\Exceptions\FireflyException;
 use League\Csv\Exception;
 use League\Csv\Reader;
 use League\Csv\Statement;
@@ -35,13 +35,18 @@ use RuntimeException;
  */
 class RoleService
 {
+    public const EXAMPLE_LENGTH = 26;
+    public const EXAMPLE_COUNT  = 7;
+
     /**
      * @param string $content
      * @param bool   $hasHeaders
      *
+     * @param array  $specifics
+     *
      * @return array
      */
-    public static function getColumns(string $content, bool $hasHeaders): array
+    public static function getColumns(string $content, bool $hasHeaders, array $specifics): array
     {
         $reader  = Reader::createFromString($content);
         $headers = [];
@@ -74,6 +79,17 @@ class RoleService
             }
         }
 
+        // specific processors may add or remove headers.
+        // so those must be processed as well.
+        /** @var string $name */
+        foreach ($specifics as $name => $enabled) {
+            if ($enabled && SpecificService::exists($name)) {
+                /** @var SpecificInterface $object */
+                $object  = app(SpecificService::fullClass($name));
+                $headers = $object->runOnHeaders($headers);
+            }
+        }
+
         return $headers;
     }
 
@@ -90,7 +106,7 @@ class RoleService
         $examples = [];
         // make statement.
         try {
-            $stmt = (new Statement)->limit(10)->offset($offset);
+            $stmt = (new Statement)->limit(self::EXAMPLE_COUNT)->offset($offset);
             // @codeCoverageIgnoreStart
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -105,6 +121,9 @@ class RoleService
             $line = array_values($line);
             $line = SpecificService::runSpecifics($line, $specifics);
             foreach ($line as $index => $cell) {
+                if (strlen($cell) > self::EXAMPLE_LENGTH) {
+                    $cell = sprintf('%s...', substr($cell, 0, self::EXAMPLE_LENGTH));
+                }
                 $examples[$index][] = $cell;
                 $examples[$index]   = array_unique($examples[$index]);
             }

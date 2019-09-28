@@ -18,7 +18,8 @@
         "laravel/framework": "^6.0",
         "laravel/tinker": "^1.0",
         "league/csv": "^9.3",
-        "rcrowe/twigbridge": "^0.11.0"
+        "rcrowe/twigbridge": "^0.11.0",
+        "ext-bcmath": "*"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master"

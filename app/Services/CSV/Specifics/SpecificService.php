@@ -49,6 +49,26 @@ class SpecificService
     }
 
     /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public static function exists(string $name): bool
+    {
+        return class_exists(self::fullClass($name));
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    public static function fullClass(string $name): string
+    {
+        return sprintf('App\\Services\\CSV\\Specifics\\%s', $name);
+    }
+
+    /**
      * @param array $row
      * @param array $specifics
      *
@@ -56,11 +76,11 @@ class SpecificService
      */
     public static function runSpecifics(array $row, array $specifics): array
     {
-        foreach ($specifics as $name) {
-            $class = sprintf('App\\Services\\CSV\\Specifics\\%s', $name);
-            if (class_exists($class)) {
+        /** @var string $name */
+        foreach ($specifics as $name => $enabled) {
+            if($enabled && self::exists($name)) {
                 /** @var SpecificInterface $object */
-                $object = app($class);
+                $object = app(self::fullClass($name));
                 $row    = $object->run($row);
             }
         }

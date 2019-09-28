@@ -38,4 +38,7 @@ class Constants
     /** @var string string */
     public const ROLES_COMPLETE_INDICATOR = 'role_config_complete';
 
+    /** @var string */
+    public const MAPPING_COMPLETE_INDICATOR = 'mapping_config_complete';
+
 }

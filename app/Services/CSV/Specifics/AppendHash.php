@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace App\Services\CSV\Specifics;
 
+use Log;
+
 /**
  * Class AppendHash.
  *
@@ -73,9 +75,27 @@ class AppendHash implements SpecificInterface
             $this->lines_counter[$representation] = 1;
         }
         $to_hash = sprintf('%s,%s', $representation, $this->lines_counter[$representation]);
+        $hash    = hash('sha256', $to_hash);
 
-        $row[] = hash('sha256', $to_hash);
+        Log::debug(sprintf('Row is hashed to %s', $hash));
+
+        $row[] = $hash;
 
         return $row;
+    }
+
+    /**
+     * If the fix(es) in your file add or remove columns from the CSV content, this must be reflected on the header row
+     * as well.
+     *
+     * @param array $headers
+     *
+     * @return array
+     */
+    public function runOnHeaders(array $headers): array
+    {
+        $headers[] = 'unique-hash';
+
+        return $headers;
     }
 }
