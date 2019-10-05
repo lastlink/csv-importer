@@ -25,11 +25,12 @@ namespace App\Services\FireflyIIIApi\Response;
 use App\Services\FireflyIIIApi\Model\TransactionCurrency;
 use Illuminate\Support\Collection;
 use Iterator;
+use Countable;
 
 /**
  * Class GetCurrenciesResponse
  */
-class GetCurrenciesResponse extends Response implements Iterator
+class GetCurrenciesResponse extends Response implements Iterator, Countable
 {
     /** @var Collection */
     private $collection;
@@ -111,5 +112,20 @@ class GetCurrenciesResponse extends Response implements Iterator
     public function valid(): bool
     {
         return $this->collection->has($this->position);
+    }
+
+    /**
+     * Count elements of an object
+     *
+     * @link  https://php.net/manual/en/countable.count.php
+     * @return int The custom count as an integer.
+     * </p>
+     * <p>
+     * The return value is cast to an integer.
+     * @since 5.1.0
+     */
+    public function count(): int
+    {
+        return $this->collection->count();
     }
 }

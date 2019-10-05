@@ -93,5 +93,12 @@ class GetAccountsRequest extends Request
     }
 
 
-
+    /**
+     * @return Response
+     * @throws ApiHttpException
+     */
+    public function post(): Response
+    {
+        // TODO: Implement post() method.
+    }
 }

@@ -65,10 +65,11 @@ class MapController extends Controller
 
         foreach ($roles as $index => $role) {
             $info = config('csv_importer.import_roles')[$role] ?? null;
+            $mappable = $info['mappable'] ?? false;
             if (null === $info) {
                 continue;
             }
-            if (false === $info['mappable']) {
+            if (false === $mappable) {
                 continue;
             }
             $info['role']   = $role;
@@ -144,5 +145,7 @@ class MapController extends Controller
 
         // set map config as complete.
         session()->put(Constants::MAPPING_COMPLETE_INDICATOR, true);
+
+        return redirect()->route('import.run.index');
     }
 }

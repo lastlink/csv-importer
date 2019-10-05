@@ -25,6 +25,7 @@ namespace App\Http\Controllers\Import;
 
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\UploadedFiles;
+use Illuminate\Http\JsonResponse;
 
 /**
  * Class StartController
@@ -51,4 +52,5 @@ class StartController extends Controller
 
         return view('import.index', compact('mainTitle', 'subTitle'));
     }
+
 }

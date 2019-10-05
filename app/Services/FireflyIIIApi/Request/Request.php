@@ -35,6 +35,7 @@ use Log;
  */
 abstract class Request
 {
+    protected const VALIDATION_ERROR_MSG = 'The given data was invalid.';
     /** @var string */
     private $base;
     /** @var string */
@@ -43,12 +44,36 @@ abstract class Request
     private $uri;
     /** @var array */
     private $parameters;
+    /** @var array */
+    private $body;
+
+    /**
+     * @return array
+     */
+    public function getBody(): ?array
+    {
+        return $this->body;
+    }
+
+    /**
+     * @param array $body
+     */
+    public function setBody(array $body): void
+    {
+        $this->body = $body;
+    }
 
     /**
      * @return Response
      * @throws ApiHttpException
      */
     abstract public function get(): Response;
+
+    /**
+     * @return Response
+     * @throws ApiHttpException
+     */
+    abstract public function post(): Response;
 
     /**
      * @return array
@@ -87,14 +112,64 @@ abstract class Request
         $cacheKey = $this->getCacheKey();
         if (Cache::has($cacheKey)) {
             Log::debug(sprintf('%s is present in cache.', substr($cacheKey, 0, 5)));
-
             return Cache::get($cacheKey);
         }
 
         Log::debug(sprintf('%s is NOT present in cache.', substr($cacheKey, 0, 5)));
 
-        $this->freshAuthenticatedGet();
+        return $this->freshAuthenticatedGet();
     }
+
+    /**
+     * @return array
+     * @throws ApiException
+     * @throws GuzzleException
+     */
+    protected function authenticatedPost(): array
+    {
+        Log::debug('authenticatedPost()');
+        $fullUri = sprintf('%s/api/v1/%s', $this->getBase(), $this->getUri());
+        if (null !== $this->parameters) {
+            $fullUri = sprintf('%s?%s', $fullUri, http_build_query($this->parameters));
+        }
+
+        $client = $this->getClient();
+        $res    = $client->request(
+            'POST', $fullUri, [
+                      'headers'    => [
+                          'Accept'        => 'application/json',
+                          'Content-Type'  => 'application/json',
+                          'Authorization' => sprintf('Bearer %s', $this->getToken()),
+                      ],
+                      'exceptions' => false,
+                      'verify'     => resource_path('certs/ca.cert.pem'),
+                      'body'       => json_encode($this->getBody()),
+                  ]
+        );
+        if (422 === $res->getStatusCode()) {
+            $body = $res->getBody();
+            $json = json_decode($body, true);
+
+            if (null === $json) {
+                throw new ApiException(sprintf('Body is empty. Status code is %d.', $res->getStatusCode()));
+            }
+
+            return $json;
+        }
+        if (200 !== $res->getStatusCode()) {
+            throw new ApiException(sprintf('Status code is %d', $res->getStatusCode()));
+        }
+
+        $body = $res->getBody();
+        $json = json_decode($body, true);
+
+        if (null === $json) {
+            throw new ApiException(sprintf('Body is empty. Status code is %d.', $res->getStatusCode()));
+        }
+
+        return $json;
+    }
+
 
     /**
      * @return array
@@ -124,7 +199,7 @@ abstract class Request
         );
 
         if (200 !== $res->getStatusCode()) {
-            throw new ApiException('Status code is %d', $res->getStatusCode());
+            throw new ApiException(sprintf('Status code is %d', $res->getStatusCode()));
         }
 
         $body = $res->getBody();

@@ -49,10 +49,10 @@ class RoleController extends Controller
         /**
          * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
          */
-        public function index()
-        {
-            $mainTitle = 'Define roles';
-            $subTitle  = 'Configure the role of each column in your file';
+    public function index()
+    {
+        $mainTitle = 'Define roles';
+        $subTitle  = 'Configure the role of each column in your file';
 
         // get configuration object.
         $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));

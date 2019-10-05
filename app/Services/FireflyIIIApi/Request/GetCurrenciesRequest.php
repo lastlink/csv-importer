@@ -35,7 +35,7 @@ use GuzzleHttp\Exception\GuzzleException;
 class GetCurrenciesRequest extends Request
 {
     /**
-     * GetAccountsRequest constructor.
+     * GetCurrenciesRequest constructor.
      */
     public function __construct()
     {
@@ -60,5 +60,14 @@ class GetCurrenciesRequest extends Request
         $response = new GetCurrenciesResponse($data['data']);
 
         return $response;
+    }
+
+    /**
+     * @return Response
+     * @throws ApiHttpException
+     */
+    public function post(): Response
+    {
+        // TODO: Implement post() method.
     }
 }

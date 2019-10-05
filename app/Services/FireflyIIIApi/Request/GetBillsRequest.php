@@ -61,4 +61,13 @@ class GetBillsRequest extends Request
 
         return $response;
     }
+
+    /**
+     * @return Response
+     * @throws ApiHttpException
+     */
+    public function post(): Response
+    {
+        // TODO: Implement post() method.
+    }
 }

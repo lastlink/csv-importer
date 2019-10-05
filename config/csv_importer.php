@@ -84,7 +84,7 @@ return [
      *
      *
      */
-    'import_roles' => [
+    'import_roles'        => [
         '_ignore'               => [
             'mappable'        => false,
             'pre-process-map' => false,
@@ -96,68 +96,67 @@ return [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'bill',
-            'converter'       => 'BillId',
+            'converter'       => 'CleanInteger',
             'mapper'          => 'Bills',
         ],
         'note'                  => [
             'mappable'        => false,
             'pre-process-map' => false,
             'field'           => 'note',
-            'converter'       => 'Note',
+            'converter'       => 'CleanNlString',
         ],
         'bill-name'             => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'bill',
-            'converter'       => 'BillName',
+            'converter'       => 'CleanString',
             'mapper'          => 'Bills',
         ],
         'currency-id'           => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'currency',
-            'converter'       => 'CurrencyId',
+            'converter'       => 'CleanInteger',
             'mapper'          => 'TransactionCurrencies',
         ],
         'currency-name'         => [
             'mappable'        => true,
             'pre-process-map' => false,
-            'converter'       => 'CurrencyName',
+            'converter'       => 'CleanString',
             'field'           => 'currency',
             'mapper'          => 'TransactionCurrencies',
         ],
         'currency-code'         => [
             'mappable'        => true,
             'pre-process-map' => false,
-            'converter'       => 'CurrencyCode',
+            'converter'       => 'CleanString',
             'field'           => 'currency',
             'mapper'          => 'TransactionCurrencies',
         ],
         'foreign-currency-code' => [
             'mappable'        => true,
             'pre-process-map' => false,
-            'converter'       => 'CurrencyCode',
+            'converter'       => 'CleanString',
             'field'           => 'foreign_currency',
             'mapper'          => 'TransactionCurrencies',
         ],
         'external-id'           => [
             'mappable'        => false,
             'pre-process-map' => false,
-            'converter'       => 'ExternalId',
+            'converter'       => 'CleanString',
             'field'           => 'external-id',
         ],
-
         'currency-symbol'      => [
             'mappable'        => true,
             'pre-process-map' => false,
-            'converter'       => 'CurrencySymbol',
+            'converter'       => 'CleanString',
             'field'           => 'currency',
             'mapper'          => 'TransactionCurrencies',
         ],
         'description'          => [
             'mappable'        => false,
             'pre-process-map' => false,
-            'converter'       => 'Description',
+            'converter'       => 'CleanString',
             'field'           => 'description',
         ],
         'date_transaction'     => [
@@ -205,19 +204,19 @@ return [
         'budget-id'            => [
             'mappable'        => true,
             'pre-process-map' => false,
-            'converter'       => 'BudgetId',
+            'converter'       => 'CleanInteger',
             'field'           => 'budget',
             'mapper'          => 'Budgets',
         ],
         'budget-name'          => [
             'mappable'        => true,
             'pre-process-map' => false,
-            'converter'       => 'BudgetName',
+            'converter'       => 'CleanString',
             'field'           => 'budget',
             'mapper'          => 'Budgets',
         ],
         'rabo-debit-credit'    => [
-            'mappable'        => false,
+            'mappable   '     => false,
             'pre-process-map' => false,
             'converter'       => 'BankDebitCredit',
             'field'           => 'amount-modifier',
@@ -237,14 +236,14 @@ return [
         'category-id'          => [
             'mappable'        => true,
             'pre-process-map' => false,
-            'converter'       => 'CategoryId',
+            'converter'       => 'CleanInteger',
             'field'           => 'category',
             'mapper'          => 'Categories',
         ],
         'category-name'        => [
             'mappable'        => true,
             'pre-process-map' => false,
-            'converter'       => 'CategoryName',
+            'converter'       => 'CleanString',
             'field'           => 'category',
             'mapper'          => 'Categories',
         ],
@@ -268,21 +267,21 @@ return [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'asset-account-id',
-            'converter'       => 'AccountId',
+            'converter'       => 'CleanInteger',
             'mapper'          => 'AssetAccounts',
         ],
         'account-name'         => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'asset-account-name',
-            'converter'       => 'AssetAccountName',
+            'converter'       => 'CleanString',
             'mapper'          => 'AssetAccounts',
         ],
         'account-iban'         => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'asset-account-iban',
-            'converter'       => 'AssetAccountIban',
+            'converter'       => 'Iban',
             'mapper'          => 'AssetAccountIbans',
 
         ],
@@ -290,47 +289,47 @@ return [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'asset-account-number',
-            'converter'       => 'AssetAccountNumber',
+            'converter'       => 'CleanString',
             'mapper'          => 'AssetAccounts',
         ],
         'account-bic'          => [
             'mappable'        => false,
             'pre-process-map' => false,
             'field'           => 'asset-account-bic',
-            'converter'       => 'AccountBic',
+            'converter'       => 'CleanString',
         ],
         'opposing-id'          => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'opposing-account-id',
-            'converter'       => 'AccountId',
+            'converter'       => 'CleanInteger',
             'mapper'          => 'OpposingAccounts',
         ],
         'opposing-bic'         => [
             'mappable'        => false,
             'pre-process-map' => false,
             'field'           => 'opposing-account-bic',
-            'converter'       => 'AccountBic',
+            'converter'       => 'CleanString',
         ],
         'opposing-name'        => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'opposing-account-name',
-            'converter'       => 'OpposingAccountName',
+            'converter'       => 'CleanString',
             'mapper'          => 'OpposingAccounts',
         ],
         'opposing-iban'        => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'opposing-account-iban',
-            'converter'       => 'OpposingAccountIban',
+            'converter'       => 'Iban',
             'mapper'          => 'OpposingAccountIbans',
         ],
         'opposing-number'      => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'opposing-account-number',
-            'converter'       => 'OpposingAccountNumber',
+            'converter'       => 'CleanString',
             'mapper'          => 'OpposingAccounts',
         ],
         'amount'               => [
@@ -363,69 +362,114 @@ return [
             'converter'       => 'Amount',
             'field'           => 'amount_foreign',
         ],
-
-        // SEPA end to end ID
         'sepa_ct_id'           => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_ct_id',
         ],
-        // SEPA opposing account identifier
         'sepa_ct_op'           => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_ct_op',
         ],
-        // SEPA Direct Debit Mandate Identifier
         'sepa_db'              => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_db',
         ],
-        // SEPA clearing code
         'sepa_cc'              => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_cc',
         ],
-        // SEPA country
         'sepa_country'         => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_country',
         ],
-        // SEPA external purpose
         'sepa_ep'              => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_ep',
         ],
-        // SEPA creditor identifier
         'sepa_ci'              => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_ci',
         ],
-        // SEPA Batch ID
         'sepa_batch_id'        => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_batch',
         ],
-        // Internal reference
         'internal_reference'   => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'internal_reference',
         ],
+    ],
+    'role_to_transaction' => [
+        'account-id'            => 'source_id',
+        'account-iban'          => 'source_iban',
+        'account-name'          => 'source_name',
+        'account-number'        => 'source_number',
+        'account-bic'           => 'source_bic', // TODO not present in API.
+        'opposing-id'           => 'destination_id',
+        'opposing-iban'         => 'destination_iban',
+        'opposing-name'         => 'destination_name',
+        'opposing-number'       => 'destination_number',
+        'opposing-bic'          => 'destination_bic', // TODO not present in API.
+        'sepa_cc'               => 'sepa_cc',
+        'sepa_ct_op'            => 'sepa_ct_op',
+        'sepa_ct_id'            => 'sepa_ct_id',
+        'sepa_db'               => 'sepa_db',
+        'sepa_country'          => 'sepa_country',
+        'sepa_ep'               => 'sepa_ep',
+        'sepa_ci'               => 'sepa_ci',
+        'sepa_batch_id'         => 'sepa_batch_id',
+        'amount'                => 'amount', // TODO needs work
+        'amount_debit'          => 'amount_debit', // TODO needs work
+        'amount_credit'         => 'amount_credit', // TODO needs work
+        'amount_negated'        => 'amount_negated', // TODO needs work
+        'amount_foreign'        => 'foreign_amount',
+        'foreign-currency-id'   => 'foreign_currency_id',
+        'foreign-currency-code' => 'foreign_currency_code',
+        'bill-id'               => 'bill_id',
+        'bill-name'             => 'bill_name',
+        'budget-id'             => 'budget_id',
+        'budget-name'           => 'budget_name',
+        'category-id'           => 'category_id',
+        'category-name'         => 'category_name',
+        'currency-id'           => 'currency_id',
+        'currency-name'         => 'currency_name',
+        'currency-symbol'       => 'currency_symbol',
+        'description'           => 'description',
+        'note'                  => 'notes',
+        'ing-debit-credit'      => 'ing-debit-credit', // TODO needs conversion.
+        'rabo-debit-credit'     => 'rabo-debit-credit', // TODO needs conversion.
+        'generic-debit-credit'  => 'generic-debit-credit',// TODO needs conversion.
+        'external-id'           => 'external_id',
+        'internal_reference'    => 'internal_reference',
+        'original-source'       => 'original_source',
+        'tags-comma'            => 'tags_comma', // TODO needs extra conversion
+        'tags-space'            => 'tags_space', // TODO needs extra conversion
+        'date_transaction'      => 'date',
+        'date_interest'         => 'date_interest',
+        'date_book'             => 'date_book',
+        'date_process'          => 'date_process',
+        'date_due'              => 'date_due',
+        'date_payment'          => 'date_payment',
+        'date_invoice'          => 'date_invoice',
+        'currency-code'         => 'currency_code',
+
     ],
 ];

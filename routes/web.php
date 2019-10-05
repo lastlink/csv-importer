@@ -50,3 +50,7 @@ Route::post('/import/mapping', ['uses' => 'Import\MapController@postIndex', 'as'
 
 // run import
 Route::get('/import/run', ['uses' => 'Import\RunController@index', 'as' => 'import.run.index']);
+
+// start import routine.
+Route::any('/import/job/start', ['uses' => 'Import\RunController@start', 'as' => 'import.job.start']);
+Route::get('/import/job/status', ['uses' => 'Import\RunController@status', 'as' => 'import.job.status']);

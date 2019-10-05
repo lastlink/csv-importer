@@ -41,4 +41,7 @@ class Constants
     /** @var string */
     public const MAPPING_COMPLETE_INDICATOR = 'mapping_config_complete';
 
+    /** @var string */
+    public const JOB_STATUS = 'import_job_status';
+
 }
