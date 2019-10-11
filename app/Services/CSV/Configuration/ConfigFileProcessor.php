@@ -41,7 +41,7 @@ class ConfigFileProcessor
         $content = StorageService::getContent($fileName);
         $json    = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
-        return Configuration::fromClassic($json);
+        return Configuration::fromFile($json);
 
     }
 

@@ -96,7 +96,7 @@ return [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'bill',
-            'converter'       => 'CleanInteger',
+            'converter'       => 'CleanId',
             'mapper'          => 'Bills',
         ],
         'note'                  => [
@@ -116,7 +116,7 @@ return [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'currency',
-            'converter'       => 'CleanInteger',
+            'converter'       => 'CleanId',
             'mapper'          => 'TransactionCurrencies',
         ],
         'currency-name'         => [
@@ -204,7 +204,7 @@ return [
         'budget-id'            => [
             'mappable'        => true,
             'pre-process-map' => false,
-            'converter'       => 'CleanInteger',
+            'converter'       => 'CleanId',
             'field'           => 'budget',
             'mapper'          => 'Budgets',
         ],
@@ -236,7 +236,7 @@ return [
         'category-id'          => [
             'mappable'        => true,
             'pre-process-map' => false,
-            'converter'       => 'CleanInteger',
+            'converter'       => 'CleanId',
             'field'           => 'category',
             'mapper'          => 'Categories',
         ],
@@ -267,7 +267,7 @@ return [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'asset-account-id',
-            'converter'       => 'CleanInteger',
+            'converter'       => 'CleanId',
             'mapper'          => 'AssetAccounts',
         ],
         'account-name'         => [
@@ -302,7 +302,7 @@ return [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'opposing-account-id',
-            'converter'       => 'CleanInteger',
+            'converter'       => 'CleanId',
             'mapper'          => 'OpposingAccounts',
         ],
         'opposing-bic'         => [
@@ -463,13 +463,13 @@ return [
         'tags-comma'            => 'tags_comma', // TODO needs extra conversion
         'tags-space'            => 'tags_space', // TODO needs extra conversion
         'date_transaction'      => 'date',
-        'date_interest'         => 'date_interest',
-        'date_book'             => 'date_book',
-        'date_process'          => 'date_process',
-        'date_due'              => 'date_due',
-        'date_payment'          => 'date_payment',
-        'date_invoice'          => 'date_invoice',
-        'currency-code'         => 'currency_code',
+        'date_interest'         => 'interest_date',
+        'date_book'             => 'book_date',
+        'date_process'          => 'process_date',
+        'date_due'              => 'due_date',
+        'date_payment'          => 'payment_date',
+        'date_invoice'          => 'invoice_date',
+        'currency-code'         => 'code_currency',
 
     ],
 ];

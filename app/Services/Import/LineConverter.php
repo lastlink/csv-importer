@@ -72,53 +72,53 @@ class LineConverter
                     'type'                  => 'withdrawal',
                     'date'                  => '',
                     'currency_id'           => null,
-                    'currency_code'         => null,
-                    'foreign_currency_id'   => null,
-                    'foreign_currency_code' => null,
+                    //'currency_code'         => null,
+                    //'foreign_currency_id'   => null,
+                    //'foreign_currency_code' => null,
                     'amount'                => null,
-                    'foreign_amount'        => null,
+                    //'foreign_amount'        => null,
                     'description'           => null,
                     'source_id'             => null,
                     'source_name'           => null,
-                    'source_iban'           => null, // TODO unsupported by API!
-                    'source_number'         => null, // TODO unsupported by API!
-                    'source_bic'            => null, // TODO unsupported by API.
+                    //'source_iban'           => null, // TODO unsupported by API!
+                    //'source_number'         => null, // TODO unsupported by API!
+                    //'source_bic'            => null, // TODO unsupported by API.
                     'destination_id'        => null,
                     'destination_name'      => null,
-                    'destination_iban'      => null, // TODO unsupported by API!
-                    'destination_number'    => null, // TODO unsupported by API!
-                    'destination_bic'       => null, // TODO unsupported by API.
-                    'budget_id'             => null,
-                    'budget_name'           => null,
-                    'category_id'           => null,
-                    'category_name'         => null,
-                    'bill_id'               => null,
-                    'bill_name'             => null,
-                    'piggy_bank_id'         => null,
-                    'piggy_bank_name'       => null,
-                    'reconciled'            => false,
-                    'notes'                 => null,
-                    'tags'                  => [],
-                    'internal_reference'    => null,
-                    'external_id'           => null,
-                    'original_source'       => null,
-                    'recurrence_id'         => null,
-                    'bunq_payment_id'       => null,
-                    'importHashV2'          => null,
-                    'sepa_cc'               => null,
-                    'sepa_ct_op'            => null,
-                    'sepa_ct_id'            => null,
-                    'sepa_db'               => null,
-                    'sepa_country'          => null,
-                    'sepa_ep'               => null,
-                    'sepa_ci'               => null,
-                    'sepa_batch_id'         => null,
-                    'interest_date'         => null,
-                    'book_date'             => null,
-                    'process_date'          => null,
-                    'due_date'              => null,
-                    'payment_date'          => null,
-                    'invoice_date'          => null,
+                    //'destination_iban'      => null, // TODO unsupported by API!
+                    //'destination_number'    => null, // TODO unsupported by API!
+                    //'destination_bic'       => null, // TODO unsupported by API.
+                    //'budget_id'             => null,
+                    //'budget_name'           => null,
+                    //'category_id'           => null,
+                    //'category_name'         => null,
+                    //'bill_id'               => null,
+                    //'bill_name'             => null,
+                    //'piggy_bank_id'         => null,
+                    //'piggy_bank_name'       => null,
+                    //'reconciled'            => false,
+                    //'notes'                 => null,
+                    //'tags'                  => [],
+                    //'internal_reference'    => null,
+                    //'external_id'           => null,
+                    //'original_source'       => null,
+                    //'recurrence_id'         => null,
+                    //'bunq_payment_id'       => null,
+                    //'importHashV2'          => null,
+                    //'sepa_cc'               => null,
+                    //'sepa_ct_op'            => null,
+                    //'sepa_ct_id'            => null,
+                    //'sepa_db'               => null,
+                    //'sepa_country'          => null,
+                    //'sepa_ep'               => null,
+                    //'sepa_ci'               => null,
+                    //'sepa_batch_id'         => null,
+                    //'interest_date'         => null,
+                    //'book_date'             => null,
+                    //'process_date'          => null,
+                    //'due_date'              => null,
+                    //'payment_date'          => null,
+                    //'invoice_date'          => null,
                 ],
             ],
         ];
@@ -133,7 +133,6 @@ class LineConverter
                 throw new RuntimeException(sprintf('No place for role "%s"', $value->getRole()));
             }
             $transaction['transactions'][0][$transactionField] = $value->getParsedValue();
-
         }
 
         return $transaction;

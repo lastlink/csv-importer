@@ -45,4 +45,14 @@ class FileReader
         return $reader;
     }
 
+    /**
+     * @param string $content
+     *
+     * @return Reader
+     */
+    public static function getReaderFromContent(string $content): Reader
+    {
+        return Reader::createFromString($content);
+    }
+
 }

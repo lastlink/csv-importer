@@ -127,25 +127,31 @@ abstract class Request
      */
     protected function authenticatedPost(): array
     {
-        Log::debug('authenticatedPost()');
+        Log::debug(sprintf('Now in %s', __METHOD__));
         $fullUri = sprintf('%s/api/v1/%s', $this->getBase(), $this->getUri());
         if (null !== $this->parameters) {
             $fullUri = sprintf('%s?%s', $fullUri, http_build_query($this->parameters));
         }
+        Log::debug(sprintf('Full URL is %s', $fullUri));
 
-        $client = $this->getClient();
-        $res    = $client->request(
-            'POST', $fullUri, [
-                      'headers'    => [
-                          'Accept'        => 'application/json',
-                          'Content-Type'  => 'application/json',
-                          'Authorization' => sprintf('Bearer %s', $this->getToken()),
-                      ],
-                      'exceptions' => false,
-                      'verify'     => resource_path('certs/ca.cert.pem'),
-                      'body'       => json_encode($this->getBody()),
-                  ]
-        );
+        $client  = $this->getClient();
+        $options = [
+            'headers'    => [
+                'Accept'        => 'application/json',
+                'Content-Type'  => 'application/json',
+                'Authorization' => sprintf('Bearer %s', $this->getToken()),
+            ],
+            'exceptions' => false,
+            'verify'     => resource_path('certs/ca.cert.pem'),
+            'body'       => json_encode($this->getBody()),
+        ];
+
+        $debugOpt = $options;
+        unset($debugOpt['body']);
+        Log::debug('Options are' , $debugOpt);
+        Log::debug('Body is', $this->getBody());
+
+        $res = $client->request('POST', $fullUri, $options);
         if (422 === $res->getStatusCode()) {
             $body = $res->getBody();
             $json = json_decode($body, true);
@@ -157,6 +163,8 @@ abstract class Request
             return $json;
         }
         if (200 !== $res->getStatusCode()) {
+            Log::error(sprintf('Status code is %d', $res->getStatusCode()));
+            Log::error((string)$res->getBody());
             throw new ApiException(sprintf('Status code is %d', $res->getStatusCode()));
         }
 

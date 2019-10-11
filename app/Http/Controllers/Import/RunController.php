@@ -24,7 +24,8 @@ namespace App\Http\Controllers\Import;
 
 
 use App\Http\Controllers\Controller;
-use App\Services\Import\ImportJobStatus\ImportJobStatus;
+use App\Services\CSV\Configuration\Configuration;
+use App\Services\CSV\File\FileReader;
 use App\Services\Import\ImportJobStatus\ImportJobStatusManager;
 use App\Services\Import\ImportRoutineManager;
 use App\Services\Session\Constants;
@@ -55,6 +56,8 @@ class RunController extends Controller
         $importJobStatus = ImportJobStatusManager::startOrFindJob();
         // TODO also start job.
         $routine = new ImportRoutineManager;
+        $routine->setConfiguration(Configuration::fromArray(session()->get(Constants::CONFIGURATION)));
+        $routine->setReader(FileReader::getReaderFromSession());
         $routine->start();
 
 

@@ -25,9 +25,11 @@ namespace App\Services\FireflyIIIApi\Request;
 
 use App\Exceptions\ApiException;
 use App\Exceptions\ApiHttpException;
+use App\Services\FireflyIIIApi\Response\PostTransactionResponse;
 use App\Services\FireflyIIIApi\Response\Response;
 use App\Services\FireflyIIIApi\Response\ValidationErrorResponse;
 use GuzzleHttp\Exception\GuzzleException;
+use Log;
 
 /**
  * Class PostTransactionRequest
@@ -61,6 +63,7 @@ class PostTransactionRequest extends Request
      */
     public function post(): Response
     {
+        Log::debug(sprintf('Now in %s', __METHOD__));
         try {
             $data = $this->authenticatedPost();
         } catch (ApiException|GuzzleException $e) {
@@ -70,11 +73,6 @@ class PostTransactionRequest extends Request
             return new ValidationErrorResponse($data['errors']);
         }
 
-        var_dump($data);exit;
-
-
-        $response = new PostTransactionResponse($data['data']);
-
-        return $response;
+        return new PostTransactionResponse($data['data']);
     }
 }

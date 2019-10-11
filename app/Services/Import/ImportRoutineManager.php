@@ -23,17 +23,19 @@
 namespace App\Services\Import;
 
 use App\Services\CSV\Configuration\Configuration;
-use App\Services\CSV\File\FileReader;
+use App\Services\CSV\Converter\Amount;
 use App\Services\CSV\Specifics\SpecificService;
+use App\Services\FireflyIIIApi\Model\Transaction;
+use App\Services\FireflyIIIApi\Model\TransactionGroup;
 use App\Services\FireflyIIIApi\Request\GetCurrencyRequest;
 use App\Services\FireflyIIIApi\Request\GetPreferenceRequest;
 use App\Services\FireflyIIIApi\Request\GetSearchAccountRequest;
 use App\Services\FireflyIIIApi\Request\PostTransactionRequest;
 use App\Services\FireflyIIIApi\Response\GetAccountsResponse;
 use App\Services\FireflyIIIApi\Response\GetCurrencyResponse;
+use App\Services\FireflyIIIApi\Response\PostTransactionResponse;
 use App\Services\FireflyIIIApi\Response\PreferenceResponse;
 use App\Services\FireflyIIIApi\Response\ValidationErrorResponse;
-use App\Services\Session\Constants;
 use League\Csv\Exception;
 use League\Csv\Reader;
 use League\Csv\ResultSet;
@@ -49,8 +51,6 @@ class ImportRoutineManager
     /** @var Configuration */
     private $configuration;
     /** @var array */
-    private $errorMessages;
-    /** @var array */
     private $errors;
     /** @var LineConverter */
     private $lineConverter;
@@ -60,6 +60,11 @@ class ImportRoutineManager
     private $messages;
     /** @var Reader */
     private $reader;
+    /** @var array */
+    private $warnings;
+
+    /** @var int */
+    private $total;
 
     /**
      * Collect info on the current job, hold it in memory.
@@ -69,17 +74,32 @@ class ImportRoutineManager
     public function __construct()
     {
         Log::debug('Constructed ImportRoutineManager');
-        // get config:
-        $this->configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
+
+        // get line converter
+        $this->lineConverter = new LineConverter();
+        $this->total         = 0;
+        $this->errors        = [];
+        $this->messages      = [];
+    }
+
+    /**
+     * @param Configuration $configuration
+     */
+    public function setConfiguration(Configuration $configuration): void
+    {
+        $this->configuration = $configuration;
 
         // get line processor
         $this->lineProcessor = new LineProcessor($this->configuration->getRoles(), $this->configuration->getMapping(), $this->configuration->getDoMapping());
 
-        // get line converter
-        $this->lineConverter = new LineConverter();
+    }
 
-        // get reader
-        $this->reader = FileReader::getReaderFromSession();
+    /**
+     * @param Reader $reader
+     */
+    public function setReader(Reader $reader): void
+    {
+        $this->reader = $reader;
     }
 
     /**
@@ -102,86 +122,160 @@ class ImportRoutineManager
         $currencyRequest = new GetCurrencyRequest();
         $currencyRequest->setCode($code);
         /** @var GetCurrencyResponse $result */
-        $result   = $currencyRequest->get();
-        $currency = $result->getCurrency();
-        // currencyPreference
-
-
+        $result       = $currencyRequest->get();
+        $currency     = $result->getCurrency();
         $transactions = $this->convertToTransactions($lines);
-        // improve accounts
-
+        $this->total  = count($transactions);
         // TODO move to other objects.
-        // TODO API must be able to handle NULL: group_title, currency_code, foreign_curency_id, foreign_currency_code
         foreach ($transactions as $index => $group) {
             foreach ($group['transactions'] as $groupIndex => $transaction) {
+                // set currency ID if not set in array
+                if (0 === $transaction['currency_id']
+                    && (null === $transaction['currency_code'] || '' === $transaction['currency_code'])) {
+                    $transaction['currency_id'] = $currency->id;
+                }
 
-
-                if (0 === $transactions[$index]['transactions'][$groupIndex]['currency_id']
-                    && null === $transactions[$index]['transactions'][$groupIndex]['currency_code']) {
-                    $transactions[$index]['transactions'][$groupIndex]['currency_id'] = $currency->id;
-                    unset($transactions[$index]['transactions'][$groupIndex]['currency_code']);
-                }
-                if (null === $transactions[$index]['transactions'][$groupIndex]['foreign_currency_code']) {
-                    unset($transactions[$index]['transactions'][$groupIndex]['foreign_currency_code']);
-                }
-                if(0=== $transactions[$index]['transactions'][$groupIndex]['destination_id']) {
-                    unset($transactions[$index]['transactions'][$groupIndex]['destination_id']);
-                }
-                $sourceArray = [
+                // get source + dest accounts:
+                $sourceArray        = [
                     'transaction_type' => $transaction['type'],
                     'id'               => $transaction['source_id'],
                     'name'             => $transaction['source_name'],
-                    'iban'             => $transaction['source_iban'],
-                    'number'           => $transaction['source_number'],
+                    'iban'             => $transaction['source_iban'] ?? null,
+                    'number'           => $transaction['source_number'] ?? null,
                 ];
-                $source      = $this->findAccount($sourceArray);
-                if (0 !== $source['id']) {
-                    $transactions[$index]['transactions'][$groupIndex]['source_id']     = $source['id'];
-                    $transactions[$index]['transactions'][$groupIndex]['source_name']   = null;
-                    $transactions[$index]['transactions'][$groupIndex]['source_iban']   = null;
-                    $transactions[$index]['transactions'][$groupIndex]['source_number'] = null;
-                }
-
                 $destinationAccount = [
                     'transaction_type' => $transaction['type'],
                     'id'               => $transaction['destination_id'],
                     'name'             => $transaction['destination_name'],
                     'iban'             => $transaction['destination_iban'] ?? null,
-                    'number'           => $transaction['destination_number'],
+                    'number'           => $transaction['destination_number'] ?? null,
                 ];
 
+                $source      = $this->findAccount($sourceArray);
                 $destination = $this->findAccount($destinationAccount);
-                if (0 !== $destination['id']) {
-                    $transactions[$index]['transactions'][$groupIndex]['destination_id']     = $destination['id'];
-                    $transactions[$index]['transactions'][$groupIndex]['destination_name']   = null;
-                    $transactions[$index]['transactions'][$groupIndex]['destination_iban']   = null;
-                    $transactions[$index]['transactions'][$groupIndex]['destination_number'] = null;
+
+                if (-1 === bccomp('0', $transaction['amount'])) {
+                    // amount is positive
+                    // fix source
+                    $transaction['source_id']     = $source['id'];
+                    $transaction['source_name']   = $source['name'];
+                    $transaction['source_iban']   = $source['iban'];
+                    $transaction['source_number'] = $source['number'];
+
+                    // same for destination
+                    $transaction['destination_id']     = $destination['id'];
+                    $transaction['destination_name']   = $destination['name'];
+                    $transaction['destination_iban']   = $destination['iban'];
+                    $transaction['destination_number'] = $destination['number'];
                 }
+
+                if (1 === bccomp('0', $transaction['amount'])) {
+                    // fix source
+                    $transaction['source_id']     = $destination['id'];
+                    $transaction['source_name']   = $destination['name'];
+                    $transaction['source_iban']   = $destination['iban'];
+                    $transaction['source_number'] = $destination['number'];
+
+                    // same for destination
+                    $transaction['destination_id']     = $source['id'];
+                    $transaction['destination_name']   = $source['name'];
+                    $transaction['destination_iban']   = $source['iban'];
+                    $transaction['destination_number'] = $source['number'];
+                    // inverse amount:
+                    $transaction['amount'] = Amount::positive($transaction['amount']);
+                }
+
+                // if the source + destination have a type, we can say something about the
+                // transaction type:
+                $transaction['type'] = $this->determineType($source['type'], $destination['type']);
+
+                // if new source ID is filled in, drop the other fields:
+                if (0 !== $transaction['source_id']) {
+                    $transaction['source_name']   = null;
+                    $transaction['source_iban']   = null;
+                    $transaction['source_number'] = null;
+                }
+                // if new source ID is filled in, drop the other fields:
+                if (0 !== $transaction['destination_id']) {
+                    $transaction['destination_name']   = null;
+                    $transaction['destination_iban']   = null;
+                    $transaction['destination_number'] = null;
+                }
+                $transactions[$index]['transactions'][$groupIndex] = $transaction;
+
             }
         }
 
-
         // for each transaction, push to API
-        foreach ($transactions as $transaction) {
-
+        foreach ($transactions as $index => $transaction) {
             if (null === $transaction['group_title']) {
                 unset($transaction['group_title']);
             }
+
+            echo 'Submitting:' . "\n";
+            echo json_encode($transaction, JSON_PRETTY_PRINT);
+            echo "\n\n";
 
             $request = new PostTransactionRequest();
             $request->setBody($transaction);
             $response = $request->post();
             if ($response instanceof ValidationErrorResponse) {
-                var_dump($transaction);
+                $responseErrors = [];
                 foreach ($response->errors->messages() as $key => $errors) {
-                    var_dump($key);
                     foreach ($errors as $error) {
-                        var_dump($error);
+                        $responseErrors[] = sprintf('%s: %s (original value: "%s")', $key, $error, $this->getOriginalValue($key, $transaction));
                     }
                 }
-                exit;
+                if (count($responseErrors) > 0) {
+                    $this->addErrorArray($index, $responseErrors);
+                }
+            }
+
+            if ($response instanceof PostTransactionResponse) {
+                /** @var TransactionGroup $group */
+                $group = $response->getTransactionGroup();
+                /** @var Transaction $transaction */
+                $transaction = $group->transactions[0];
+                $message     = sprintf(
+                    'Created %s #%d "%s" (%s %s)', $transaction->type, $group->id, $transaction->description, $transaction->currencyCode, $transaction->amount
+                );
+                $this->addMessageString($index, $message);
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMessages(): array
+    {
+        return $this->messages;
+    }
+
+    /**
+     * @param int   $index
+     * @param array $errors
+     */
+    private function addErrorArray(int $index, array $errors): void
+    {
+        $this->errors[$index] = $errors;
+    }
+
+    /**
+     * @param int    $index
+     * @param string $message
+     */
+    private function addMessageString(int $index, string $message)
+    {
+        $this->messages[$index] = $message;
     }
 
     /**
@@ -195,11 +289,37 @@ class ImportRoutineManager
     }
 
     /**
+     * @return int
+     */
+    public function getTotal(): int
+    {
+        return $this->total;
+    }
+
+
+    /**
+     * @param string|null $sourceType
+     * @param string|null $destinationType
+     *
+     * @return string
+     */
+    private function determineType(?string $sourceType, ?string $destinationType): string
+    {
+        if (null === $sourceType || null === $destinationType) {
+            return 'withdrawal';
+        }
+        $type = config(sprintf('transaction_types.account_to_transaction.%s.%s', $sourceType, $destinationType));
+
+        return $type ?? 'withdrawal';
+    }
+
+    /**
      * TODO move to own class.
      *
      * @param array $array
      *
      * @return array
+     * @throws \App\Exceptions\ApiHttpException
      */
     private function findAccount(array $array): array
     {
@@ -253,7 +373,27 @@ class ImportRoutineManager
             }
         }
 
+        // append an empty type to the array for consistency's sake.
+        $array['type'] = null;
+
         return $array;
+    }
+
+    /**
+     * @param string $key
+     * @param array  $transaction
+     *
+     * @return string
+     */
+    private function getOriginalValue(string $key, array $transaction): string
+    {
+        $parts = explode('.', $key);
+        if (3 !== count($parts)) {
+            return '(unknown)';
+        }
+        $index = (int)$parts[1];
+
+        return $transaction['transactions'][$index][$parts[2]] ?? '(not found)';
     }
 
     /**

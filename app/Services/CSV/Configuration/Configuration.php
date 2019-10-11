@@ -166,7 +166,7 @@ class Configuration
      *
      * @return $this
      */
-    public static function fromClassic(array $data): self
+    public static function fromFile(array $data): self
     {
         Log::debug('Now in Configuration::fromClassic', $data);
 
@@ -206,6 +206,8 @@ class Configuration
         $object->headers        = $data['has-headers'] ?? false;
         $object->rules          = $data['apply-rules'] ?? true;
         $object->specifics      = [];
+
+        // some
 
         Log::debug(sprintf('Has headers: %s', var_export($object->headers, true)));
 

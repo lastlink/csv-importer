@@ -61,4 +61,13 @@ class SystemInformationRequest extends Request
         }
         return new SystemInformationResponse($data['data'] ?? []);
     }
+
+    /**
+     * @return Response
+     * @throws ApiHttpException
+     */
+    public function post(): Response
+    {
+        // TODO: Implement post() method.
+    }
 }

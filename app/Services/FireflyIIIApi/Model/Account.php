@@ -35,6 +35,8 @@ class Account
     public $type;
     /** @var string */
     public $iban;
+    /** @var string */
+    public $number;
 
     /**
      * Account constructor.
@@ -51,12 +53,12 @@ class Account
      */
     public static function fromArray(array $array): self
     {
-        $account = new Account;
-
-        $account->id   = (int)$array['id'];
-        $account->name = $array['attributes']['name'];
-        $account->type = $array['attributes']['type'];
-        $account->iban = $array['attributes']['iban'];
+        $account         = new Account;
+        $account->id     = (int)$array['id'];
+        $account->name   = $array['attributes']['name'];
+        $account->type   = $array['attributes']['type'];
+        $account->iban   = $array['attributes']['iban'];
+        $account->number = $array['attributes']['account_number'];
 
         return $account;
 
@@ -68,10 +70,11 @@ class Account
     public function toArray(): array
     {
         return [
-            'id'   => $this->id,
-            'name' => $this->name,
-            'type' => $this->type,
-            'iban' => $this->iban,
+            'id'     => $this->id,
+            'name'   => $this->name,
+            'type'   => $this->type,
+            'iban'   => $this->iban,
+            'number' => $this->number,
         ];
     }
 
