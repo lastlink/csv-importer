@@ -1,6 +1,6 @@
 <?php
 /**
- * TransactionProcessor.php
+ * AbstractTask.php
  * Copyright (c) 2019 - 2019 thegrumpydictator@gmail.com
  *
  * This file is part of the Firefly III CSV importer
@@ -20,41 +20,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\Import;
+namespace App\Services\Import\Task;
 
-use App\Services\Import\Task\TaskInterface;
-use Log;
+use App\Services\FireflyIIIApi\Model\Account;
+use App\Services\FireflyIIIApi\Model\TransactionCurrency;
 
 /**
- * Class TransactionProcessor
+ * Class AbstractTask
  */
-class TransactionProcessor
+abstract class AbstractTask implements TaskInterface
 {
-    /** @var array */
-    private $tasks;
+    /** @var Account */
+    protected $account;
+
+    /** @var TransactionCurrency */
+    protected $transactionCurrency;
 
     /**
-     * TransactionProcessor constructor.
+     * @param Account $account
      */
-    public function __construct()
+    public function setAccount(Account $account): void
     {
-        $this->tasks = config('csv_importer.transaction_tasks');
+        $this->account = $account;
     }
 
     /**
-     * @param array $transaction
-     *
-     * @return array
+     * @param TransactionCurrency $transactionCurrency
      */
-    public function process(array $transaction): array
+    public function setTransactionCurrency(TransactionCurrency $transactionCurrency): void
     {
-        Log::debug(sprintf('Now in %s', __METHOD__));
-        foreach($this->tasks as $task) {
-            /** @var TaskInterface $object */
-            $object = app($task);
-            $transaction = $object->process($transaction);
-        }
-        return $transaction;
+        $this->transactionCurrency = $transactionCurrency;
     }
+
+
 
 }

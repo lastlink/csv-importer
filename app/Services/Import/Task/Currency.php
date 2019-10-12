@@ -22,10 +22,12 @@
 
 namespace App\Services\Import\Task;
 
+use Log;
+
 /**
  * Class Currency
  */
-class Currency implements TaskInterface
+class Currency extends AbstractTask
 {
 
     /**
@@ -35,6 +37,48 @@ class Currency implements TaskInterface
      */
     public function process(array $group): array
     {
-        // TODO: Implement process() method.
+        foreach ($group['transactions'] as $index => $transaction) {
+            $group['transactions'][$index] = $this->processCurrency($transaction);
+        }
+
+        return $group;
+    }
+
+    /**
+     * @param array $transaction
+     *
+     * @return array
+     */
+    private function processCurrency(array $transaction): array
+    {
+        if (
+            (0 === $transaction['currency_id'] || null === $transaction['currency_id'])
+            && (null === $transaction['currency_code'] || '' === $transaction['currency_code'])) {
+            $transaction['currency_id']   = $this->transactionCurrency->id;
+            $transaction['currency_code'] = null;
+            Log::debug(sprintf('Set currency to %d because it was NULL or empty.', $this->transactionCurrency->id));
+        }
+
+        return $transaction;
+    }
+
+    /**
+     * Returns true if the task requires the default currency of the user.
+     *
+     * @return bool
+     */
+    public function requiresTransactionCurrency(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Returns true if the task requires the default account.
+     *
+     * @return bool
+     */
+    public function requiresDefaultAccount(): bool
+    {
+        return false;
     }
 }

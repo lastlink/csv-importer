@@ -32,6 +32,8 @@ use App\Services\CSV\Specifics\PresidentsChoice;
 use App\Services\CSV\Specifics\SnsDescription;
 use App\Services\Import\Task\Amount;
 use App\Services\Import\Task\Tags;
+use App\Services\Import\Task\Currency;
+use App\Services\Import\Task\Accounts;
 
 return [
     'version'           => '0.1',
@@ -50,6 +52,8 @@ return [
     'transaction_tasks' => [
         Amount::class,
         Tags::class,
+        Currency::class,
+        Accounts::class,
     ],
 
     /*

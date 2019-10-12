@@ -23,14 +23,15 @@
 namespace App\Services\Import\Task;
 
 use App\Services\CSV\Converter\Amount as AmountConverter;
+use App\Services\FireflyIIIApi\Model\Account;
+use App\Services\FireflyIIIApi\Model\TransactionCurrency;
 use Log;
 
 /**
  * Class Amount
  */
-class Amount implements TaskInterface
+class Amount extends AbstractTask
 {
-
     /**
      * @param array $group
      *
@@ -81,5 +82,25 @@ class Amount implements TaskInterface
         unset($transaction['amount_credit'], $transaction['amount_debit'], $transaction['amount_negated']);
 
         return $transaction;
+    }
+
+    /**
+     * Returns true if the task requires the default currency of the user.
+     *
+     * @return bool
+     */
+    public function requiresTransactionCurrency(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Returns true if the task requires the default account.
+     *
+     * @return bool
+     */
+    public function requiresDefaultAccount(): bool
+    {
+        return false;
     }
 }

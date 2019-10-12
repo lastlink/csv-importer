@@ -26,7 +26,7 @@ namespace App\Services\Import\Task;
 /**
  * Class Tags
  */
-class Tags implements TaskInterface
+class Tags extends AbstractTask
 {
 
     /**
@@ -56,5 +56,25 @@ class Tags implements TaskInterface
         unset($transaction['tags_comma'], $transaction['tags_space']);
 
         return $transaction;
+    }
+
+    /**
+     * Returns true if the task requires the default currency of the user.
+     *
+     * @return bool
+     */
+    public function requiresTransactionCurrency(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Returns true if the task requires the default account.
+     *
+     * @return bool
+     */
+    public function requiresDefaultAccount(): bool
+    {
+        return false;
     }
 }

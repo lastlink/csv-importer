@@ -22,7 +22,15 @@
 
 namespace App\Services\Import\Routine;
 
-use App\Services\Import\Task\TaskInterface;
+use App\Services\FireflyIIIApi\Model\Account;
+use App\Services\FireflyIIIApi\Model\TransactionCurrency;
+use App\Services\FireflyIIIApi\Request\GetAccountRequest;
+use App\Services\FireflyIIIApi\Request\GetCurrencyRequest;
+use App\Services\FireflyIIIApi\Request\GetPreferenceRequest;
+use App\Services\FireflyIIIApi\Response\GetAccountResponse;
+use App\Services\FireflyIIIApi\Response\GetCurrencyResponse;
+use App\Services\FireflyIIIApi\Response\PreferenceResponse;
+use App\Services\Import\Task\AbstractTask;
 use Log;
 
 /**
@@ -33,12 +41,24 @@ class PseudoTransactionProcessor
     /** @var array */
     private $tasks;
 
+    /** @var Account */
+    private $defaultAccount;
+
+    /** @var TransactionCurrency */
+    private $defaultCurrency;
+
     /**
      * PseudoTransactionProcessor constructor.
+     *
+     * @param int|null $defaultAccountId
+     *
+     * @throws \App\Exceptions\ApiHttpException
      */
-    public function __construct()
+    public function __construct(?int $defaultAccountId)
     {
         $this->tasks = config('csv_importer.transaction_tasks');
+        $this->getDefaultAccount($defaultAccountId);
+        $this->getDefaultCurrency();
     }
 
     /**
@@ -60,6 +80,39 @@ class PseudoTransactionProcessor
     }
 
     /**
+     * @param int|null $accountId
+     *
+     * @throws \App\Exceptions\ApiHttpException
+     */
+    private function getDefaultAccount(?int $accountId): void
+    {
+        if (null !== $accountId) {
+            $accountRequest = new GetAccountRequest;
+            $accountRequest->setId($accountId);
+            /** @var GetAccountResponse $result */
+            $result               = $accountRequest->get();
+            $this->defaultAccount = $result->getAccount();
+        }
+    }
+
+    /**
+     * @throws \App\Exceptions\ApiHttpException
+     */
+    private function getDefaultCurrency(): void
+    {
+        $prefRequest = new GetPreferenceRequest;
+        $prefRequest->setName('currencyPreference');
+        /** @var PreferenceResponse $response */
+        $response        = $prefRequest->get();
+        $code            = $response->getPreference()->data;
+        $currencyRequest = new GetCurrencyRequest();
+        $currencyRequest->setCode($code);
+        /** @var GetCurrencyResponse $result */
+        $result                = $currencyRequest->get();
+        $this->defaultCurrency = $result->getCurrency();
+    }
+
+    /**
      * @param array $line
      *
      * @return array
@@ -68,9 +121,17 @@ class PseudoTransactionProcessor
     {
         Log::debug(sprintf('Now in %s', __METHOD__));
         foreach ($this->tasks as $task) {
-            /** @var TaskInterface $object */
+            /** @var AbstractTask $object */
             $object = app($task);
-            $line   = $object->process($line);
+
+            if ($object->requiresDefaultAccount()) {
+                $object->setAccount($this->defaultAccount);
+            }
+            if ($object->requiresTransactionCurrency()) {
+                $object->setTransactionCurrency($this->defaultCurrency);
+            }
+
+            $line = $object->process($line);
         }
         var_dump($line);
         exit;

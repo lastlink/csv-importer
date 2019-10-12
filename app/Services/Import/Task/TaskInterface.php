@@ -22,6 +22,9 @@
 
 namespace App\Services\Import\Task;
 
+use App\Services\FireflyIIIApi\Model\Account;
+use App\Services\FireflyIIIApi\Model\TransactionCurrency;
+
 /**
  * Interface TaskInterface
  */
@@ -33,5 +36,29 @@ interface TaskInterface
      * @return array
      */
     public function process(array $group): array;
+
+    /**
+     * Returns true if the task requires the default currency of the user.
+     *
+     * @return bool
+     */
+    public function requiresTransactionCurrency(): bool;
+
+    /**
+     * Returns true if the task requires the default account.
+     *
+     * @return bool
+     */
+    public function requiresDefaultAccount(): bool;
+
+    /**
+     * @param TransactionCurrency $transactionCurrency
+     */
+    public function setTransactionCurrency(TransactionCurrency $transactionCurrency): void;
+
+    /**
+     * @param Account $account
+     */
+    public function setAccount(Account $account): void;
 
 }

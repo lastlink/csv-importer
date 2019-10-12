@@ -23,22 +23,15 @@
 namespace App\Services\Import;
 
 use App\Services\CSV\Configuration\Configuration;
-use App\Services\CSV\Converter\Amount;
 use App\Services\CSV\Specifics\SpecificService;
 use App\Services\FireflyIIIApi\Model\Account;
 use App\Services\FireflyIIIApi\Model\Transaction;
 use App\Services\FireflyIIIApi\Model\TransactionCurrency;
 use App\Services\FireflyIIIApi\Model\TransactionGroup;
-use App\Services\FireflyIIIApi\Request\GetAccountRequest;
-use App\Services\FireflyIIIApi\Request\GetCurrencyRequest;
-use App\Services\FireflyIIIApi\Request\GetPreferenceRequest;
-use App\Services\FireflyIIIApi\Request\GetSearchAccountRequest;
 use App\Services\FireflyIIIApi\Request\PostTransactionRequest;
-use App\Services\FireflyIIIApi\Response\GetAccountsResponse;
-use App\Services\FireflyIIIApi\Response\GetCurrencyResponse;
 use App\Services\FireflyIIIApi\Response\PostTransactionResponse;
-use App\Services\FireflyIIIApi\Response\PreferenceResponse;
 use App\Services\FireflyIIIApi\Response\ValidationErrorResponse;
+use App\Services\Import\Routine\APISubmitter;
 use App\Services\Import\Routine\ColumnValueConverter;
 use App\Services\Import\Routine\LineProcessor;
 use App\Services\Import\Routine\PseudoTransactionProcessor;
@@ -58,12 +51,8 @@ class ImportRoutineManager
     private $configuration;
     /** @var array */
     private $errors;
-    /** @var LineConverter */
-    private $lineConverter;
     /** @var LineProcessor */
     private $lineProcessor;
-    /** @var TransactionProcessor */
-    private $transactionProcessor;
     /** @var array */
     private $messages;
     /** @var Reader */
@@ -80,6 +69,8 @@ class ImportRoutineManager
     private $columnValueConverter;
     /** @var PseudoTransactionProcessor */
     private $pseudoTransactionProcessor;
+    /** @var APISubmitter */
+    private $apiSubmitter;
     /**
      * Collect info on the current job, hold it in memory.
      *
@@ -90,24 +81,25 @@ class ImportRoutineManager
         Log::debug('Constructed ImportRoutineManager');
 
         // get line converter
-        $this->lineConverter              = new LineConverter;
-        $this->transactionProcessor       = new TransactionProcessor;
-        $this->columnValueConverter       = new ColumnValueConverter;
-        $this->pseudoTransactionProcessor = new PseudoTransactionProcessor;
-        $this->total                      = 0;
-        $this->errors                     = [];
-        $this->messages                   = [];
+        $this->columnValueConverter = new ColumnValueConverter;
+        $this->apiSubmitter         = new APISubmitter;
+        $this->total                = 0;
+        $this->errors               = [];
+        $this->messages             = [];
     }
 
     /**
      * @param Configuration $configuration
+     *
+     * @throws \App\Exceptions\ApiHttpException
      */
     public function setConfiguration(Configuration $configuration): void
     {
         $this->configuration = $configuration;
 
         // get line processor
-        $this->lineProcessor = new LineProcessor($this->configuration->getRoles(), $this->configuration->getMapping(), $this->configuration->getDoMapping());
+        $this->lineProcessor              = new LineProcessor($this->configuration->getRoles(), $this->configuration->getMapping(), $this->configuration->getDoMapping());
+        $this->pseudoTransactionProcessor = new PseudoTransactionProcessor($this->configuration->getDefaultAccount());
 
     }
 
@@ -124,10 +116,6 @@ class ImportRoutineManager
      */
     public function start(): void
     {
-        // TODO get currency.
-
-        // TODO get default account.
-
         Log::debug('Now in start()');
 
         // convert CSV file into raw lines (arrays)
@@ -143,164 +131,7 @@ class ImportRoutineManager
         $transactions = $this->pseudoTransactionProcessor->processPseudo($pseudo);
 
         // submit transactions to API:
-
-
-        exit;
-
-
-        $count = count($lines);
-        Log::debug(sprintf('Total number of lines to submit: %d', $count));
-
-        // get standard currency in case we don't have it locally.
-        // TODO move out and log
-        $prefRequest = new GetPreferenceRequest;
-        $prefRequest->setName('currencyPreference');
-        /** @var PreferenceResponse $response */
-        $response = $prefRequest->get();
-        $code     = $response->getPreference()->data;
-        $currencyRequest = new GetCurrencyRequest();
-        $currencyRequest->setCode($code);
-        /** @var GetCurrencyResponse $result */
-        $result       = $currencyRequest->get();
-        $currency     = $result->getCurrency();
-
-        // get default import account (if set) in case CSV doesn't have it
-        // TODO move out and log
-        $defaultAccountId = $this->configuration->getDefaultAccount();
-        $defaultAccount =null;
-        if(null !== $defaultAccountId) {
-            $accountRequest = new GetAccountRequest;
-            $accountRequest->setId($defaultAccountId);
-            $defaultAccount = $accountRequest->get();
-        }
-
-
-        $this->total  = count($transactions);
-        // TODO move to other objects.
-        Log::debug(sprintf('Now looping and cleaning up %d groups.', $this->total));
-        foreach ($transactions as $index => $group) {
-            $groupCount = count($group['transactions']);
-            Log::debug(sprintf('Now at group %d/%d (has %d transaction(s))', $index+1, $this->total, $groupCount));
-            foreach ($group['transactions'] as $groupIndex => $transaction) {
-                Log::debug(sprintf('Now at transaction %d/%d', $groupIndex+1,$groupCount));
-
-                // TODO api accepts that source + dest are equal
-
-                // get source + dest accounts:
-                $sourceArray        = [
-                    'transaction_type' => $transaction['type'],
-                    'id'               => $transaction['source_id'],
-                    'name'             => $transaction['source_name'],
-                    'iban'             => $transaction['source_iban'] ?? null,
-                    'number'           => $transaction['source_number'] ?? null,
-                    'bic'              => $transaction['source_bic'] ?? null,
-                ];
-                $destinationAccount = [
-                    'transaction_type' => $transaction['type'],
-                    'id'               => $transaction['destination_id'],
-                    'name'             => $transaction['destination_name'],
-                    'iban'             => $transaction['destination_iban'] ?? null,
-                    'number'           => $transaction['destination_number'] ?? null,
-                    'bic'              => $transaction['destination_bic'] ?? null,
-                ];
-                // TODO add warning when falling back on the default account.
-                $source      = $this->findAccount($sourceArray, $defaultAccount->getAccount());
-                $destination = $this->findAccount($destinationAccount,null);
-
-                if (-1 === bccomp('0', $transaction['amount'])) {
-                    // amount is positive
-                    $transaction['source_id']     = $source['id'];
-                    $transaction['source_name']   = $source['name'];
-                    $transaction['source_iban']   = $source['iban'];
-                    $transaction['source_number'] = $source['number'];
-                    $transaction['source_bic']    = $source['bic'];
-
-                    $transaction['destination_id']     = $destination['id'];
-                    $transaction['destination_name']   = $destination['name'];
-                    $transaction['destination_iban']   = $destination['iban'];
-                    $transaction['destination_number'] = $destination['number'];
-                    $transaction['destination_bic']    = $destination['bic'];
-
-                    $transaction['type'] = $this->determineType($source['type'], $destination['type']);
-                }
-
-                if (1 === bccomp('0', $transaction['amount'])) {
-                    // fix source
-                    $transaction['source_id']     = $destination['id'];
-                    $transaction['source_name']   = $destination['name'];
-                    $transaction['source_iban']   = $destination['iban'];
-                    $transaction['source_number'] = $destination['number'];
-                    $transaction['source_bic']    = $destination['bic'];
-
-                    $transaction['destination_id']     = $source['id'];
-                    $transaction['destination_name']   = $source['name'];
-                    $transaction['destination_iban']   = $source['iban'];
-                    $transaction['destination_number'] = $source['number'];
-                    $transaction['destination_bic']    = $source['bic'];
-
-                    $transaction['amount'] = Amount::positive($transaction['amount']);
-                    $transaction['type'] = $this->determineType($destination['type'], $source['type']);
-                }
-
-                // if source is NULL
-
-                // if the source + destination have a type, we can say something about the
-                // transaction type:
-
-
-                // if new source ID is filled in, drop the other fields:
-                if (0 !== $transaction['source_id'] && null !== $transaction['source_id']) {
-                    $transaction['source_name']   = null;
-                    $transaction['source_iban']   = null;
-                    $transaction['source_number'] = null;
-                }
-                // if new source ID is filled in, drop the other fields:
-                if (0 !== $transaction['destination_id'] && null !== $transaction['destination_id']) {
-                    $transaction['destination_name']   = null;
-                    $transaction['destination_iban']   = null;
-                    $transaction['destination_number'] = null;
-                }
-                $transactions[$index]['transactions'][$groupIndex] = $transaction;
-
-            }
-        }
-
-        // for each transaction, push to API
-        foreach ($transactions as $index => $transaction) {
-            if (null === $transaction['group_title']) {
-                unset($transaction['group_title']);
-            }
-
-            echo 'Submitting:' . "\n";
-            echo json_encode($transaction, JSON_PRETTY_PRINT);
-            echo "\n\n";
-
-            $request = new PostTransactionRequest();
-            $request->setBody($transaction);
-            $response = $request->post();
-            if ($response instanceof ValidationErrorResponse) {
-                $responseErrors = [];
-                foreach ($response->errors->messages() as $key => $errors) {
-                    foreach ($errors as $error) {
-                        $responseErrors[] = sprintf('%s: %s (original value: "%s")', $key, $error, $this->getOriginalValue($key, $transaction));
-                    }
-                }
-                if (count($responseErrors) > 0) {
-                    $this->addErrorArray($index, $responseErrors);
-                }
-            }
-
-            if ($response instanceof PostTransactionResponse) {
-                /** @var TransactionGroup $group */
-                $group = $response->getTransactionGroup();
-                /** @var Transaction $transaction */
-                $transaction = $group->transactions[0];
-                $message     = sprintf(
-                    'Created %s #%d "%s" (%s %s)', $transaction->type, $group->id, $transaction->description, $transaction->currencyCode, $transaction->amount
-                );
-                $this->addMessageString($index, $message);
-            }
-        }
+        $report = $this->apiSubmitter->processTransactions($transactions);
     }
 
     /**
@@ -320,177 +151,11 @@ class ImportRoutineManager
     }
 
     /**
-     * @param int   $index
-     * @param array $errors
-     */
-    private function addErrorArray(int $index, array $errors): void
-    {
-        $this->errors[$index] = $errors;
-    }
-
-    /**
-     * @param int    $index
-     * @param string $message
-     */
-    private function addMessageString(int $index, string $message): void
-    {
-        $this->messages[$index] = $message;
-    }
-
-    /**
-     * @param array $lines
-     *
-     * @return array
-     */
-    private function convertToTransactions(array $lines): array
-    {
-        Log::debug(sprintf('Now in %s', __METHOD__));
-        return $this->lineConverter->convert($lines);
-    }
-
-    /**
      * @return int
      */
     public function getTotal(): int
     {
         return $this->total;
-    }
-
-
-    /**
-     * @param string|null $sourceType
-     * @param string|null $destinationType
-     *
-     * @return string
-     */
-    private function determineType(?string $sourceType, ?string $destinationType): string
-    {
-        if (null === $sourceType && null === $destinationType) {
-            return 'withdrawal';
-        }
-
-        // if source is a asset and dest is NULL, its a withdrawal
-        if('asset' === $sourceType && null === $destinationType){
-            return 'withdrawal';
-        }
-        // if destination is asset and source is NULL, its a deposit
-        if(null === $sourceType && 'asset' === $destinationType){
-            return 'deposit';
-        }
-
-        $type = config(sprintf('transaction_types.account_to_transaction.%s.%s', $sourceType, $destinationType));
-
-        return $type ?? 'withdrawal';
-    }
-
-    /**
-     * TODO move to own class.
-     *
-     * @param array        $array
-     *
-     * @param Account|null $defaultAccount
-     *
-     * @return array
-     * @throws \App\Exceptions\ApiHttpException
-     */
-    private function findAccount(array $array, ?Account $defaultAccount): array
-    {
-        Log::debug('Now in findAccount', $array);
-        // search ID
-        if (is_int($array['id']) && $array['id'] > 0) {
-            Log::debug(sprintf('Going to search account with ID #%d', $array['id']));
-            $request = new GetSearchAccountRequest();
-            $request->setField('id');
-            $request->setQuery($array['id']);
-            /** @var GetAccountsResponse $response */
-            $response = $request->get();
-            if (1 === count($response)) {
-                /** @var Account $account */
-                $account = $response->current();
-                Log::debug(sprintf('Found account #%d based on ID #%d', $account->id, $array['id']));
-                return $account->toArray();
-            }
-
-            return $array;
-        }
-
-        // search name
-        if (is_string($array['name']) && '' !== $array['name']) {
-            Log::debug(sprintf('Going to search account with name "%s"', $array['name']));
-            $request = new GetSearchAccountRequest();
-            $request->setField('name');
-            $request->setQuery($array['name']);
-            /** @var GetAccountsResponse $response */
-            $response = $request->get();
-            if (1 === count($response)) {
-                /** @var Account $account */
-                $account = $response->current();
-                Log::debug(sprintf('Found account #%d based on name "%s"', $account->id, $array['name']));
-                return $account->toArray();
-            }
-            Log::debug('Found nothing on name.');
-        }
-        // search IBAN
-        if (is_string($array['iban']) && '' !== $array['iban']) {
-            Log::debug(sprintf('Going to search account with iban "%s"', $array['iban']));
-            $request = new GetSearchAccountRequest();
-            $request->setField('iban');
-            $request->setQuery($array['iban']);
-            /** @var GetAccountsResponse $response */
-            $response = $request->get();
-            if (1 === count($response)) {
-                /** @var Account $account */
-                $account = $response->current();
-                Log::debug(sprintf('Found account #%d based on IBAN "%s"', $account->id, $array['iban']));
-                return $account->toArray();
-            }
-            Log::debug('Found nothing on IBAN.');
-        }
-
-        // search number
-        if (is_string($array['number']) && '' !== $array['number']) {
-            Log::debug(sprintf('Going to search account with number "%s"', $array['number']));
-            $request = new GetSearchAccountRequest();
-            $request->setField('number');
-            $request->setQuery($array['number']);
-            /** @var GetAccountsResponse $response */
-            $response = $request->get();
-            if (1 === count($response)) {
-                /** @var Account $account */
-                $account = $response->current();
-                Log::debug(sprintf('Found account #%d based on account number "%s"', $account->id, $array['number']));
-                return $account->toArray();
-            }
-            Log::debug('Found nothing on number.');
-        }
-        Log::debug('Found no account or haven\'t searched for one.');
-
-        // append an empty type to the array for consistency's sake.
-        $array['type'] = $array['type'] ?? null;
-        $array['bic']  = $array['bic'] ?? null;
-        // if the default account is not NULL, return that one instead:
-        if(null !== $defaultAccount) {
-            return $defaultAccount->toArray();
-        }
-
-        return $array;
-    }
-
-    /**
-     * @param string $key
-     * @param array  $transaction
-     *
-     * @return string
-     */
-    private function getOriginalValue(string $key, array $transaction): string
-    {
-        $parts = explode('.', $key);
-        if (3 !== count($parts)) {
-            return '(unknown)';
-        }
-        $index = (int)$parts[1];
-
-        return $transaction['transactions'][$index][$parts[2]] ?? '(not found)';
     }
 
     /**
@@ -515,28 +180,6 @@ class ImportRoutineManager
         }
 
         return $updatedRecords;
-    }
-
-    /**
-     * @param array $line
-     *
-     * @return array
-     */
-    private function processRecord(array $line): array
-    {
-        Log::debug('Now in processRecord()');
-
-        // first step collects data.
-        // not a lot of inter-field communication
-        $pseudoTransaction = $this->lineProcessor->process($line);
-
-
-        $transactions = $this->convertToTransactions($lines);
-        // send steps merges and cleanups.
-        // pseudo cause not yet complete.
-        return $this->transactionProcessor->process($pseudoTransaction);
-
-
     }
 
     /**
