@@ -1,2 +1,2 @@
 source_name,source_bic,source_iban,destination_name,description,amount,date
-New Revenue Account 7,RABONL2U,AD34013328187RCB7FNRIAN0,Checking Account,Test API transaction 1,-12.44,2019-10-06
+New Expense Account 9,RABONL2U,AD34013328187RCB7FNRIAN0,Checking Account,Test API transaction 1,12.44,2019-10-06

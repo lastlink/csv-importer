@@ -128,6 +128,10 @@ class LineConverter
                     //'invoice_date'          => null,
                     'tags_comma' => [],
                     'tags_space' => [],
+                    // extra fields for amounts:
+                    'amount_debit'   => null,
+                    'amount_credit'  => null,
+                    'amount_negated' => null,
                 ],
             ],
         ];

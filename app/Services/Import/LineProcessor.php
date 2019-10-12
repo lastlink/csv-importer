@@ -44,6 +44,7 @@ class LineProcessor
     public function __construct(array $roles, array $mapping, array $doMapping)
     {
         Log::debug('Created LineProcessor()');
+        Log::debug('Roles', $roles);
         $this->roles     = $roles;
         $this->mapping   = $mapping;
         $this->doMapping = $doMapping;

@@ -1,0 +1,36 @@
+{
+    "has-headers": true,
+    "date-format": "Y-m-d",
+    "delimiter": ",",
+    "import-account": 1,
+    "specifics": [],
+    "column-count": 5,
+    "column-roles": [
+        "account-name",
+        "opposing-name",
+        "description",
+        "date-transaction",
+        "amount",
+        "sepa_ct_op",
+        "internal_reference"
+    ],
+    "column-do-mapping": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+    ],
+    "column-mapping-config": {
+    },
+    "file-type": "csv",
+    "has-config-file": true,
+    "apply-rules": true,
+    "match-bills": false,
+    "auto-start": true,
+    "column-roles-complete": false,
+    "column-mapping-complete": false,
+    "initial-config-complete": false,
+    "has-file-upload": false
+}

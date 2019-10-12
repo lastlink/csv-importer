@@ -156,7 +156,30 @@ class ImportRoutineManager
                 }
 
                 // modify amount:
+                // TODO also apply to foreign amount if set
                 $transaction['amount'] = bcmul($transaction['amount'], $transaction['amount_modifier']);
+
+
+
+                // amount is overruled by amount_debit:
+                if (null !== $transaction['amount_debit']) {
+                    Log::debug(sprintf('Debit amount is "%s" which trumps the normal amount.', $transaction['amount_debit']));
+                    $transaction['amount'] = Amount::negative($transaction['amount_debit']);
+                }
+
+                // then credit
+                if (null !== $transaction['amount_credit']) {
+                    Log::debug(sprintf('Credit amount is "%s" which trumps the normal amount.', $transaction['amount_credit']));
+                    $transaction['amount'] = Amount::positive($transaction['amount_credit']);
+                }
+
+                // then negated
+                if (null !== $transaction['amount_negated']) {
+                    Log::debug(sprintf('Negated amount is "%s" which trumps the normal amount.', $transaction['amount_negated']));
+                    $transaction['amount'] = Amount::negative($transaction['amount_negated']);
+                }
+                // unset those fields:
+                unset($transaction['amount_credit'], $transaction['amount_debit'], $transaction['amount_negated']);
 
                 // do something with the collected tags.
                 $transaction['tags'] = array_unique(array_merge(array_values($transaction['tags_space']), array_values($transaction['tags_comma'])));
@@ -310,7 +333,7 @@ class ImportRoutineManager
      * @param int    $index
      * @param string $message
      */
-    private function addMessageString(int $index, string $message)
+    private function addMessageString(int $index, string $message): void
     {
         $this->messages[$index] = $message;
     }

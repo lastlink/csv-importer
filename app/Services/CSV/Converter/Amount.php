@@ -45,6 +45,20 @@ class Amount implements ConverterInterface
     }
 
     /**
+     * @param string $amount
+     *
+     * @return string
+     */
+    public static function negative(string $amount): string
+    {
+        if (bccomp($amount, '0') === 1) {
+            $amount = bcmul($amount, '-1');
+        }
+
+        return $amount;
+    }
+
+    /**
      * Some people, when confronted with a problem, think "I know, I'll use regular expressions." Now they have two problems.
      * - Jamie Zawinski.
      *
