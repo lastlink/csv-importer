@@ -57,14 +57,12 @@ class GetCategoriesRequest extends Request
         } catch (ApiException|GuzzleException $e) {
             throw new ApiHttpException($e->getMessage());
         }
-        $response = new GetCategoriesResponse($data['data']);
 
-        return $response;
+        return new GetCategoriesResponse($data['data']);
     }
 
     /**
      * @return Response
-     * @throws ApiHttpException
      */
     public function post(): Response
     {

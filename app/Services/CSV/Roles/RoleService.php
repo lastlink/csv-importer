@@ -97,6 +97,8 @@ class RoleService
      * @param string $content
      * @param bool   $hasHeaders
      *
+     * @param array  $specifics
+     *
      * @return array
      */
     public static function getExampleData(string $content, bool $hasHeaders, array $specifics): array

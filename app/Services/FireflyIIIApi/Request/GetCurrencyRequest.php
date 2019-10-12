@@ -25,7 +25,6 @@ namespace App\Services\FireflyIIIApi\Request;
 
 use App\Exceptions\ApiException;
 use App\Exceptions\ApiHttpException;
-use App\Services\FireflyIIIApi\Response\GetCurrenciesResponse;
 use App\Services\FireflyIIIApi\Response\GetCurrencyResponse;
 use App\Services\FireflyIIIApi\Response\Response;
 use GuzzleHttp\Exception\GuzzleException;
@@ -61,9 +60,8 @@ class GetCurrencyRequest extends Request
         } catch (ApiException|GuzzleException $e) {
             throw new ApiHttpException($e->getMessage());
         }
-        $response = new GetCurrencyResponse($data['data']);
 
-        return $response;
+        return new GetCurrencyResponse($data['data']);
     }
 
     /**
@@ -77,7 +75,6 @@ class GetCurrencyRequest extends Request
 
     /**
      * @return Response
-     * @throws ApiHttpException
      */
     public function post(): Response
     {

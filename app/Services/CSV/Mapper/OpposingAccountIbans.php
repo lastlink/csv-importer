@@ -37,6 +37,7 @@ class OpposingAccountIbans implements MapperInterface
      * Get map of objects.
      *
      * @return array
+     * @throws \App\Exceptions\ApiHttpException
      */
     public function getMap(): array
     {

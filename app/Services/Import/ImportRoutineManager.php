@@ -387,7 +387,9 @@ class ImportRoutineManager
     /**
      * TODO move to own class.
      *
-     * @param array $array
+     * @param array        $array
+     *
+     * @param Account|null $defaultAccount
      *
      * @return array
      * @throws \App\Exceptions\ApiHttpException
@@ -524,11 +526,10 @@ class ImportRoutineManager
     private function processRecord(array $line): array
     {
         Log::debug('Now in processRecord()');
-        $updatedLine = $this->lineProcessor->process($line);
 
         // TODO any other steps go here.
 
-        return $updatedLine;
+        return $this->lineProcessor->process($line);
     }
 
     /**

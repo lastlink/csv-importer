@@ -57,14 +57,12 @@ class GetBudgetsRequest extends Request
         } catch (ApiException|GuzzleException $e) {
             throw new ApiHttpException($e->getMessage());
         }
-        $response = new GetBudgetsResponse($data['data']);
 
-        return $response;
+        return new GetBudgetsResponse($data['data']);
     }
 
     /**
      * @return Response
-     * @throws ApiHttpException
      */
     public function post(): Response
     {

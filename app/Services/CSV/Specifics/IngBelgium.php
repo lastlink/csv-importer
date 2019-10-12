@@ -64,12 +64,14 @@ class IngBelgium implements SpecificInterface
      */
     public function run(array $row): array
     {
-        return IngBelgium::processTransactionDetails($row);
+        return self::processTransactionDetails($row);
     }
 
     /**
      * Gets the description and opposing account information (IBAN and name) from the transaction details and adds
      * them to the row of data.
+     *
+     * @param array $row
      *
      * @return array the row containing the description and opposing account's IBAN
      */
@@ -77,9 +79,9 @@ class IngBelgium implements SpecificInterface
     {
         if(isset($row[9])) {
             $transactionDetails = $row[9];
-            $row[11] = IngBelgium::opposingAccountName($transactionDetails);
-            $row[12] = IngBelgium::opposingAccountIban($transactionDetails);
-            $row[13] = IngBelgium::description($transactionDetails);
+            $row[11] = self::opposingAccountName($transactionDetails);
+            $row[12] = self::opposingAccountIban($transactionDetails);
+            $row[13] = self::description($transactionDetails);
         }
         return $row;
     }
@@ -87,34 +89,37 @@ class IngBelgium implements SpecificInterface
     /**
      * Gets the opposing account name from the transaction details.
      *
+     * @param string $transactionDetails
      * @return string the opposing account name
      */
     protected static function opposingAccountName(string $transactionDetails): string
     {
-        return IngBelgium::parseInformationFromTransactionDetails($transactionDetails, '/Van:\s*(.+?)(?=\s{2,})/');
+        return self::parseInformationFromTransactionDetails($transactionDetails, '/Van:\s*(.+?)(?=\s{2,})/');
 
     }
 
     /**
      * Gets the opposing account's IBAN from the transaction details.
      *
+     * @param string $transactionDetails
      * @return string the opposing account's IBAN
      */
     protected static function opposingAccountIban(string $transactionDetails): string
     {
-        return IngBelgium::parseInformationFromTransactionDetails($transactionDetails, '/IBAN:\s*(.+?)(?=\s+)/');
+        return self::parseInformationFromTransactionDetails($transactionDetails, '/IBAN:\s*(.+?)(?=\s+)/');
     }
 
     /**
      * Gets the description from the transaction details and makes sure structured descriptions are in the
      * "+++090/9337/55493+++" format.
      *
+     * @param string $transactionDetails
      * @return string the description
      */
     protected static function description(string $transactionDetails): string
     {
-        $description = IngBelgium::parseInformationFromTransactionDetails($transactionDetails, '/Mededeling:\s*(.+)$/');
-        return IngBelgium::convertStructuredDescriptionToProperFormat($description);
+        $description = self::parseInformationFromTransactionDetails($transactionDetails, '/Mededeling:\s*(.+)$/');
+        return self::convertStructuredDescriptionToProperFormat($description);
     }
 
     /**

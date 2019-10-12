@@ -47,7 +47,9 @@ class UploadController extends Controller
     }
 
     /**
+     * @param Request $request
      *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function upload(Request $request)
     {

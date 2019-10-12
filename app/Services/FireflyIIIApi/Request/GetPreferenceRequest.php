@@ -25,7 +25,6 @@ namespace App\Services\FireflyIIIApi\Request;
 
 use App\Exceptions\ApiException;
 use App\Exceptions\ApiHttpException;
-use App\Services\FireflyIIIApi\Response\GetBudgetsResponse;
 use App\Services\FireflyIIIApi\Response\PreferenceResponse;
 use App\Services\FireflyIIIApi\Response\Response;
 use GuzzleHttp\Exception\GuzzleException;
@@ -61,9 +60,8 @@ class GetPreferenceRequest extends Request
         } catch (ApiException|GuzzleException $e) {
             throw new ApiHttpException($e->getMessage());
         }
-        $response = new PreferenceResponse($data['data']);
 
-        return $response;
+        return new PreferenceResponse($data['data']);
     }
 
     /**
@@ -85,7 +83,6 @@ class GetPreferenceRequest extends Request
 
     /**
      * @return Response
-     * @throws ApiHttpException
      */
     public function post(): Response
     {

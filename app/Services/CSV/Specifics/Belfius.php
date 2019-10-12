@@ -66,18 +66,20 @@ class Belfius implements SpecificInterface
      */
     public function run(array $row): array
     {
-        return Belfius::processRecurringTransactionDescription($row);
+        return self::processRecurringTransactionDescription($row);
     }
 
     /**
      * Fixes the description for outgoing recurring transactions so doubles can be detected when the equivalent incoming
      * transaction is imported for another bank account.
      *
+     * @param array $row
+     *
      * @return array the row containing the new description
      */
     protected static function processRecurringTransactionDescription(array $row): array
     {
-        if (!isset($row[5]) || !isset($row[14])) {
+        if (!isset($row[5], $row[14])) {
             return $row;
         }
 

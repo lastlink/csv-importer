@@ -36,6 +36,11 @@ class MapperService
     /**
      * Appends the given array with data from the CSV file in the config.
      *
+     * @param string $content
+     * @param bool   $hasHeaders
+     * @param array  $specifics
+     * @param array  $data
+     *
      * @return array
      */
     public static function getMapData(string $content, bool $hasHeaders, array $specifics, array $data): array

@@ -106,6 +106,8 @@ class ConfigurationController extends Controller
 
     /**
      * @param ConfigurationPostRequest $request
+     *
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function postIndex(ConfigurationPostRequest $request)
     {

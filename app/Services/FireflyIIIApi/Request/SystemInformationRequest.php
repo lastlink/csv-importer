@@ -64,7 +64,6 @@ class SystemInformationRequest extends Request
 
     /**
      * @return Response
-     * @throws ApiHttpException
      */
     public function post(): Response
     {

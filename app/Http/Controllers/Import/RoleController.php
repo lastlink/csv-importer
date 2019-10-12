@@ -79,7 +79,9 @@ class RoleController extends Controller
     }
 
     /**
+     * @param RolesPostRequest $request
      *
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function postIndex(RolesPostRequest $request)
     {

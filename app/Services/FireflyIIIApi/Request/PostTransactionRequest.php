@@ -50,7 +50,6 @@ class PostTransactionRequest extends Request
 
     /**
      * @return Response
-     * @throws ApiHttpException
      */
     public function get(): Response
     {

@@ -57,14 +57,12 @@ class GetCurrenciesRequest extends Request
         } catch (ApiException|GuzzleException $e) {
             throw new ApiHttpException($e->getMessage());
         }
-        $response = new GetCurrenciesResponse($data['data']);
 
-        return $response;
+        return new GetCurrenciesResponse($data['data']);
     }
 
     /**
      * @return Response
-     * @throws ApiHttpException
      */
     public function post(): Response
     {

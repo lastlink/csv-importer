@@ -26,7 +26,6 @@ namespace App\Services\FireflyIIIApi\Request;
 use App\Exceptions\ApiException;
 use App\Exceptions\ApiHttpException;
 use App\Services\FireflyIIIApi\Response\GetAccountResponse;
-use App\Services\FireflyIIIApi\Response\GetAccountsResponse;
 use App\Services\FireflyIIIApi\Response\Response;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -62,9 +61,8 @@ class GetAccountRequest extends Request
         } catch (ApiException|GuzzleException $e) {
             throw new ApiHttpException($e->getMessage());
         }
-        $response = new GetAccountResponse($data['data']);
 
-        return $response;
+        return new GetAccountResponse($data['data']);
     }
 
     /**
@@ -78,7 +76,6 @@ class GetAccountRequest extends Request
 
     /**
      * @return Response
-     * @throws ApiHttpException
      */
     public function post(): Response
     {

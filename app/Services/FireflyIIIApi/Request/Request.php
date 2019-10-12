@@ -275,12 +275,10 @@ abstract class Request
      */
     private function getClient(): Client
     {
-        $client = new Client;
-
         // config here
 
 
-        return $client;
+        return new Client;
     }
 
 

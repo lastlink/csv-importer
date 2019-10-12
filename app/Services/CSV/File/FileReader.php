@@ -39,10 +39,9 @@ class FileReader
     public static function getReaderFromSession(): Reader
     {
         $content = StorageService::getContent(session()->get(Constants::UPLOAD_CSV_FILE));
-        $reader  = Reader::createFromString($content);
 
         // room for config
-        return $reader;
+        return Reader::createFromString($content);
     }
 
     /**

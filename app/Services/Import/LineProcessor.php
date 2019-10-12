@@ -61,10 +61,10 @@ class LineProcessor
     public function process(array $line): array
     {
         Log::debug('Now in LineProcessor::process()');
-        $convertedLine = $this->convertLine($line);
+
         // should return line.
 
-        return $convertedLine;
+        return $this->convertLine($line);
     }
 
     /**

@@ -61,9 +61,8 @@ class GetSearchAccountRequest extends Request
         } catch (ApiException|GuzzleException $e) {
             throw new ApiHttpException($e->getMessage());
         }
-        $response = new GetAccountsResponse($data['data']);
 
-        return $response;
+        return new GetAccountsResponse($data['data']);
     }
 
     /**
@@ -103,7 +102,6 @@ class GetSearchAccountRequest extends Request
 
     /**
      * @return Response
-     * @throws ApiHttpException
      */
     public function post(): Response
     {

@@ -252,7 +252,7 @@ class Amount implements ConverterInterface
         $value = trim((string)str_replace(['€'], '', $value));
         $str   = preg_replace('/[^\-\(\)\.\,0-9 ]/', '', $value);
         $len   = strlen($str);
-        if ('(' === $str[0] && ')' === $str[$len - 1]) {
+        if (strpos($str, '(') === 0 && ')' === $str[$len - 1]) {
             $str = '-' . substr($str, 1, $len - 2);
         }
 
