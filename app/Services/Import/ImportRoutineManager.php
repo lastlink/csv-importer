@@ -27,6 +27,7 @@ use App\Services\CSV\Converter\Amount;
 use App\Services\CSV\Specifics\SpecificService;
 use App\Services\FireflyIIIApi\Model\Account;
 use App\Services\FireflyIIIApi\Model\Transaction;
+use App\Services\FireflyIIIApi\Model\TransactionCurrency;
 use App\Services\FireflyIIIApi\Model\TransactionGroup;
 use App\Services\FireflyIIIApi\Request\GetAccountRequest;
 use App\Services\FireflyIIIApi\Request\GetCurrencyRequest;
@@ -38,6 +39,9 @@ use App\Services\FireflyIIIApi\Response\GetCurrencyResponse;
 use App\Services\FireflyIIIApi\Response\PostTransactionResponse;
 use App\Services\FireflyIIIApi\Response\PreferenceResponse;
 use App\Services\FireflyIIIApi\Response\ValidationErrorResponse;
+use App\Services\Import\Routine\ColumnValueConverter;
+use App\Services\Import\Routine\LineProcessor;
+use App\Services\Import\Routine\PseudoTransactionProcessor;
 use League\Csv\Exception;
 use League\Csv\Reader;
 use League\Csv\ResultSet;
@@ -58,16 +62,24 @@ class ImportRoutineManager
     private $lineConverter;
     /** @var LineProcessor */
     private $lineProcessor;
+    /** @var TransactionProcessor */
+    private $transactionProcessor;
     /** @var array */
     private $messages;
     /** @var Reader */
     private $reader;
     /** @var array */
     private $warnings;
-
     /** @var int */
     private $total;
-
+    /** @var TransactionCurrency Used as a fallback when creating transactions. */
+    private $defaultCurrency;
+    /** @var Account Used as a fallback when creating transactions */
+    private $defaultAccount;
+    /** @var ColumnValueConverter */
+    private $columnValueConverter;
+    /** @var PseudoTransactionProcessor */
+    private $pseudoTransactionProcessor;
     /**
      * Collect info on the current job, hold it in memory.
      *
@@ -78,10 +90,13 @@ class ImportRoutineManager
         Log::debug('Constructed ImportRoutineManager');
 
         // get line converter
-        $this->lineConverter = new LineConverter();
-        $this->total         = 0;
-        $this->errors        = [];
-        $this->messages      = [];
+        $this->lineConverter              = new LineConverter;
+        $this->transactionProcessor       = new TransactionProcessor;
+        $this->columnValueConverter       = new ColumnValueConverter;
+        $this->pseudoTransactionProcessor = new PseudoTransactionProcessor;
+        $this->total                      = 0;
+        $this->errors                     = [];
+        $this->messages                   = [];
     }
 
     /**
@@ -109,10 +124,32 @@ class ImportRoutineManager
      */
     public function start(): void
     {
+        // TODO get currency.
+
+        // TODO get default account.
+
         Log::debug('Now in start()');
-        $lines = $this->startImportLoop();
+
+        // convert CSV file into raw lines (arrays)
+        $CSVLines = $this->processCSVFile();
+
+        // convert raw lines into arrays with individual ColumnValues
+        $valueArrays = $this->lineProcessor->processCSVLines($CSVLines);
+
+        // convert value arrays into (pseudo) transactions.
+        $pseudo = $this->columnValueConverter->processValueArrays($valueArrays);
+
+        // convert pseudo transactions into actual transactions.
+        $transactions = $this->pseudoTransactionProcessor->processPseudo($pseudo);
+
+        // submit transactions to API:
+
+
+        exit;
+
+
         $count = count($lines);
-        Log::debug(sprintf('Total number of lines to process: %d', $count));
+        Log::debug(sprintf('Total number of lines to submit: %d', $count));
 
         // get standard currency in case we don't have it locally.
         // TODO move out and log
@@ -137,7 +174,7 @@ class ImportRoutineManager
             $defaultAccount = $accountRequest->get();
         }
 
-        $transactions = $this->convertToTransactions($lines);
+
         $this->total  = count($transactions);
         // TODO move to other objects.
         Log::debug(sprintf('Now looping and cleaning up %d groups.', $this->total));
@@ -146,44 +183,6 @@ class ImportRoutineManager
             Log::debug(sprintf('Now at group %d/%d (has %d transaction(s))', $index+1, $this->total, $groupCount));
             foreach ($group['transactions'] as $groupIndex => $transaction) {
                 Log::debug(sprintf('Now at transaction %d/%d', $groupIndex+1,$groupCount));
-                // set currency ID if not set in array
-                if (
-                    (0 === $transaction['currency_id'] || null === $transaction['currency_id']) &&
-                    (null === $transaction['currency_code'] || '' === $transaction['currency_code'])) {
-                    $transaction['currency_id']   = $currency->id;
-                    $transaction['currency_code'] = null;
-                    Log::debug(sprintf('Set currency to %d because it was NULL or empty.', $currency->id));
-                }
-
-                // modify amount:
-                // TODO also apply to foreign amount if set
-                $transaction['amount'] = bcmul($transaction['amount'], $transaction['amount_modifier']);
-
-
-
-                // amount is overruled by amount_debit:
-                if (null !== $transaction['amount_debit']) {
-                    Log::debug(sprintf('Debit amount is "%s" which trumps the normal amount.', $transaction['amount_debit']));
-                    $transaction['amount'] = Amount::negative($transaction['amount_debit']);
-                }
-
-                // then credit
-                if (null !== $transaction['amount_credit']) {
-                    Log::debug(sprintf('Credit amount is "%s" which trumps the normal amount.', $transaction['amount_credit']));
-                    $transaction['amount'] = Amount::positive($transaction['amount_credit']);
-                }
-
-                // then negated
-                if (null !== $transaction['amount_negated']) {
-                    Log::debug(sprintf('Negated amount is "%s" which trumps the normal amount.', $transaction['amount_negated']));
-                    $transaction['amount'] = Amount::negative($transaction['amount_negated']);
-                }
-                // unset those fields:
-                unset($transaction['amount_credit'], $transaction['amount_debit'], $transaction['amount_negated']);
-
-                // do something with the collected tags.
-                $transaction['tags'] = array_unique(array_merge(array_values($transaction['tags_space']), array_values($transaction['tags_comma'])));
-                unset($transaction['tags_comma'], $transaction['tags_space']);
 
                 // TODO api accepts that source + dest are equal
 
@@ -501,17 +500,17 @@ class ImportRoutineManager
      *
      * @return array
      */
-    private function loopRecords(ResultSet $records): array
+    private function processCSVLines(ResultSet $records): array
     {
         $updatedRecords = [];
         $count          = $records->count();
-        Log::debug(sprintf('Now in loopRecords() with %d records', $count));
+        Log::debug(sprintf('Now in processCSVLines() with %d records', $count));
         $currentIndex = 1;
         foreach ($records as $index => $line) {
             $line = $this->sanitize($line);
             Log::debug(sprintf('In loop %d/%d', $currentIndex, $count));
             $line             = SpecificService::runSpecifics($line, $this->configuration->getSpecifics());
-            $updatedRecords[] = $this->processRecord($line);
+            $updatedRecords[] = $line;
             $currentIndex++;
         }
 
@@ -527,9 +526,17 @@ class ImportRoutineManager
     {
         Log::debug('Now in processRecord()');
 
-        // TODO any other steps go here.
+        // first step collects data.
+        // not a lot of inter-field communication
+        $pseudoTransaction = $this->lineProcessor->process($line);
 
-        return $this->lineProcessor->process($line);
+
+        $transactions = $this->convertToTransactions($lines);
+        // send steps merges and cleanups.
+        // pseudo cause not yet complete.
+        return $this->transactionProcessor->process($pseudoTransaction);
+
+
     }
 
     /**
@@ -558,7 +565,7 @@ class ImportRoutineManager
      *
      * @return array
      */
-    private function startImportLoop(): array
+    private function processCSVFile(): array
     {
         Log::debug('Now in startImportLoop()');
         $offset = $this->configuration->isHeaders() ? 1 : 0;
@@ -572,7 +579,7 @@ class ImportRoutineManager
             throw new RuntimeException($e->getMessage());
         }
 
-        return $this->loopRecords($records);
+        return $this->processCSVLines($records);
     }
 
 }

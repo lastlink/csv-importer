@@ -1,34 +1,37 @@
 <?php
 /**
  * LineProcessor.php
- * Copyright (c) 2019 thegrumpydictator@gmail.com
+ * Copyright (c) 2019 - 2019 thegrumpydictator@gmail.com
  *
- * This file is part of Firefly III CSV Importer.
+ * This file is part of the Firefly III CSV importer
+ * (https://github.com/firefly-iii-csv-importer).
  *
- * Firefly III CSV Importer is free software: you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * Firefly III CSV Importer is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Firefly III CSV Importer.If not, see
- * <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\Import;
+namespace App\Services\Import\Routine;
 
+use App\Services\Import\ColumnValue;
 use Log;
 use RuntimeException;
 
 /**
  * Class LineProcessor
  *
- * Processes single lines from a CSV file.
+ * Processes single lines from a CSV file. Converts them into
+ * arrays with single "ColumnValue" that hold the value + the role of the column
+ * + the mapped value (if any).
  */
 class LineProcessor
 {
@@ -51,6 +54,21 @@ class LineProcessor
     }
 
     /**
+     * @param array $lines
+     *
+     * @return array
+     */
+    public function processCSVLines(array $lines): array
+    {
+        $processed = [];
+        foreach ($lines as $line) {
+            $processed[] = $this->process($line);
+        }
+
+        return $processed;
+    }
+
+    /**
      * Convert each raw CSV to a set of ColumnValue objects, which hold as much info
      * as we can cram into it. These new lines can be imported later on.
      *
@@ -58,25 +76,9 @@ class LineProcessor
      *
      * @return array
      */
-    public function process(array $line): array
+    private function process(array $line): array
     {
-        Log::debug('Now in LineProcessor::process()');
-
-        // should return line.
-
-        return $this->convertLine($line);
-    }
-
-    /**
-     * Convert each line.
-     *
-     * @param array $line
-     *
-     * @return array
-     */
-    private function convertLine(array $line): array
-    {
-        Log::debug('Now in convertLine()');
+        Log::debug(sprintf('Now in %s', __METHOD__));
         $count  = count($line);
         $return = [];
         foreach ($line as $columnIndex => $value) {

@@ -30,14 +30,15 @@ use App\Services\CSV\Specifics\IngBelgium;
 use App\Services\CSV\Specifics\IngDescription;
 use App\Services\CSV\Specifics\PresidentsChoice;
 use App\Services\CSV\Specifics\SnsDescription;
-
+use App\Services\Import\Task\Amount;
+use App\Services\Import\Task\Tags;
 
 return [
-    'version'      => '0.1',
-    'access_token' => env('FIREFLY_III_ACCESS_TOKEN'),
-    'uri'          => env('FIREFLY_III_URI'),
-    'upload_path'  => storage_path('uploads'),
-    'specifics'    => [
+    'version'           => '0.1',
+    'access_token'      => env('FIREFLY_III_ACCESS_TOKEN'),
+    'uri'               => env('FIREFLY_III_URI'),
+    'upload_path'       => storage_path('uploads'),
+    'specifics'         => [
         AbnAmroDescription::class,
         AppendHash::class,
         Belfius::class,
@@ -45,6 +46,10 @@ return [
         IngDescription::class,
         PresidentsChoice::class,
         SnsDescription::class,
+    ],
+    'transaction_tasks' => [
+        Amount::class,
+        Tags::class,
     ],
 
     /*
