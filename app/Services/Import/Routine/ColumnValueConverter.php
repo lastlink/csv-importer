@@ -23,6 +23,7 @@
 namespace App\Services\Import\Routine;
 
 use App\Services\Import\ColumnValue;
+use App\Services\Import\Support\ProgressInformation;
 use Log;
 use RuntimeException;
 
@@ -34,6 +35,8 @@ use RuntimeException;
  */
 class ColumnValueConverter
 {
+    use ProgressInformation;
+
     /** @var array */
     private $roleToTransaction;
 
@@ -52,19 +55,20 @@ class ColumnValueConverter
         Log::debug(sprintf('Now in %s', __METHOD__));
         $processed = [];
 
-        foreach ($lines as $line) {
-            $processed[] = $this->processValueArray($line);
+        foreach ($lines as $index => $line) {
+            $processed[] = $this->processValueArray($index, $line);
         }
 
         return $processed;
     }
 
     /**
-     * @param $line
+     * @param int   $index
+     * @param array $line
      *
      * @return array
      */
-    private function processValueArray($line): array
+    private function processValueArray(int $index, array $line): array
     {
         $count = count($line);
         Log::debug(sprintf('Now in %s with %d columns in this line.', __METHOD__, $count));
@@ -156,6 +160,10 @@ class ColumnValueConverter
             $transaction['transactions'][0][$transactionField] = $parsedValue;
         }
         Log::debug('Final transaction', $transaction);
+
+        $this->addWarning($index,'Warning from Column value converter.');
+        $this->addMessage($index,'Message from Column value converter.');
+        $this->addError($index,'Error from Column value converter.');
 
         return $transaction;
     }

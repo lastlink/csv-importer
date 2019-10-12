@@ -23,6 +23,7 @@
 namespace App\Services\Import\Routine;
 
 use App\Services\Import\ColumnValue;
+use App\Services\Import\Support\ProgressInformation;
 use Log;
 use RuntimeException;
 
@@ -35,6 +36,8 @@ use RuntimeException;
  */
 class LineProcessor
 {
+    use ProgressInformation;
+
     /** @var array */
     private $doMapping;
     /** @var array */
@@ -61,8 +64,8 @@ class LineProcessor
     public function processCSVLines(array $lines): array
     {
         $processed = [];
-        foreach ($lines as $line) {
-            $processed[] = $this->process($line);
+        foreach ($lines as $index => $line) {
+            $processed[] = $this->process($index, $line);
         }
 
         return $processed;
@@ -72,11 +75,12 @@ class LineProcessor
      * Convert each raw CSV to a set of ColumnValue objects, which hold as much info
      * as we can cram into it. These new lines can be imported later on.
      *
+     * @param int   $index
      * @param array $line
      *
      * @return array
      */
-    private function process(array $line): array
+    private function process(int $index, array $line): array
     {
         Log::debug(sprintf('Now in %s', __METHOD__));
         $count  = count($line);
@@ -113,6 +117,10 @@ class LineProcessor
         $columnValue->setRole('original-source');
         $return[] = $columnValue;
         Log::debug(sprintf('Added column #%d to denote the original source.', count($return)-1));
+
+        $this->addError($index, 'Error from line processor.');
+        $this->addWarning($index, 'Warning from line processor.');
+        $this->addMessage($index, 'Message from line processor.');
 
         return $return;
     }

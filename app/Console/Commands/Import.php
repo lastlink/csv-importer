@@ -8,6 +8,7 @@ use App\Services\Import\ImportRoutineManager;
 use Illuminate\Console\Command;
 use JsonException;
 use Log;
+
 /**
  * Class Import
  */
@@ -91,6 +92,14 @@ class Import extends Command
         $manager->setConfiguration($configObject);
         $manager->setReader(FileReader::getReaderFromContent($csv));
         $manager->start();
+
+        $messages = $manager->getAllMessages();
+        $warnings = $manager->getAllWarnings();
+        $errors   = $manager->getAllErrors();
+        var_dump($messages);
+        var_dump($warnings);
+        var_dump($errors);
+        exit;
 
         $total    = $manager->getTotal();
         $messages = $manager->getMessages();

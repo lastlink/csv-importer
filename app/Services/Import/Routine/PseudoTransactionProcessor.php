@@ -30,6 +30,7 @@ use App\Services\FireflyIIIApi\Request\GetPreferenceRequest;
 use App\Services\FireflyIIIApi\Response\GetAccountResponse;
 use App\Services\FireflyIIIApi\Response\GetCurrencyResponse;
 use App\Services\FireflyIIIApi\Response\PreferenceResponse;
+use App\Services\Import\Support\ProgressInformation;
 use App\Services\Import\Task\AbstractTask;
 use Log;
 
@@ -38,6 +39,8 @@ use Log;
  */
 class PseudoTransactionProcessor
 {
+    use ProgressInformation;
+
     /** @var array */
     private $tasks;
 
@@ -71,8 +74,8 @@ class PseudoTransactionProcessor
         Log::debug(sprintf('Now in %s', __METHOD__));
         $processed = [];
         /** @var array $line */
-        foreach ($lines as $line) {
-            $processed[] = $this->processPseudoLine($line);
+        foreach ($lines as $index => $line) {
+            $processed[] = $this->processPseudoLine($index, $line);
         }
 
         return $processed;
@@ -113,11 +116,12 @@ class PseudoTransactionProcessor
     }
 
     /**
+     * @param int   $index
      * @param array $line
      *
      * @return array
      */
-    private function processPseudoLine(array $line): array
+    private function processPseudoLine(int $index, array $line): array
     {
         Log::debug(sprintf('Now in %s', __METHOD__));
         foreach ($this->tasks as $task) {
@@ -133,8 +137,10 @@ class PseudoTransactionProcessor
 
             $line = $object->process($line);
         }
-        var_dump($line);
-        exit;
+
+        $this->addWarning($index,'Warning from Pseudo.');
+        $this->addMessage($index,'Message from Pseudo.');
+        $this->addError($index,'Error from Pseudo.');
 
         return $line;
     }

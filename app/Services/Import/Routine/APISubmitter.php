@@ -27,20 +27,19 @@ use App\Services\FireflyIIIApi\Model\TransactionGroup;
 use App\Services\FireflyIIIApi\Request\PostTransactionRequest;
 use App\Services\FireflyIIIApi\Response\PostTransactionResponse;
 use App\Services\FireflyIIIApi\Response\ValidationErrorResponse;
+use App\Services\Import\Support\ProgressInformation;
 
 /**
  * Class APISubmitter
  */
 class APISubmitter
 {
+    use ProgressInformation;
     /**
      * @param array $lines
-     *
-     * @return array
      */
-    public function processTransactions(array $lines): array
+    public function processTransactions(array $lines): void
     {
-        $report = [];
         /**
          * @var int   $index
          * @var array $line
@@ -48,8 +47,6 @@ class APISubmitter
         foreach ($lines as $index => $line) {
             $this->processTransaction($index, $line);
         }
-
-        return $report;
     }
 
     /**
@@ -59,17 +56,15 @@ class APISubmitter
     private function processTransaction(int $index, array $line): void
     {
         $request = new PostTransactionRequest();
-        $request->setBody($transaction);
+        $request->setBody($line);
         $response = $request->post();
         if ($response instanceof ValidationErrorResponse) {
             $responseErrors = [];
             foreach ($response->errors->messages() as $key => $errors) {
                 foreach ($errors as $error) {
-                    $responseErrors[] = sprintf('%s: %s (original value: "%s")', $key, $error, $this->getOriginalValue($key, $transaction));
+                    $msg = sprintf('%s: %s (original value: "%s")', $key, $error, $this->getOriginalValue($key, $line));
+                    $this->addError($index, $msg);
                 }
-            }
-            if (count($responseErrors) > 0) {
-                $this->addErrorArray($index, $responseErrors);
             }
         }
 
@@ -81,8 +76,30 @@ class APISubmitter
             $message     = sprintf(
                 'Created %s #%d "%s" (%s %s)', $transaction->type, $group->id, $transaction->description, $transaction->currencyCode, $transaction->amount
             );
-            $this->addMessageString($index, $message);
+            $this->addMessage($index, $message);
         }
+
+        $this->addWarning($index,'Warning from API.');
+        $this->addMessage($index,'Message from API.');
+        $this->addError($index,'Error from API.');
+
+    }
+
+    /**
+     * @param string $key
+     * @param array  $transaction
+     *
+     * @return string
+     */
+    private function getOriginalValue(string $key, array $transaction): string
+    {
+        $parts = explode('.', $key);
+        if (3 !== count($parts)) {
+            return '(unknown)';
+        }
+        $index = (int)$parts[1];
+
+        return $transaction['transactions'][$index][$parts[2]] ?? '(not found)';
     }
 
 }
