@@ -280,7 +280,7 @@ class Configuration
     /**
      * @return int
      */
-    public function getDefaultAccount(): int
+    public function getDefaultAccount(): ?int
     {
         return $this->defaultAccount;
     }

@@ -59,9 +59,8 @@ class LineProcessor
      */
     public function process(array $line): array
     {
-        Log::debug('Now in process()');
+        Log::debug('Now in LineProcessor::process()');
         $convertedLine = $this->convertLine($line);
-
         // should return line.
 
         return $convertedLine;
@@ -76,6 +75,7 @@ class LineProcessor
      */
     private function convertLine(array $line): array
     {
+        Log::debug('Now in convertLine()');
         $count  = count($line);
         $return = [];
         foreach ($line as $columnIndex => $value) {
@@ -109,6 +109,7 @@ class LineProcessor
         $columnValue->setMappedValue(0);
         $columnValue->setRole('original-source');
         $return[] = $columnValue;
+        Log::debug(sprintf('Added column #%d to denote the original source.', count($return)-1));
 
         return $return;
     }

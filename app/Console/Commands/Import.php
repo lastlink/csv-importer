@@ -7,7 +7,7 @@ use App\Services\CSV\File\FileReader;
 use App\Services\Import\ImportRoutineManager;
 use Illuminate\Console\Command;
 use JsonException;
-
+use Log;
 /**
  * Class Import
  */
@@ -43,17 +43,21 @@ class Import extends Command
      */
     public function handle()
     {
+        Log::debug(sprintf('Now in %s',__METHOD__));
         $file   = $this->argument('file');
         $config = $this->argument('config');
         if (!file_exists($file) || (file_exists($file) && !is_file($file))) {
-            $this->error(sprintf('File "%s" does not exist or could not be read.', $file));
+            $message = sprintf('CSV file "%s" does not exist or could not be read.', $file);
+            $this->error($message);
+            Log::error($message);
 
             return 1;
         }
 
         if (!file_exists($config) || (file_exists($config) && !is_file($config))) {
-            $this->error(sprintf('File "%s" does not exist or could not be read.', $config));
-
+            $message = sprintf('Configuration file "%s" does not exist or could not be read.', $config);
+            $this->error($message);
+            Log::error($message);
             return 1;
         }
         // basic check on the JSON.
@@ -61,7 +65,9 @@ class Import extends Command
         try {
             $configuration = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
-            $this->error(sprintf('Could not decode the JSON in the config file: %s' . $e->getMessage()));
+            $message = sprintf('Could not decode the JSON in the config file: %s' , $e->getMessage());
+            $this->error($message);
+            Log::error($message);
 
             return 1;
         }
@@ -79,6 +85,7 @@ class Import extends Command
      */
     private function startImport(string $csv, array $configuration): void
     {
+        Log::debug(sprintf('Now in %s',__METHOD__));
         $configObject = Configuration::fromFile($configuration);
         $manager      = new ImportRoutineManager();
         $manager->setConfiguration($configObject);

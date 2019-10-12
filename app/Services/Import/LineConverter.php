@@ -22,6 +22,7 @@
 
 namespace App\Services\Import;
 
+use Log;
 use RuntimeException;
 
 /**
@@ -47,8 +48,11 @@ class LineConverter
      */
     public function convert(array $lines): array
     {
+        $count = count($lines);
+        Log::debug(sprintf('Now in %s with %d lines to convert.', __METHOD__, $count));
         $return = [];
         foreach ($lines as $index => $line) {
+            Log::debug(sprintf('Now converting line %d/%d to a transaction array.', $index+1, $count));
             $return[] = $this->convertLine($line);
         }
 
@@ -62,6 +66,8 @@ class LineConverter
      */
     private function convertLine(array $line): array
     {
+        $count = count($line);
+        Log::debug(sprintf('Now in %s with %d columns in this line.', __METHOD__, $count));
         // make a new transaction:
         $transaction = [
             //'user'          => 1, // ??
@@ -72,7 +78,7 @@ class LineConverter
                     'type'                  => 'withdrawal',
                     'date'                  => '',
                     'currency_id'           => null,
-                    //'currency_code'         => null,
+                    'currency_code'         => null,
                     //'foreign_currency_id'   => null,
                     //'foreign_currency_code' => null,
                     'amount'                => null,
@@ -129,11 +135,14 @@ class LineConverter
         foreach ($line as $columnIndex => $value) {
             $role             = $value->getRole();
             $transactionField = $this->roleToTransaction[$role] ?? null;
+            $parsedValue      = $value->getParsedValue();
             if (null === $transactionField) {
                 throw new RuntimeException(sprintf('No place for role "%s"', $value->getRole()));
             }
-            $transaction['transactions'][0][$transactionField] = $value->getParsedValue();
+            Log::debug(sprintf('Stored "%s" with role "%s" in field "%s"', $parsedValue, $role, $transactionField));
+            $transaction['transactions'][0][$transactionField] = $parsedValue;
         }
+        Log::debug('Final transaction', $transaction);
 
         return $transaction;
     }

@@ -25,8 +25,10 @@ namespace App\Services\Import;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Converter\Amount;
 use App\Services\CSV\Specifics\SpecificService;
+use App\Services\FireflyIIIApi\Model\Account;
 use App\Services\FireflyIIIApi\Model\Transaction;
 use App\Services\FireflyIIIApi\Model\TransactionGroup;
+use App\Services\FireflyIIIApi\Request\GetAccountRequest;
 use App\Services\FireflyIIIApi\Request\GetCurrencyRequest;
 use App\Services\FireflyIIIApi\Request\GetPreferenceRequest;
 use App\Services\FireflyIIIApi\Request\GetSearchAccountRequest;
@@ -110,29 +112,47 @@ class ImportRoutineManager
         Log::debug('Now in start()');
         $lines = $this->startImportLoop();
         $count = count($lines);
-        Log::debug(sprintf('Total number of lines: %d', $count));
+        Log::debug(sprintf('Total number of lines to process: %d', $count));
 
         // get standard currency in case we don't have it locally.
+        // TODO move out and log
         $prefRequest = new GetPreferenceRequest;
         $prefRequest->setName('currencyPreference');
         /** @var PreferenceResponse $response */
         $response = $prefRequest->get();
         $code     = $response->getPreference()->data;
-
         $currencyRequest = new GetCurrencyRequest();
         $currencyRequest->setCode($code);
         /** @var GetCurrencyResponse $result */
         $result       = $currencyRequest->get();
         $currency     = $result->getCurrency();
+
+        // get default import account (if set) in case CSV doesn't have it
+        // TODO move out and log
+        $defaultAccountId = $this->configuration->getDefaultAccount();
+        $defaultAccount =null;
+        if(null !== $defaultAccountId) {
+            $accountRequest = new GetAccountRequest;
+            $accountRequest->setId($defaultAccountId);
+            $defaultAccount = $accountRequest->get();
+        }
+
         $transactions = $this->convertToTransactions($lines);
         $this->total  = count($transactions);
         // TODO move to other objects.
+        Log::debug(sprintf('Now looping and cleaning up %d groups.', $this->total));
         foreach ($transactions as $index => $group) {
+            $groupCount = count($group['transactions']);
+            Log::debug(sprintf('Now at group %d/%d (has %d transaction(s))', $index+1, $this->total, $groupCount));
             foreach ($group['transactions'] as $groupIndex => $transaction) {
+                Log::debug(sprintf('Now at transaction %d/%d', $groupIndex+1,$groupCount));
                 // set currency ID if not set in array
-                if (0 === $transaction['currency_id']
-                    && (null === $transaction['currency_code'] || '' === $transaction['currency_code'])) {
-                    $transaction['currency_id'] = $currency->id;
+                if (
+                    (0 === $transaction['currency_id'] || null === $transaction['currency_id']) &&
+                    (null === $transaction['currency_code'] || '' === $transaction['currency_code'])) {
+                    $transaction['currency_id']   = $currency->id;
+                    $transaction['currency_code'] = null;
+                    Log::debug(sprintf('Set currency to %d because it was NULL or empty.', $currency->id));
                 }
 
                 // get source + dest accounts:
@@ -151,22 +171,20 @@ class ImportRoutineManager
                     'number'           => $transaction['destination_number'] ?? null,
                 ];
 
-                $source      = $this->findAccount($sourceArray);
-                $destination = $this->findAccount($destinationAccount);
+                $source      = $this->findAccount($sourceArray, $defaultAccount->getAccount());
+                $destination = $this->findAccount($destinationAccount,null);
 
                 if (-1 === bccomp('0', $transaction['amount'])) {
                     // amount is positive
-                    // fix source
                     $transaction['source_id']     = $source['id'];
                     $transaction['source_name']   = $source['name'];
                     $transaction['source_iban']   = $source['iban'];
                     $transaction['source_number'] = $source['number'];
-
-                    // same for destination
                     $transaction['destination_id']     = $destination['id'];
                     $transaction['destination_name']   = $destination['name'];
                     $transaction['destination_iban']   = $destination['iban'];
                     $transaction['destination_number'] = $destination['number'];
+                    $transaction['type'] = $this->determineType($source['type'], $destination['type']);
                 }
 
                 if (1 === bccomp('0', $transaction['amount'])) {
@@ -175,28 +193,28 @@ class ImportRoutineManager
                     $transaction['source_name']   = $destination['name'];
                     $transaction['source_iban']   = $destination['iban'];
                     $transaction['source_number'] = $destination['number'];
-
-                    // same for destination
                     $transaction['destination_id']     = $source['id'];
                     $transaction['destination_name']   = $source['name'];
                     $transaction['destination_iban']   = $source['iban'];
                     $transaction['destination_number'] = $source['number'];
-                    // inverse amount:
                     $transaction['amount'] = Amount::positive($transaction['amount']);
+                    $transaction['type'] = $this->determineType($destination['type'], $source['type']);
                 }
+
+                // if source is NULL
 
                 // if the source + destination have a type, we can say something about the
                 // transaction type:
-                $transaction['type'] = $this->determineType($source['type'], $destination['type']);
+
 
                 // if new source ID is filled in, drop the other fields:
-                if (0 !== $transaction['source_id']) {
+                if (0 !== $transaction['source_id'] && null !== $transaction['source_id']) {
                     $transaction['source_name']   = null;
                     $transaction['source_iban']   = null;
                     $transaction['source_number'] = null;
                 }
                 // if new source ID is filled in, drop the other fields:
-                if (0 !== $transaction['destination_id']) {
+                if (0 !== $transaction['destination_id'] && null !== $transaction['destination_id']) {
                     $transaction['destination_name']   = null;
                     $transaction['destination_iban']   = null;
                     $transaction['destination_number'] = null;
@@ -285,6 +303,7 @@ class ImportRoutineManager
      */
     private function convertToTransactions(array $lines): array
     {
+        Log::debug(sprintf('Now in %s', __METHOD__));
         return $this->lineConverter->convert($lines);
     }
 
@@ -305,9 +324,19 @@ class ImportRoutineManager
      */
     private function determineType(?string $sourceType, ?string $destinationType): string
     {
-        if (null === $sourceType || null === $destinationType) {
+        if (null === $sourceType && null === $destinationType) {
             return 'withdrawal';
         }
+
+        // if source is a asset and dest is NULL, its a withdrawal
+        if('asset' === $sourceType && null === $destinationType){
+            return 'withdrawal';
+        }
+        // if destination is asset and source is NULL, its a deposit
+        if(null === $sourceType && 'asset' === $destinationType){
+            return 'deposit';
+        }
+
         $type = config(sprintf('transaction_types.account_to_transaction.%s.%s', $sourceType, $destinationType));
 
         return $type ?? 'withdrawal';
@@ -321,18 +350,22 @@ class ImportRoutineManager
      * @return array
      * @throws \App\Exceptions\ApiHttpException
      */
-    private function findAccount(array $array): array
+    private function findAccount(array $array, ?Account $defaultAccount): array
     {
-
+        Log::debug('Now in findAccount', $array);
         // search ID
         if (is_int($array['id']) && $array['id'] > 0) {
+            Log::debug(sprintf('Going to search account with ID #%d', $array['id']));
             $request = new GetSearchAccountRequest();
             $request->setField('id');
             $request->setQuery($array['id']);
             /** @var GetAccountsResponse $response */
             $response = $request->get();
             if (1 === count($response)) {
-                return $response->current()->toArray();
+                /** @var Account $account */
+                $account = $response->current();
+                Log::debug(sprintf('Found account #%d based on ID #%d', $account->id, $array['id']));
+                return $account->toArray();
             }
 
             return $array;
@@ -340,41 +373,61 @@ class ImportRoutineManager
 
         // search name
         if (is_string($array['name']) && '' !== $array['name']) {
+            Log::debug(sprintf('Going to search account with name "%s"', $array['name']));
             $request = new GetSearchAccountRequest();
             $request->setField('name');
             $request->setQuery($array['name']);
             /** @var GetAccountsResponse $response */
             $response = $request->get();
             if (1 === count($response)) {
-                return $response->current()->toArray();
+                /** @var Account $account */
+                $account = $response->current();
+                Log::debug(sprintf('Found account #%d based on name "%s"', $account->id, $array['name']));
+                return $account->toArray();
             }
+            Log::debug('Found nothing on name.');
         }
         // search IBAN
         if (is_string($array['iban']) && '' !== $array['iban']) {
+            Log::debug(sprintf('Going to search account with iban "%s"', $array['iban']));
             $request = new GetSearchAccountRequest();
             $request->setField('iban');
             $request->setQuery($array['iban']);
             /** @var GetAccountsResponse $response */
             $response = $request->get();
             if (1 === count($response)) {
-                return $response->current()->toArray();
+                /** @var Account $account */
+                $account = $response->current();
+                Log::debug(sprintf('Found account #%d based on IBAN "%s"', $account->id, $array['iban']));
+                return $account->toArray();
             }
+            Log::debug('Found nothing on IBAN.');
         }
 
         // search number
         if (is_string($array['number']) && '' !== $array['number']) {
+            Log::debug(sprintf('Going to search account with number "%s"', $array['number']));
             $request = new GetSearchAccountRequest();
             $request->setField('number');
             $request->setQuery($array['number']);
             /** @var GetAccountsResponse $response */
             $response = $request->get();
             if (1 === count($response)) {
-                return $response->current()->toArray();
+                /** @var Account $account */
+                $account = $response->current();
+                Log::debug(sprintf('Found account #%d based on account number "%s"', $account->id, $array['number']));
+                return $account->toArray();
             }
+            Log::debug('Found nothing on number.');
         }
+        Log::debug('Found no account or haven\'t searched for one.');
 
         // append an empty type to the array for consistency's sake.
         $array['type'] = null;
+        // if the default account is not NULL, return that one instead:
+        if(null !== $defaultAccount) {
+            return $defaultAccount->toArray();
+        }
 
         return $array;
     }
@@ -408,11 +461,13 @@ class ImportRoutineManager
         $updatedRecords = [];
         $count          = $records->count();
         Log::debug(sprintf('Now in loopRecords() with %d records', $count));
+        $currentIndex = 1;
         foreach ($records as $index => $line) {
             $line = $this->sanitize($line);
-            Log::debug(sprintf('In loop %d/%d', $index + 1, $count));
+            Log::debug(sprintf('In loop %d/%d', $currentIndex, $count));
             $line             = SpecificService::runSpecifics($line, $this->configuration->getSpecifics());
             $updatedRecords[] = $this->processRecord($line);
+            $currentIndex++;
         }
 
         return $updatedRecords;
@@ -427,7 +482,8 @@ class ImportRoutineManager
     {
         Log::debug('Now in processRecord()');
         $updatedLine = $this->lineProcessor->process($line);
-        unset($processor);
+
+        // TODO any other steps go here.
 
         return $updatedLine;
     }

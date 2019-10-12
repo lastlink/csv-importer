@@ -1,0 +1,31 @@
+{
+    "has-headers": true,
+    "date-format": "Y-m-d",
+    "delimiter": ",",
+    "import-account": 1,
+    "specifics": [],
+    "column-count": 47,
+    "column-roles": [
+        "opposing-name",
+        "description",
+        "amount",
+        "date-transaction"
+    ],
+    "column-do-mapping": [
+        false,
+        false,
+        false,
+        false
+    ],
+    "column-mapping-config": {
+    },
+    "file-type": "csv",
+    "has-config-file": true,
+    "apply-rules": true,
+    "match-bills": false,
+    "auto-start": true,
+    "column-roles-complete": false,
+    "column-mapping-complete": false,
+    "initial-config-complete": false,
+    "has-file-upload": false
+}
