@@ -82,6 +82,7 @@ class LineConverter
                     //'foreign_currency_id'   => null,
                     //'foreign_currency_code' => null,
                     'amount'                => null,
+                    'amount_modifier'       => '1', // 1 or -1
                     //'foreign_amount'        => null,
                     'description'           => null,
                     'source_id'             => null,
@@ -125,6 +126,8 @@ class LineConverter
                     //'due_date'              => null,
                     //'payment_date'          => null,
                     //'invoice_date'          => null,
+                    'tags_comma' => [],
+                    'tags_space' => [],
                 ],
             ],
         ];
@@ -139,11 +142,27 @@ class LineConverter
             if (null === $transactionField) {
                 throw new RuntimeException(sprintf('No place for role "%s"', $value->getRole()));
             }
-            Log::debug(sprintf('Stored "%s" with role "%s" in field "%s"', $parsedValue, $role, $transactionField));
+            if(null === $parsedValue) {
+                Log::debug(sprintf('Skip column #%d with role "%s" (in field "%s")', $columnIndex, $role, $transactionField));
+                continue;
+            }
+            Log::debug(sprintf('Stored column #%d with value"%s" and role "%s" in field "%s"', $columnIndex, $this->toString($parsedValue), $role, $transactionField));
             $transaction['transactions'][0][$transactionField] = $parsedValue;
         }
         Log::debug('Final transaction', $transaction);
 
         return $transaction;
+    }
+
+    /**
+     * @param $value
+     *
+     * @return string
+     */
+    private function toString($value): string {
+        if(is_array($value)) {
+            return json_encode($value);
+        }
+        return (string)$value;
     }
 }

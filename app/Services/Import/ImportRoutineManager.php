@@ -155,6 +155,15 @@ class ImportRoutineManager
                     Log::debug(sprintf('Set currency to %d because it was NULL or empty.', $currency->id));
                 }
 
+                // modify amount:
+                $transaction['amount'] = bcmul($transaction['amount'], $transaction['amount_modifier']);
+
+                // do something with the collected tags.
+                $transaction['tags'] = array_unique(array_merge(array_values($transaction['tags_space']), array_values($transaction['tags_comma'])));
+                unset($transaction['tags_comma'], $transaction['tags_space']);
+
+                // TODO api accepts that source + dest are equal
+
                 // get source + dest accounts:
                 $sourceArray        = [
                     'transaction_type' => $transaction['type'],
@@ -162,6 +171,7 @@ class ImportRoutineManager
                     'name'             => $transaction['source_name'],
                     'iban'             => $transaction['source_iban'] ?? null,
                     'number'           => $transaction['source_number'] ?? null,
+                    'bic'              => $transaction['source_bic'] ?? null,
                 ];
                 $destinationAccount = [
                     'transaction_type' => $transaction['type'],
@@ -169,8 +179,9 @@ class ImportRoutineManager
                     'name'             => $transaction['destination_name'],
                     'iban'             => $transaction['destination_iban'] ?? null,
                     'number'           => $transaction['destination_number'] ?? null,
+                    'bic'              => $transaction['destination_bic'] ?? null,
                 ];
-
+                // TODO add warning when falling back on the default account.
                 $source      = $this->findAccount($sourceArray, $defaultAccount->getAccount());
                 $destination = $this->findAccount($destinationAccount,null);
 
@@ -180,10 +191,14 @@ class ImportRoutineManager
                     $transaction['source_name']   = $source['name'];
                     $transaction['source_iban']   = $source['iban'];
                     $transaction['source_number'] = $source['number'];
+                    $transaction['source_bic']    = $source['bic'];
+
                     $transaction['destination_id']     = $destination['id'];
                     $transaction['destination_name']   = $destination['name'];
                     $transaction['destination_iban']   = $destination['iban'];
                     $transaction['destination_number'] = $destination['number'];
+                    $transaction['destination_bic']    = $destination['bic'];
+
                     $transaction['type'] = $this->determineType($source['type'], $destination['type']);
                 }
 
@@ -193,10 +208,14 @@ class ImportRoutineManager
                     $transaction['source_name']   = $destination['name'];
                     $transaction['source_iban']   = $destination['iban'];
                     $transaction['source_number'] = $destination['number'];
+                    $transaction['source_bic']    = $destination['bic'];
+
                     $transaction['destination_id']     = $source['id'];
                     $transaction['destination_name']   = $source['name'];
                     $transaction['destination_iban']   = $source['iban'];
                     $transaction['destination_number'] = $source['number'];
+                    $transaction['destination_bic']    = $source['bic'];
+
                     $transaction['amount'] = Amount::positive($transaction['amount']);
                     $transaction['type'] = $this->determineType($destination['type'], $source['type']);
                 }
@@ -423,7 +442,8 @@ class ImportRoutineManager
         Log::debug('Found no account or haven\'t searched for one.');
 
         // append an empty type to the array for consistency's sake.
-        $array['type'] = null;
+        $array['type'] = $array['type'] ?? null;
+        $array['bic']  = $array['bic'] ?? null;
         // if the default account is not NULL, return that one instead:
         if(null !== $defaultAccount) {
             return $defaultAccount->toArray();

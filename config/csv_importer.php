@@ -454,9 +454,9 @@ return [
         'currency-symbol'       => 'currency_symbol',
         'description'           => 'description',
         'note'                  => 'notes',
-        'ing-debit-credit'      => 'ing-debit-credit', // TODO needs conversion.
-        'rabo-debit-credit'     => 'rabo-debit-credit', // TODO needs conversion.
-        'generic-debit-credit'  => 'generic-debit-credit',// TODO needs conversion.
+        'ing-debit-credit'      => 'amount_modifier',
+        'rabo-debit-credit'     => 'amount_modifier',
+        'generic-debit-credit'  => 'amount_modifier',
         'external-id'           => 'external_id',
         'internal_reference'    => 'internal_reference',
         'original-source'       => 'original_source',

@@ -1,2 +1,11 @@
-destination_name,description,amount,date,
-SomeAPIAccount,Test API transaction 1,-12.44,2019-10-06
+destination_name,description,amount,date,rabo
+SomeAPIAccount,Test API transaction 1,12.44,2019-10-06,D
+SomeAPIAccount,Test API transaction 2,12.44,2019-10-06,A
+SomeAPIAccount,Test API transaction 3,12.44,2019-10-06,DR
+SomeAPIAccount,Test API transaction 3,12.44,2019-10-06,Af
+SomeAPIAccount,Test API transaction 3,12.44,2019-10-06,Debet
+SomeAPIAccount,Test API transaction 1,12.44,2019-10-06,C
+SomeAPIAccount,Test API transaction 2,12.44,2019-10-06,B
+SomeAPIAccount,Test API transaction 3,12.44,2019-10-06,CR
+SomeAPIAccount,Test API transaction 3,12.44,2019-10-06,Bij
+SomeAPIAccount,Test API transaction 3,12.44,2019-10-06,Credit

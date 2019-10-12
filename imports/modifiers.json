@@ -9,7 +9,8 @@
         "opposing-name",
         "description",
         "amount",
-        "date-transaction"
+        "date-transaction",
+        "rabo-debit-credit"
     ],
     "column-do-mapping": [
         false,

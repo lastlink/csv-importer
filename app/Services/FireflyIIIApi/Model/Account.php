@@ -37,6 +37,8 @@ class Account
     public $iban;
     /** @var string */
     public $number;
+    /** @var string */
+    public $bic;
 
     /**
      * Account constructor.
@@ -59,6 +61,7 @@ class Account
         $account->type   = $array['attributes']['type'];
         $account->iban   = $array['attributes']['iban'];
         $account->number = $array['attributes']['account_number'];
+        $account->bic    = $array['attributes']['bic'];
 
         return $account;
 
@@ -75,6 +78,7 @@ class Account
             'type'   => $this->type,
             'iban'   => $this->iban,
             'number' => $this->number,
+            'bic'    => $this->bic,
         ];
     }
 
