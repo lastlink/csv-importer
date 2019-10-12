@@ -119,8 +119,8 @@ class LineProcessor
         Log::debug(sprintf('Added column #%d to denote the original source.', count($return)-1));
 
         $this->addError($index, 'Error from line processor.');
-        $this->addWarning($index, 'Warning from line processor.');
-        $this->addMessage($index, 'Message from line processor.');
+        //        $this->addWarning($index, 'Warning from line processor.');
+        //        $this->addMessage($index, 'Message from line processor.');
 
         return $return;
     }

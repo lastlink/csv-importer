@@ -79,9 +79,9 @@ class APISubmitter
             $this->addMessage($index, $message);
         }
 
-        $this->addWarning($index,'Warning from API.');
-        $this->addMessage($index,'Message from API.');
-        $this->addError($index,'Error from API.');
+        //$this->addWarning($index,'Warning from API.');
+        //$this->addMessage($index,'Message from API.');
+        //$this->addError($index,'Error from API.');
 
     }
 
@@ -94,6 +94,9 @@ class APISubmitter
     private function getOriginalValue(string $key, array $transaction): string
     {
         $parts = explode('.', $key);
+        if(1 === count($parts)) {
+            return $transaction[$key] ?? '(not found)';
+        }
         if (3 !== count($parts)) {
             return '(unknown)';
         }

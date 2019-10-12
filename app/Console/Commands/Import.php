@@ -96,29 +96,30 @@ class Import extends Command
         $messages = $manager->getAllMessages();
         $warnings = $manager->getAllWarnings();
         $errors   = $manager->getAllErrors();
-        var_dump($messages);
-        var_dump($warnings);
-        var_dump($errors);
-        exit;
 
-        $total    = $manager->getTotal();
-        $messages = $manager->getMessages();
-        $errors   = $manager->getErrors();
-
-        for ($i = 0; $i < $total; $i++) {
-            if (isset($messages[$i])) {
-                $this->info(sprintf('#%d: %s', $i, $messages[$i]));
-            }
-            if (isset($errors[$i])) {
-                if (is_array($errors[$i])) {
-                    foreach ($errors[$i] as $line) {
-                        $this->error(sprintf('#%d: %s', $i, $line));
-                    }
-                }
-                if (!is_array($errors[$i])) {
-                    $this->error(sprintf('#%d: %s', $i, $errors[$i]));
+        if (count($errors) > 0) {
+            foreach ($errors as $index => $error) {
+                foreach ($error as $line) {
+                    $this->error(sprintf('ERROR in line     #%d: %s', $index + 1, $line));
                 }
             }
         }
+
+        if (count($warnings) > 0) {
+            foreach ($warnings as $index => $warning) {
+                foreach ($warning as $line) {
+                    $this->warn(sprintf('Warning from line #%d: %s', $index + 1, $line));
+                }
+            }
+        }
+
+        if (count($messages) > 0) {
+            foreach ($messages as $index => $message) {
+                foreach ($message as $line) {
+                    $this->info(sprintf('Message from line #%d: %s', $index + 1, $line));
+                }
+            }
+        }
+
     }
 }

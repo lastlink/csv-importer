@@ -118,9 +118,9 @@ class CSVFileProcessor
             Log::debug(sprintf('In loop %d/%d', $currentIndex, $count));
             $line             = SpecificService::runSpecifics($line, $this->specifics);
             $updatedRecords[] = $line;
-            $this->addWarning($zeroIndex,'Warning from CSV file processor.');
-            $this->addMessage($zeroIndex,'Message from CSV file processor.');
-            $this->addError($zeroIndex,'Error from CSV file processor.');
+            //            $this->addWarning($zeroIndex,'Warning from CSV file processor.');
+            //            $this->addMessage($zeroIndex,'Message from CSV file processor.');
+            //            $this->addError($zeroIndex,'Error from CSV file processor.');
             $currentIndex++;
             $zeroIndex++;
 

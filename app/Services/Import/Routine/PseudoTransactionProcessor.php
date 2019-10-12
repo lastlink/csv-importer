@@ -138,9 +138,9 @@ class PseudoTransactionProcessor
             $line = $object->process($line);
         }
 
-        $this->addWarning($index,'Warning from Pseudo.');
-        $this->addMessage($index,'Message from Pseudo.');
-        $this->addError($index,'Error from Pseudo.');
+        //        $this->addWarning($index,'Warning from Pseudo.');
+        //        $this->addMessage($index,'Message from Pseudo.');
+        //        $this->addError($index,'Error from Pseudo.');
 
         return $line;
     }

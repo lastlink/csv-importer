@@ -152,9 +152,14 @@ abstract class Request
         Log::debug('Body is', $this->getBody());
 
         $res = $client->request('POST', $fullUri, $options);
+
+        Log::debug(sprintf('Status code is %d', $res->getStatusCode()));
+
         if (422 === $res->getStatusCode()) {
             $body = $res->getBody();
             $json = json_decode($body, true);
+
+            Log::debug('Returned body from 422.', $json);
 
             if (null === $json) {
                 throw new ApiException(sprintf('Body is empty. Status code is %d.', $res->getStatusCode()));
