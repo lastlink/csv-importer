@@ -51,6 +51,7 @@ class LineProcessor
     {
         Log::debug('Created LineProcessor()');
         Log::debug('Roles', $roles);
+        Log::debug('Mapping', $mapping);
         $this->roles     = $roles;
         $this->mapping   = $mapping;
         $this->doMapping = $doMapping;
@@ -64,7 +65,9 @@ class LineProcessor
     public function processCSVLines(array $lines): array
     {
         $processed = [];
+        $count     = count($lines);
         foreach ($lines as $index => $line) {
+            Log::debug(sprintf('Now processing CSV line #%d/#%d', $index + 1, $count));
             $processed[] = $this->process($index, $line);
         }
 
@@ -100,6 +103,9 @@ class LineProcessor
 
             // is a mapped value present?
             $mapped = $this->mapping[$columnIndex][$value] ?? 0;
+            Log::debug(sprintf('ColumnIndex is %s', var_export($columnIndex, true)));
+            Log::debug(sprintf('Value is %s', var_export($value, true)));
+            Log::debug('Local mapping', $this->mapping[$columnIndex] ?? ['empty']);
             // the role might change because of the mapping.
             $role = $this->getRoleForColumn($columnIndex, $mapped);
 
@@ -118,9 +124,7 @@ class LineProcessor
         $return[] = $columnValue;
         Log::debug(sprintf('Added column #%d to denote the original source.', count($return)-1));
 
-        $this->addError($index, 'Error from line processor.');
-        //        $this->addWarning($index, 'Warning from line processor.');
-        //        $this->addMessage($index, 'Message from line processor.');
+        //$this->addError($index, 'Error from line processor.');
 
         return $return;
     }

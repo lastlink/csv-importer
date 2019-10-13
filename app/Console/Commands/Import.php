@@ -44,11 +44,12 @@ class Import extends Command
      */
     public function handle()
     {
+        $this->info(sprintf('Welcome to the Firefly III CSV importer, v%s', config('csv_importer.version')));
         Log::debug(sprintf('Now in %s',__METHOD__));
         $file   = $this->argument('file');
         $config = $this->argument('config');
         if (!file_exists($file) || (file_exists($file) && !is_file($file))) {
-            $message = sprintf('CSV file "%s" does not exist or could not be read.', $file);
+            $message = sprintf('The importer can\'t import: CSV file "%s" does not exist or could not be read.', $file);
             $this->error($message);
             Log::error($message);
 
@@ -56,7 +57,7 @@ class Import extends Command
         }
 
         if (!file_exists($config) || (file_exists($config) && !is_file($config))) {
-            $message = sprintf('Configuration file "%s" does not exist or could not be read.', $config);
+            $message = sprintf('The importer can\'t import: configuration file "%s" does not exist or could not be read.', $config);
             $this->error($message);
             Log::error($message);
             return 1;
@@ -66,12 +67,18 @@ class Import extends Command
         try {
             $configuration = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
-            $message = sprintf('Could not decode the JSON in the config file: %s' , $e->getMessage());
+            $message = sprintf('The importer can\'t import: could not decode the JSON in the config file: %s' , $e->getMessage());
             $this->error($message);
             Log::error($message);
 
             return 1;
         }
+
+        $this->line('The import routine is about to start.');
+        $this->line('This is invisible and may take quite some time.');
+        $this->line('Once finished, you will see a list of errors, warnings and messages (if applicable).');
+        $this->line('--------');
+        $this->line('Running...');
         $csv = file_get_contents($file);
         $this->startImport($csv, $configuration);
 

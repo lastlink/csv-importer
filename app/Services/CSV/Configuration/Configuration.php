@@ -235,12 +235,14 @@ class Configuration
         // loop do mapping
         $doMapping = $data['column-do-mapping'] ?? [];
         foreach ($doMapping as $index => $map) {
+            $index                     = (int)$index;
             $object->doMapping[$index] = $map;
         }
 
         // loop mapping
         $mapping = $data['column-mapping-config'] ?? [];
         foreach ($mapping as $index => $map) {
+            $index                   = (int)$index;
             $object->mapping[$index] = $map;
         }
 

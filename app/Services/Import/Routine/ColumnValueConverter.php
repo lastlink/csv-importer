@@ -161,7 +161,7 @@ class ColumnValueConverter
         }
         Log::debug('Final transaction', $transaction);
 
-                $this->addWarning($index,'Warning from Column value converter.');
+        //$this->addWarning($index,'Warning from Column value converter.');
         //        $this->addMessage($index,'Message from Column value converter.');
         //        $this->addError($index,'Error from Column value converter.');
 
