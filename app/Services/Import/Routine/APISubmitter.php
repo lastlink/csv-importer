@@ -28,7 +28,7 @@ use App\Services\FireflyIIIApi\Request\PostTransactionRequest;
 use App\Services\FireflyIIIApi\Response\PostTransactionResponse;
 use App\Services\FireflyIIIApi\Response\ValidationErrorResponse;
 use App\Services\Import\Support\ProgressInformation;
-
+use Log;
 /**
  * Class APISubmitter
  */
@@ -40,6 +40,8 @@ class APISubmitter
      */
     public function processTransactions(array $lines): void
     {
+        $count = count($lines);
+        Log::info(sprintf('Going to submit %d transactions to your Firefly III instance.', $count));
         /**
          * @var int   $index
          * @var array $line
@@ -47,6 +49,7 @@ class APISubmitter
         foreach ($lines as $index => $line) {
             $this->processTransaction($index, $line);
         }
+        Log::info(sprintf('Done submitting %d transactions to your Firefly III instance.', $count));
     }
 
     /**
@@ -64,6 +67,7 @@ class APISubmitter
                 foreach ($errors as $error) {
                     $msg = sprintf('%s: %s (original value: "%s")', $key, $error, $this->getOriginalValue($key, $line));
                     $this->addError($index, $msg);
+                    Log::error($msg);
                 }
             }
         }
@@ -77,12 +81,8 @@ class APISubmitter
                 'Created %s #%d "%s" (%s %s)', $transaction->type, $group->id, $transaction->description, $transaction->currencyCode, $transaction->amount
             );
             $this->addMessage($index, $message);
+            Log::info($message);
         }
-
-        //$this->addWarning($index,'Warning from API.');
-        //$this->addMessage($index,'Message from API.');
-        //$this->addError($index,'Error from API.');
-
     }
 
     /**

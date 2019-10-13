@@ -66,10 +66,15 @@ class LineProcessor
     {
         $processed = [];
         $count     = count($lines);
+
+        Log::info(sprintf('Now processing the data in the %d CSV lines...', $count));
+
         foreach ($lines as $index => $line) {
             Log::debug(sprintf('Now processing CSV line #%d/#%d', $index + 1, $count));
             $processed[] = $this->process($index, $line);
         }
+
+        Log::info(sprintf('Done processing data in %d CSV lines...', $count));
 
         return $processed;
     }
@@ -193,6 +198,7 @@ class LineProcessor
         // used to validate whatever has been set as mapping
         // TODO this validation is not implemented yet.
         $this->mappedValues[$newRole][] = $mapped;
+        $this->mappedValues[$newRole] = array_unique($this->mappedValues[$newRole]);
         Log::debug(sprintf('Values mapped to role "%s" are: ', $newRole), $this->mappedValues[$newRole]);
 
         return $newRole;

@@ -127,7 +127,7 @@ class ImportRoutineManager
      */
     public function start(): void
     {
-        Log::debug('Now in start()');
+        Log::debug(sprintf('Now in %s', __METHOD__));
 
         // convert CSV file into raw lines (arrays)
         $this->csvFileProcessor->setSpecifics($this->configuration->getSpecifics());

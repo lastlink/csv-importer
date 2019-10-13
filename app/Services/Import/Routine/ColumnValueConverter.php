@@ -53,11 +53,14 @@ class ColumnValueConverter
     public function processValueArrays(array $lines): array
     {
         Log::debug(sprintf('Now in %s', __METHOD__));
-        $processed = [];
 
+        $processed = [];
+        $count     = count($lines);
+        Log::info(sprintf('Now parsing and combining %d lines.', $count));
         foreach ($lines as $index => $line) {
             $processed[] = $this->processValueArray($index, $line);
         }
+        Log::info(sprintf('Done parsing and combining %d lines.', $count));
 
         return $processed;
     }

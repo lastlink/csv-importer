@@ -70,8 +70,8 @@ return [
 
         'daily' => [
             'driver' => 'daily',
-            'path'   => storage_path('logs/laravel.log'),
-            'level'  => 'debug',
+            'path'   => storage_path('logs/csv-import.log'),
+            'level'  => env('LOG_LEVEL', 'debug'),
             'days'   => 14,
         ],
 

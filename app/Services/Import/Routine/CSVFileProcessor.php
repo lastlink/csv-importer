@@ -110,16 +110,17 @@ class CSVFileProcessor
     {
         $updatedRecords = [];
         $count          = $records->count();
-        Log::debug(sprintf('Now in processCSVLines() with %d records', $count));
+        Log::info(sprintf('Now in %s with %d records',__METHOD__, $count));
         $currentIndex = 1;
         foreach ($records as $index => $line) {
             $line = $this->sanitize($line);
-            Log::debug(sprintf('In loop %d/%d', $currentIndex, $count));
+            Log::debug(sprintf('Parsing line %d/%d', $currentIndex, $count));
             $line             = SpecificService::runSpecifics($line, $this->specifics);
             $updatedRecords[] = $line;
             $currentIndex++;
 
         }
+        Log::info(sprintf('Parsed all %d lines.', $count));
 
         return $updatedRecords;
     }
