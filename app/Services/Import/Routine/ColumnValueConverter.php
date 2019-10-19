@@ -158,7 +158,7 @@ class ColumnValueConverter
                 continue;
             }
             Log::debug(
-                sprintf('Stored column #%d with value"%s" and role "%s" in field "%s"', $columnIndex, $this->toString($parsedValue), $role, $transactionField)
+                sprintf('Stored column #%d with value "%s" and role "%s" in field "%s"', $columnIndex, $this->toString($parsedValue), $role, $transactionField)
             );
             $transaction['transactions'][0][$transactionField] = $parsedValue;
         }

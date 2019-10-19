@@ -138,7 +138,7 @@ class Accounts extends AbstractTask
         if (1 === count($response)) {
             /** @var Account $account */
             $account = $response->current();
-            Log::debug(sprintf('Found account #%d based on "%s" "%s"', $account->id, $field, $value));
+            Log::debug(sprintf('Found %s account #%d based on "%s" "%s"', $account->type, $account->id, $field, $value));
 
             return $account;
         }
@@ -181,6 +181,46 @@ class Accounts extends AbstractTask
     }
 
     /**
+     * @param array $transaction
+     * @param array $source
+     *
+     * @return array
+     */
+    private function setSource(array $transaction, array $source): array
+    {
+        return $this->setTransactionAccount('source', $transaction, $source);
+    }
+
+    /**
+     * @param array $transaction
+     * @param array $source
+     *
+     * @return array
+     */
+    private function setDestination(array $transaction, array $source): array
+    {
+        return $this->setTransactionAccount('destination', $transaction, $source);
+    }
+
+    /**
+     * @param string $direction
+     * @param array  $transaction
+     * @param array  $account
+     *
+     * @return array
+     */
+    private function setTransactionAccount(string $direction, array $transaction, array $account): array
+    {
+        $transaction[sprintf('%s_id', $direction)]     = $account['id'];
+        $transaction[sprintf('%s_name', $direction)]   = $account['name'];
+        $transaction[sprintf('%s_iban', $direction)]   = $account['iban'];
+        $transaction[sprintf('%s_number', $direction)] = $account['number'];
+        $transaction[sprintf('%s_bic', $direction)]    = $account['bic'];
+
+        return $transaction;
+    }
+
+    /**
      * // TODO add warning when falling back on the default account.
      *
      * @param array $transaction
@@ -190,7 +230,6 @@ class Accounts extends AbstractTask
      */
     private function processTransaction(array $transaction): array
     {
-
         $sourceArray = $this->getSourceArray($transaction);
         $destArray   = $this->getDestinationArray($transaction);
         $source      = $this->findAccount($sourceArray, $this->account);
@@ -198,44 +237,22 @@ class Accounts extends AbstractTask
 
         if (-1 === bccomp('0', $transaction['amount'])) {
             // amount is positive
-            $transaction['source_id']     = $source['id'];
-            $transaction['source_name']   = $source['name'];
-            $transaction['source_iban']   = $source['iban'];
-            $transaction['source_number'] = $source['number'];
-            $transaction['source_bic']    = $source['bic'];
-
-            $transaction['destination_id']     = $destination['id'];
-            $transaction['destination_name']   = $destination['name'];
-            $transaction['destination_iban']   = $destination['iban'];
-            $transaction['destination_number'] = $destination['number'];
-            $transaction['destination_bic']    = $destination['bic'];
-
+            $transaction         = $this->setSource($transaction, $source);
+            $transaction         = $this->setDestination($transaction, $destination);
             $transaction['type'] = $this->determineType($source['type'], $destination['type']);
         }
 
         if (1 === bccomp('0', $transaction['amount'])) {
-            // fix source
-            $transaction['source_id']     = $destination['id'];
-            $transaction['source_name']   = $destination['name'];
-            $transaction['source_iban']   = $destination['iban'];
-            $transaction['source_number'] = $destination['number'];
-            $transaction['source_bic']    = $destination['bic'];
-
-            $transaction['destination_id']     = $source['id'];
-            $transaction['destination_name']   = $source['name'];
-            $transaction['destination_iban']   = $source['iban'];
-            $transaction['destination_number'] = $source['number'];
-            $transaction['destination_bic']    = $source['bic'];
-
+            $transaction           = $this->setSource($transaction, $destination);
+            $transaction           = $this->setDestination($transaction, $source);
             $transaction['amount'] = Amount::positive($transaction['amount']);
             $transaction['type']   = $this->determineType($destination['type'], $source['type']);
+
+            // also fix foreign amount
+            if (isset($transaction['foreign_amount']) && null !== $transaction['foreign_amount']) {
+                $transaction['foreign_amount'] = Amount::positive($transaction['foreign_amount']);
+            }
         }
-
-        // if source is NULL
-
-        // if the source + destination have a type, we can say something about the
-        // transaction type:
-
 
         // if new source ID is filled in, drop the other fields:
         if (0 !== $transaction['source_id'] && null !== $transaction['source_id']) {
@@ -262,21 +279,28 @@ class Accounts extends AbstractTask
      */
     private function determineType(?string $sourceType, ?string $destinationType): string
     {
+        Log::debug(sprintf('Now in determineType("%s", "%s")', $sourceType, $destinationType));
         if (null === $sourceType && null === $destinationType) {
+            Log::debug('Return withdrawal, both are NULL');
             return 'withdrawal';
         }
 
         // if source is a asset and dest is NULL, its a withdrawal
-        if('asset' === $sourceType && null === $destinationType){
+        if ('asset' === $sourceType && null === $destinationType) {
+            Log::debug('Return withdrawal, source is asset');
             return 'withdrawal';
         }
         // if destination is asset and source is NULL, its a deposit
         if(null === $sourceType && 'asset' === $destinationType){
+            Log::debug('Return deposit, dest is asset');
             return 'deposit';
         }
 
-        $type = config(sprintf('transaction_types.account_to_transaction.%s.%s', $sourceType, $destinationType));
+        $key   = sprintf('transaction_types.account_to_transaction.%s.%s', $sourceType, $destinationType);
+        $type  = config($key);
+        $value = $type ?? 'withdrawal';
+        Log::debug(sprintf('Check config for "%s" and found "%s". Returning "%s"', $key, $type, $value));
 
-        return $type ?? 'withdrawal';
+        return $value;
     }
 }

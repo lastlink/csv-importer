@@ -478,7 +478,7 @@ return [
         'date_due'              => 'due_date',
         'date_payment'          => 'payment_date',
         'date_invoice'          => 'invoice_date',
-        'currency-code'         => 'code_currency',
+        'currency-code'         => 'currency_code',
 
     ],
 ];

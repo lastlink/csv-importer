@@ -110,7 +110,7 @@ class PseudoTransactionProcessor
         $prefRequest->setName('currencyPreference');
         /** @var PreferenceResponse $response */
         $response        = $prefRequest->get();
-        $code            = $response->getPreference()->data;
+        $code            = $response->getPreference()->data ?? 'EUR';
         $currencyRequest = new GetCurrencyRequest();
         $currencyRequest->setCode($code);
         /** @var GetCurrencyResponse $result */

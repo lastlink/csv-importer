@@ -151,7 +151,7 @@ class LineProcessor
     {
         $role = $this->roles[$column] ?? '_ignore';
         if (0 === $mapped) {
-            Log::debug(sprintf('Column #%d with role "%s" is not mapped.', $column, $role));
+            Log::debug(sprintf('Column #%d with role "%s" is not mapped.', $column + 1, $role));
 
             return $role;
         }

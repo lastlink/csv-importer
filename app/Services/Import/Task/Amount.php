@@ -23,8 +23,6 @@
 namespace App\Services\Import\Task;
 
 use App\Services\CSV\Converter\Amount as AmountConverter;
-use App\Services\FireflyIIIApi\Model\Account;
-use App\Services\FireflyIIIApi\Model\TransactionCurrency;
 use Log;
 
 /**
@@ -62,19 +60,19 @@ class Amount extends AbstractTask
         }
 
         // amount is overruled by amount_debit:
-        if (null !== $transaction['amount_debit']) {
+        if (null !== $transaction['amount_debit'] && 0 !== bccomp('0', $transaction['amount_debit'])) {
             Log::debug(sprintf('Debit amount is "%s" which trumps the normal amount.', $transaction['amount_debit']));
             $transaction['amount'] = AmountConverter::negative($transaction['amount_debit']);
         }
 
         // then credit
-        if (null !== $transaction['amount_credit']) {
+        if (null !== $transaction['amount_credit'] && 0 !== bccomp('0', $transaction['amount_debit'])) {
             Log::debug(sprintf('Credit amount is "%s" which trumps the normal amount.', $transaction['amount_credit']));
             $transaction['amount'] = AmountConverter::positive($transaction['amount_credit']);
         }
 
         // then negated
-        if (null !== $transaction['amount_negated']) {
+        if (null !== $transaction['amount_negated'] && 0 !== bccomp('0', $transaction['amount_debit'])) {
             Log::debug(sprintf('Negated amount is "%s" which trumps the normal amount.', $transaction['amount_negated']));
             $transaction['amount'] = AmountConverter::negative($transaction['amount_negated']);
         }

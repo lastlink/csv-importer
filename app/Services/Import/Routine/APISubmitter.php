@@ -29,6 +29,7 @@ use App\Services\FireflyIIIApi\Response\PostTransactionResponse;
 use App\Services\FireflyIIIApi\Response\ValidationErrorResponse;
 use App\Services\Import\Support\ProgressInformation;
 use Log;
+
 /**
  * Class APISubmitter
  */
@@ -53,6 +54,44 @@ class APISubmitter
     }
 
     /**
+     * @param int              $lineIndex
+     * @param array            $line
+     * @param TransactionGroup $group
+     */
+    private function compareArrays(int $lineIndex, array $line, TransactionGroup $group): void
+    {
+        // some fields may not have survived. Be sure to warn the user about this.
+        /** @var Transaction $transaction */
+        foreach ($group->transactions as $index => $transaction) {
+            // compare currency ID
+            if (null !== $line['transactions'][$index]['currency_id']
+                && (int)$line['transactions'][$index]['currency_id'] !== (int)$transaction->currencyId
+            ) {
+                $this->addWarning(
+                    $lineIndex,
+                    sprintf(
+                        'Line #%d may have had its currency changed (from ID #%d to ID #%d). This happens because the associated asset account overrules the currency of the transaction.',
+                        $lineIndex + 1, $line['transactions'][$index]['currency_id'], (int)$transaction->currencyId
+                    )
+                );
+            }
+            // compare currency code:
+            if (null !== $line['transactions'][$index]['currency_code']
+                && $line['transactions'][$index]['currency_code'] !== $transaction->currencyCode
+            ) {
+                $this->addWarning(
+                    $lineIndex,
+                    sprintf(
+                        'Line #%d may have had its currency changed (from %s to %s). This happens because the associated asset account overrules the currency of the transaction.',
+                        $lineIndex + 1, $line['transactions'][$index]['currency_code'], $transaction->currencyCode
+                    )
+                );
+            }
+
+        }
+    }
+
+    /**
      * @param int   $index
      * @param array $line
      */
@@ -62,7 +101,6 @@ class APISubmitter
         $request->setBody($line);
         $response = $request->post();
         if ($response instanceof ValidationErrorResponse) {
-            $responseErrors = [];
             foreach ($response->errors->messages() as $key => $errors) {
                 foreach ($errors as $error) {
                     $msg = sprintf('%s: %s (original value: "%s")', $key, $error, $this->getOriginalValue($key, $line));
@@ -81,6 +119,7 @@ class APISubmitter
                 'Created %s #%d "%s" (%s %s)', $transaction->type, $group->id, $transaction->description, $transaction->currencyCode, $transaction->amount
             );
             $this->addMessage($index, $message);
+            $this->compareArrays($index, $line, $group);
             Log::info($message);
         }
     }
