@@ -42,4 +42,13 @@ class CleanId implements ConverterInterface
 
         return 0 === $value ? null : $value;
     }
+    /**
+     * Add extra configuration parameters.
+     *
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void
+    {
+
+    }
 }

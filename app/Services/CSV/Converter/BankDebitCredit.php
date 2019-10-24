@@ -57,4 +57,13 @@ class BankDebitCredit implements ConverterInterface
 
         return 1;
     }
+    /**
+     * Add extra configuration parameters.
+     *
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void
+    {
+
+    }
 }

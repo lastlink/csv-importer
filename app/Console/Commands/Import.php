@@ -2,8 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Exceptions\ApiHttpException;
+use App\Exceptions\ImportException;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\File\FileReader;
+use App\Services\FireflyIIIApi\Request\SystemInformationRequest;
 use App\Services\Import\ImportRoutineManager;
 use Illuminate\Console\Command;
 use JsonException;
@@ -44,8 +47,15 @@ class Import extends Command
      */
     public function handle()
     {
+        $access = $this->haveAccess();
+        if (false === $access) {
+            $this->error('Could not connect to your local Firefly III instance.');
+
+            return 1;
+        }
+
         $this->info(sprintf('Welcome to the Firefly III CSV importer, v%s', config('csv_importer.version')));
-        Log::debug(sprintf('Now in %s',__METHOD__));
+        Log::debug(sprintf('Now in %s', __METHOD__));
         $file   = $this->argument('file');
         $config = $this->argument('config');
         if (!file_exists($file) || (file_exists($file) && !is_file($file))) {
@@ -60,6 +70,7 @@ class Import extends Command
             $message = sprintf('The importer can\'t import: configuration file "%s" does not exist or could not be read.', $config);
             $this->error($message);
             Log::error($message);
+
             return 1;
         }
         // basic check on the JSON.
@@ -79,24 +90,54 @@ class Import extends Command
         $this->line('Once finished, you will see a list of errors, warnings and messages (if applicable).');
         $this->line('--------');
         $this->line('Running...');
-        $csv = file_get_contents($file);
-        $this->startImport($csv, $configuration);
+        $csv    = file_get_contents($file);
+        $result = $this->startImport($csv, $configuration);
+        if (0 === $result) {
+            $this->line('Import complete.');
+        }
+        if (0 !== $result) {
+            $this->warn('The import finished with errors.');
+        }
 
-        $this->line('Import complete.');
+        return $result;
+    }
 
-        return 0;
+    /**
+     * @return bool
+     */
+    private function haveAccess(): bool
+    {
+        $request = new SystemInformationRequest();
+        try {
+            $request->get();
+        } catch (ApiHttpException $e) {
+            $this->error(sprintf('Could not connect to Firefly III: %s', $e->getMessage()));
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * @param string $csv
      * @param array  $configuration
+     *
+     * @return int
      */
-    private function startImport(string $csv, array $configuration): void
+    private function startImport(string $csv, array $configuration): int
     {
-        Log::debug(sprintf('Now in %s',__METHOD__));
+        Log::debug(sprintf('Now in %s', __METHOD__));
         $configObject = Configuration::fromFile($configuration);
         $manager      = new ImportRoutineManager();
-        $manager->setConfiguration($configObject);
+
+        try {
+            $manager->setConfiguration($configObject);
+        } catch (ImportException $e) {
+            $this->error($e->getMessage());
+
+            return 1;
+        }
         $manager->setReader(FileReader::getReaderFromContent($csv));
         $manager->start();
 
@@ -128,5 +169,6 @@ class Import extends Command
             }
         }
 
+        return 0;
     }
 }

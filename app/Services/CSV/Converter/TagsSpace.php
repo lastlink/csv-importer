@@ -92,4 +92,13 @@ class TagsSpace implements ConverterInterface
 
         return explode(' ', $string);
     }
+    /**
+     * Add extra configuration parameters.
+     *
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void
+    {
+
+    }
 }

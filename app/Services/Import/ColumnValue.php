@@ -39,6 +39,8 @@ class ColumnValue
     private $role;
     /** @var string */
     private $value;
+    /** @var string */
+    private $configuration;
 
     /**
      * ColumnValue constructor.
@@ -54,6 +56,14 @@ class ColumnValue
     public function getMappedValue(): int
     {
         return $this->mappedValue;
+    }
+
+    /**
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void
+    {
+        $this->configuration = $configuration;
     }
 
     /**
@@ -91,8 +101,7 @@ class ColumnValue
 
         // run converter on data:
         $converterClass = (string)config(sprintf('csv_importer.import_roles.%s.converter', $this->role));
-
-        return ConverterService::convert($converterClass, $this->value);
+        return ConverterService::convert($converterClass, $this->value, $this->configuration);
     }
 
     /**

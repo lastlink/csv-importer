@@ -22,11 +22,16 @@
 
 namespace App\Services\CSV\Converter;
 
+use App\Exceptions\ImportException;
+use Carbon\Carbon;
+use InvalidArgumentException;
+
 /**
  * Class Date
  */
 class Date implements ConverterInterface
 {
+    private $dateFormat = 'Y-m-d';
 
     /**
      * Convert a value.
@@ -35,6 +40,7 @@ class Date implements ConverterInterface
      *
      * @return mixed
      *
+     * @throws ImportException
      */
     public function convert($value)
     {
@@ -91,6 +97,23 @@ class Date implements ConverterInterface
         $string  = trim(str_replace(["\n", "\t", "\r"], "\x20", $string));
 
         // TODO convert to date, based on config?
-        return $string;
+        /** @var Carbon $carbon */
+        try {
+            $carbon = Carbon::createFromFormat($this->dateFormat, $string);
+        } catch (InvalidArgumentException $e) {
+            throw new ImportException(sprintf('Could not convert date "%s" using format "%s".', $string, $this->dateFormat));
+        }
+
+        return $carbon->format('Y-m-d');
+    }
+
+    /**
+     * Add extra configuration parameters.
+     *
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void
+    {
+        $this->dateFormat = $configuration;
     }
 }

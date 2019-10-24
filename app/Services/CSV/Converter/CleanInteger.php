@@ -38,4 +38,13 @@ class CleanInteger implements ConverterInterface
     {
         return (int)$value;
     }
+    /**
+     * Add extra configuration parameters.
+     *
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void
+    {
+
+    }
 }

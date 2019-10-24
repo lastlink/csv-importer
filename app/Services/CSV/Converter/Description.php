@@ -40,4 +40,13 @@ class Description implements ConverterInterface
     {
         return $value;
     }
+    /**
+     * Add extra configuration parameters.
+     *
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void
+    {
+
+    }
 }

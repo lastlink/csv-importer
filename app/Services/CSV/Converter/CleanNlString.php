@@ -92,4 +92,13 @@ class CleanNlString implements ConverterInterface
 
         return trim($string);
     }
+    /**
+     * Add extra configuration parameters.
+     *
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void
+    {
+
+    }
 }

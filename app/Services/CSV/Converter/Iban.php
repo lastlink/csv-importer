@@ -118,4 +118,13 @@ class Iban implements ConverterInterface
 
         return 1 === (int)$checksum;
     }
+    /**
+     * Add extra configuration parameters.
+     *
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void
+    {
+
+    }
 }

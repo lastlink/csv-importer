@@ -22,6 +22,7 @@
 
 namespace App\Services\Import\Routine;
 
+use App\Services\CSV\Configuration\Configuration;
 use App\Services\Import\ColumnValue;
 use App\Services\Import\Support\ProgressInformation;
 use Log;
@@ -47,14 +48,19 @@ class LineProcessor
     /** @var array */
     private $roles;
 
-    public function __construct(array $roles, array $mapping, array $doMapping)
+    /** @var string */
+    private $dateFormat;
+
+    public function __construct(Configuration $configuration)
     {
+        //array $roles, array $mapping, array $doMapping
         Log::debug('Created LineProcessor()');
-        Log::debug('Roles', $roles);
-        Log::debug('Mapping', $mapping);
-        $this->roles     = $roles;
-        $this->mapping   = $mapping;
-        $this->doMapping = $doMapping;
+        Log::debug('Roles', $configuration->getRoles());
+        Log::debug('Mapping', $configuration->getMapping());
+        $this->roles      = $configuration->getRoles();
+        $this->mapping    = $configuration->getMapping();
+        $this->doMapping  = $configuration->getDoMapping();
+        $this->dateFormat = $configuration->getDate();
     }
 
     /**
@@ -119,6 +125,12 @@ class LineProcessor
             $columnValue->setRole($role);
             $columnValue->setMappedValue($mapped);
             $columnValue->setOriginalRole($originalRole);
+
+            // if column role is 'date', add the date config for conversion:
+            if (in_array($originalRole, ['date_transaction', 'date_interest', 'date_process', 'date_book'], true)) {
+                $columnValue->setConfiguration($this->dateFormat);
+            }
+
             $return[] = $columnValue;
         }
         // add a special column value for the "source"
@@ -127,7 +139,7 @@ class LineProcessor
         $columnValue->setMappedValue(0);
         $columnValue->setRole('original-source');
         $return[] = $columnValue;
-        Log::debug(sprintf('Added column #%d to denote the original source.', count($return)-1));
+        Log::debug(sprintf('Added column #%d to denote the original source.', count($return) - 1));
 
         //$this->addError($index, 'Error from line processor.');
 
@@ -198,7 +210,7 @@ class LineProcessor
         // used to validate whatever has been set as mapping
         // TODO this validation is not implemented yet.
         $this->mappedValues[$newRole][] = $mapped;
-        $this->mappedValues[$newRole] = array_unique($this->mappedValues[$newRole]);
+        $this->mappedValues[$newRole]   = array_unique($this->mappedValues[$newRole]);
         Log::debug(sprintf('Values mapped to role "%s" are: ', $newRole), $this->mappedValues[$newRole]);
 
         return $newRole;

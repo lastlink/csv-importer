@@ -22,6 +22,8 @@
 
 namespace App\Services\Import\Routine;
 
+use App\Exceptions\ApiHttpException;
+use App\Exceptions\ImportException;
 use App\Services\FireflyIIIApi\Model\Account;
 use App\Services\FireflyIIIApi\Model\TransactionCurrency;
 use App\Services\FireflyIIIApi\Request\GetAccountRequest;
@@ -55,7 +57,7 @@ class PseudoTransactionProcessor
      *
      * @param int|null $defaultAccountId
      *
-     * @throws \App\Exceptions\ApiHttpException
+     * @throws ImportException
      */
     public function __construct(?int $defaultAccountId)
     {
@@ -88,7 +90,7 @@ class PseudoTransactionProcessor
     /**
      * @param int|null $accountId
      *
-     * @throws \App\Exceptions\ApiHttpException
+     * @throws ImportException
      */
     private function getDefaultAccount(?int $accountId): void
     {
@@ -96,26 +98,42 @@ class PseudoTransactionProcessor
             $accountRequest = new GetAccountRequest;
             $accountRequest->setId($accountId);
             /** @var GetAccountResponse $result */
-            $result               = $accountRequest->get();
+            try {
+                $result = $accountRequest->get();
+            } catch (ApiHttpException $e) {
+                Log::error($e->getMessage());
+                throw new ImportException(sprintf('The default account in your configuration file (%d) does not exist.', $accountId));
+            }
             $this->defaultAccount = $result->getAccount();
         }
     }
 
     /**
-     * @throws \App\Exceptions\ApiHttpException
+     * @throws ImportException
      */
     private function getDefaultCurrency(): void
     {
         $prefRequest = new GetPreferenceRequest;
         $prefRequest->setName('currencyPreference');
-        /** @var PreferenceResponse $response */
-        $response        = $prefRequest->get();
+
+        try {
+            /** @var PreferenceResponse $response */
+            $response = $prefRequest->get();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+            throw new ImportException('Could not load the users currency preference.');
+        }
         $code            = $response->getPreference()->data ?? 'EUR';
         $currencyRequest = new GetCurrencyRequest();
         $currencyRequest->setCode($code);
-        /** @var GetCurrencyResponse $result */
-        $result                = $currencyRequest->get();
-        $this->defaultCurrency = $result->getCurrency();
+        try {
+            /** @var GetCurrencyResponse $result */
+            $result                = $currencyRequest->get();
+            $this->defaultCurrency = $result->getCurrency();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+            throw new ImportException(sprintf('The default currency ("%s") could not be loaded.', $code));
+        }
     }
 
     /**
@@ -140,10 +158,6 @@ class PseudoTransactionProcessor
 
             $line = $object->process($line);
         }
-
-        //        $this->addWarning($index,'Warning from Pseudo.');
-        //        $this->addMessage($index,'Message from Pseudo.');
-        //        $this->addError($index,'Error from Pseudo.');
 
         return $line;
     }

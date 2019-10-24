@@ -22,6 +22,7 @@
 
 namespace App\Services\Import;
 
+use App\Exceptions\ImportException;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\Import\Routine\APISubmitter;
 use App\Services\Import\Routine\ColumnValueConverter;
@@ -57,6 +58,7 @@ class ImportRoutineManager
     private $allWarnings;
     /** @var array */
     private $allErrors;
+
     /**
      * Collect info on the current job, hold it in memory.
      *
@@ -67,26 +69,25 @@ class ImportRoutineManager
         Log::debug('Constructed ImportRoutineManager');
 
         // get line converter
-        $this->columnValueConverter = new ColumnValueConverter;
-        $this->apiSubmitter         = new APISubmitter;
-        $this->csvFileProcessor     = new CSVFileProcessor;
-        $this->allMessages          = [];
-        $this->allWarnings          = [];
-        $this->allErrors            = [];
+        $this->apiSubmitter     = new APISubmitter;
+        $this->csvFileProcessor = new CSVFileProcessor;
+        $this->allMessages      = [];
+        $this->allWarnings      = [];
+        $this->allErrors        = [];
     }
 
     /**
      * @param Configuration $configuration
      *
-     * @throws \App\Exceptions\ApiHttpException
+     * @throws ImportException
      */
     public function setConfiguration(Configuration $configuration): void
     {
-        $this->configuration = $configuration;
-
-        // get line processor
-        $this->lineProcessor              = new LineProcessor($this->configuration->getRoles(), $this->configuration->getMapping(), $this->configuration->getDoMapping());
+        $this->configuration              = $configuration;
+        $this->lineProcessor              = new LineProcessor($this->configuration);
         $this->pseudoTransactionProcessor = new PseudoTransactionProcessor($this->configuration->getDefaultAccount());
+        $this->columnValueConverter       = new ColumnValueConverter;
+
 
     }
 

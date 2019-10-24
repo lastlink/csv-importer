@@ -44,4 +44,13 @@ class AmountCredit implements ConverterInterface
 
         return $result;
     }
+    /**
+     * Add extra configuration parameters.
+     *
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void
+    {
+
+    }
 }

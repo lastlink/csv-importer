@@ -260,4 +260,14 @@ class Amount implements ConverterInterface
 
         return $str;
     }
+
+    /**
+     * Add extra configuration parameters.
+     *
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void
+    {
+
+    }
 }

@@ -30,12 +30,13 @@ use RuntimeException;
 class ConverterService
 {
     /**
-     * @param string $class
-     * @param mixed  $value
+     * @param string      $class
+     * @param mixed       $value
+     * @param string|null $configuration
      *
      * @return mixed
      */
-    public static function convert(string $class, $value)
+    public static function convert(string $class, $value, ?string $configuration)
     {
         if ('' === $class) {
             return $value;
@@ -43,6 +44,9 @@ class ConverterService
         if (self::exists($class)) {
             /** @var ConverterInterface $object */
             $object = app(self::fullName($class));
+            if (null !== $configuration) {
+                $object->setConfiguration($configuration);
+            }
 
             return $object->convert($value);
         }

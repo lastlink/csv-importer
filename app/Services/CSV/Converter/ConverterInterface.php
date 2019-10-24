@@ -36,4 +36,11 @@ interface ConverterInterface
      * @param $value
      */
     public function convert($value);
+
+    /**
+     * Add extra configuration parameters.
+     *
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void;
 }

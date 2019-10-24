@@ -445,10 +445,10 @@ return [
         'sepa_ep'               => 'sepa_ep',
         'sepa_ci'               => 'sepa_ci',
         'sepa_batch_id'         => 'sepa_batch_id',
-        'amount'                => 'amount', // TODO needs work
-        'amount_debit'          => 'amount_debit', // TODO needs work
-        'amount_credit'         => 'amount_credit', // TODO needs work
-        'amount_negated'        => 'amount_negated', // TODO needs work
+        'amount'                => 'amount',
+        'amount_debit'          => 'amount_debit',
+        'amount_credit'         => 'amount_credit',
+        'amount_negated'        => 'amount_negated',
         'amount_foreign'        => 'foreign_amount',
         'foreign-currency-id'   => 'foreign_currency_id',
         'foreign-currency-code' => 'foreign_currency_code',
