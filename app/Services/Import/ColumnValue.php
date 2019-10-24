@@ -41,6 +41,8 @@ class ColumnValue
     private $value;
     /** @var string */
     private $configuration;
+    /** @var bool */
+    private $appendValue;
 
     /**
      * ColumnValue constructor.
@@ -48,6 +50,22 @@ class ColumnValue
     public function __construct()
     {
         $this->mappedValue = 0;
+    }
+
+    /**
+     * @param bool $appendValue
+     */
+    public function setAppendValue(bool $appendValue): void
+    {
+        $this->appendValue = $appendValue;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAppendValue(): bool
+    {
+        return $this->appendValue;
     }
 
     /**

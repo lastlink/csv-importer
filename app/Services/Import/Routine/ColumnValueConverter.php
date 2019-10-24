@@ -160,7 +160,17 @@ class ColumnValueConverter
             Log::debug(
                 sprintf('Stored column #%d with value "%s" and role "%s" in field "%s"', $columnIndex, $this->toString($parsedValue), $role, $transactionField)
             );
-            $transaction['transactions'][0][$transactionField] = $parsedValue;
+
+            // if append, append.
+            if (true === $value->isAppendValue()) {
+                $transaction['transactions'][0][$transactionField] = sprintf('%s %s', $transaction['transactions'][0][$transactionField], $parsedValue);
+            }
+            // if not, not.
+            if (false === $value->isAppendValue()) {
+                $transaction['transactions'][0][$transactionField] = $parsedValue;
+            }
+
+
         }
         Log::debug('Final transaction', $transaction);
 

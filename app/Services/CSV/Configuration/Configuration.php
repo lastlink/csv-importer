@@ -38,11 +38,11 @@ class Configuration
     private $delimiter;
     /** @var bool */
     private $headers;
-    /** @var bool */
+    /** @var bool Do not import import duplicate transactions. */
     private $ignoreDuplicates;
-    /** @var bool */
+    /** @var bool Do not import duplicate lines (from file) */
     private $ignoreLines;
-    /** @var bool */
+    /** @var bool Do not import duplicate a/b transfers */
     private $ignoreTransfers;
     /** @var bool */
     private $rules;
@@ -59,37 +59,6 @@ class Configuration
     /** @var array */
     private $mapping;
 
-    /**
-     * @param array $roles
-     */
-    public function setRoles(array $roles): void
-    {
-        $this->roles = $roles;
-    }
-
-    /**
-     * @param array $doMapping
-     */
-    public function setDoMapping(array $doMapping): void
-    {
-        $this->doMapping = $doMapping;
-    }
-
-    /**
-     * @param array $mapping
-     */
-    public function setMapping(array $mapping): void
-    {
-        $this->mapping = $mapping;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRoles(): array
-    {
-        return $this->roles;
-    }
 
     /**
      * Configuration constructor.
@@ -100,9 +69,9 @@ class Configuration
         $this->defaultAccount   = 1;
         $this->delimiter        = 'comma';
         $this->headers          = false;
-        $this->ignoreDuplicates = false;
-        $this->ignoreLines      = false;
-        $this->ignoreTransfers  = false;
+        $this->ignoreDuplicates = true;
+        $this->ignoreLines      = true;
+        $this->ignoreTransfers  = true;
         $this->rules            = true;
         $this->skipForm         = false;
         $this->specifics        = [];
@@ -134,6 +103,39 @@ class Configuration
         $object->doMapping        = $array['do_mapping'];
 
         return $object;
+    }
+
+
+    /**
+     * @param array $roles
+     */
+    public function setRoles(array $roles): void
+    {
+        $this->roles = $roles;
+    }
+
+    /**
+     * @param array $doMapping
+     */
+    public function setDoMapping(array $doMapping): void
+    {
+        $this->doMapping = $doMapping;
+    }
+
+    /**
+     * @param array $mapping
+     */
+    public function setMapping(array $mapping): void
+    {
+        $this->mapping = $mapping;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRoles(): array
+    {
+        return $this->roles;
     }
 
     /**

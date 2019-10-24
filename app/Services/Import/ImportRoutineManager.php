@@ -70,7 +70,6 @@ class ImportRoutineManager
 
         // get line converter
         $this->apiSubmitter     = new APISubmitter;
-        $this->csvFileProcessor = new CSVFileProcessor;
         $this->allMessages      = [];
         $this->allWarnings      = [];
         $this->allErrors        = [];
@@ -87,8 +86,7 @@ class ImportRoutineManager
         $this->lineProcessor              = new LineProcessor($this->configuration);
         $this->pseudoTransactionProcessor = new PseudoTransactionProcessor($this->configuration->getDefaultAccount());
         $this->columnValueConverter       = new ColumnValueConverter;
-
-
+        $this->csvFileProcessor           = new CSVFileProcessor($this->configuration);
     }
 
     /**
@@ -125,6 +123,8 @@ class ImportRoutineManager
 
     /**
      * Start the import.
+     *
+     * @throws ImportException
      */
     public function start(): void
     {
@@ -133,6 +133,7 @@ class ImportRoutineManager
         // convert CSV file into raw lines (arrays)
         $this->csvFileProcessor->setSpecifics($this->configuration->getSpecifics());
         $this->csvFileProcessor->setHasHeaders($this->configuration->isHeaders());
+        $this->csvFileProcessor->setDelimiter($this->configuration->getDelimiter());
         $CSVLines = $this->csvFileProcessor->processCSVFile();
 
         // convert raw lines into arrays with individual ColumnValues

@@ -139,7 +139,13 @@ class Import extends Command
             return 1;
         }
         $manager->setReader(FileReader::getReaderFromContent($csv));
-        $manager->start();
+        try {
+            $manager->start();
+        } catch (ImportException $e) {
+            $this->error($e->getMessage());
+
+            return 1;
+        }
 
         $messages = $manager->getAllMessages();
         $warnings = $manager->getAllWarnings();

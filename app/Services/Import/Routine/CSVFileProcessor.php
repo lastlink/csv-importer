@@ -22,6 +22,8 @@
 
 namespace App\Services\Import\Routine;
 
+use App\Exceptions\ImportException;
+use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Specifics\SpecificService;
 use App\Services\Import\Support\ProgressInformation;
 use League\Csv\Exception;
@@ -44,25 +46,52 @@ class CSVFileProcessor
     private $reader;
     /** @var array */
     private $specifics;
+    /** @var string */
+    private $delimiter;
+    /** @var Configuration */
+    private $configuration;
 
     /**
      * CSVFileProcessor constructor.
+     *
+     * @param Configuration $configuration
      */
-    public function __construct()
+    public function __construct(Configuration $configuration)
     {
-        $this->specifics = [];
+        $this->specifics     = [];
+        $this->configuration = $configuration;
+    }
+
+
+    /**
+     * @param string $delimiter
+     */
+    public function setDelimiter(string $delimiter): void
+    {
+        $map = [
+            'tab'       => "\t",
+            'semicolon' => ';',
+            'comma'     => ',',
+        ];
+
+        $this->delimiter = $map[$delimiter] ?? ',';
     }
 
     /**
      * Get a reader, and start looping over each line.
      *
      * @return array
+     * @throws ImportException
      */
     public function processCSVFile(): array
     {
         Log::debug('Now in startImportLoop()');
         $offset = $this->hasHeaders ? 1 : 0;
-
+        try {
+            $this->reader->setDelimiter($this->delimiter);
+        } catch (Exception $e) {
+            throw new ImportException(sprintf('Could not set delimiter: %s', $e->getMessage()));
+        }
         Log::debug(sprintf('Offset is %d', $offset));
         try {
             $stmt    = (new Statement)->offset($offset);
@@ -110,7 +139,7 @@ class CSVFileProcessor
     {
         $updatedRecords = [];
         $count          = $records->count();
-        Log::info(sprintf('Now in %s with %d records',__METHOD__, $count));
+        Log::info(sprintf('Now in %s with %d records', __METHOD__, $count));
         $currentIndex = 1;
         foreach ($records as $index => $line) {
             $line = $this->sanitize($line);
@@ -122,7 +151,39 @@ class CSVFileProcessor
         }
         Log::info(sprintf('Parsed all %d lines.', $count));
 
+        // exclude double lines.
+        if ($this->configuration->isIgnoreLines()) {
+            Log::info('Going to remove duplicate lines.');
+            $updatedRecords = $this->removeDuplicateLines($updatedRecords);
+        }
+
         return $updatedRecords;
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    private function removeDuplicateLines(array $array): array
+    {
+        $hashes = [];
+        $return = [];
+        foreach ($array as $index => $line) {
+            $hash = hash('sha256', json_encode($line, JSON_THROW_ON_ERROR));
+            if (in_array($hash, $hashes, true)) {
+                $message = sprintf('Going to skip line #%d because it\'s in the file twice. This may reset the count below.', $index + 1);
+                Log::warning($message);
+                $this->addWarning($index, $message);
+            }
+            if (!in_array($hash, $hashes, true)) {
+                $hashes[] = $hash;
+                $return[] = $line;
+            }
+        }
+        Log::info(sprintf('Went from %d line(s) to %d line(s)', count($array), count($return)));
+
+        return $return;
     }
 
 

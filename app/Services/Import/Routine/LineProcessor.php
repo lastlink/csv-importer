@@ -118,11 +118,13 @@ class LineProcessor
             Log::debug(sprintf('Value is %s', var_export($value, true)));
             Log::debug('Local mapping', $this->mapping[$columnIndex] ?? ['empty']);
             // the role might change because of the mapping.
-            $role = $this->getRoleForColumn($columnIndex, $mapped);
+            $role        = $this->getRoleForColumn($columnIndex, $mapped);
+            $appendValue = config(sprintf('csv_importer.import_roles.%s.append_value', $originalRole));
 
             $columnValue = new ColumnValue;
             $columnValue->setValue($value);
             $columnValue->setRole($role);
+            $columnValue->setAppendValue($appendValue);
             $columnValue->setMappedValue($mapped);
             $columnValue->setOriginalRole($originalRole);
 
@@ -137,6 +139,7 @@ class LineProcessor
         $columnValue = new ColumnValue;
         $columnValue->setValue(sprintf('jc5-csv-import-v%s', config('csv_importer.version')));
         $columnValue->setMappedValue(0);
+        $columnValue->setAppendValue(false);
         $columnValue->setRole('original-source');
         $return[] = $columnValue;
         Log::debug(sprintf('Added column #%d to denote the original source.', count($return) - 1));
