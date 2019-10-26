@@ -38,12 +38,10 @@ class Configuration
     private $delimiter;
     /** @var bool */
     private $headers;
-    /** @var bool Do not import import duplicate transactions. */
-    private $ignoreDuplicates;
-    /** @var bool Do not import duplicate lines (from file) */
-    private $ignoreLines;
-    /** @var bool Do not import duplicate a/b transfers */
-    private $ignoreTransfers;
+    /** @var bool When set to true, the importer will ignore existing duplicate transactions found in Firefly III. */
+    private $ignoreDuplicateTransactions;
+    /** @var bool When set to true, the importer will ignore duplicate lines in the CSV file. */
+    private $ignoreDuplicateLines;
     /** @var bool */
     private $rules;
     /** @var bool */
@@ -52,12 +50,16 @@ class Configuration
     private $specifics;
     /** @var array */
     private $roles;
+    /** @var int */
+    private $version;
 
     /** @var array */
     private $doMapping;
 
     /** @var array */
     private $mapping;
+    /** @var int */
+    public const VERSION = 2;
 
 
     /**
@@ -65,19 +67,19 @@ class Configuration
      */
     private function __construct()
     {
-        $this->date             = 'Y-m-d';
-        $this->defaultAccount   = 1;
-        $this->delimiter        = 'comma';
-        $this->headers          = false;
-        $this->ignoreDuplicates = true;
-        $this->ignoreLines      = true;
-        $this->ignoreTransfers  = true;
-        $this->rules            = true;
-        $this->skipForm         = false;
-        $this->specifics        = [];
-        $this->roles            = [];
-        $this->mapping          = [];
-        $this->doMapping        = [];
+        $this->date                        = 'Y-m-d';
+        $this->defaultAccount              = 1;
+        $this->delimiter                   = 'comma';
+        $this->headers                     = false;
+        $this->ignoreDuplicateTransactions = true;
+        $this->ignoreDuplicateLines        = true;
+        $this->rules                       = true;
+        $this->skipForm                    = false;
+        $this->specifics                   = [];
+        $this->roles                       = [];
+        $this->mapping                     = [];
+        $this->doMapping                   = [];
+        $this->version                     = self::VERSION;
     }
 
     /**
@@ -87,20 +89,24 @@ class Configuration
      */
     public static function fromArray(array $array): self
     {
-        $object                   = new self;
-        $object->headers          = $array['headers'];
-        $object->date             = $array['date'];
-        $object->defaultAccount   = $array['defaultAccount'];
-        $object->delimiter        = $array['delimiter'];
-        $object->ignoreDuplicates = $array['ignoreDuplicates'];
-        $object->ignoreLines      = $array['ignoreLines'];
-        $object->ignoreTransfers  = $array['ignoreTransfers'];
-        $object->rules            = $array['rules'];
-        $object->skipForm         = $array['skipForm'];
-        $object->specifics        = $array['specifics'];
-        $object->roles            = $array['roles'];
-        $object->mapping          = $array['mapping'];
-        $object->doMapping        = $array['do_mapping'];
+        $version = $array['version'] ?? 1;
+
+        // TODO now have room to do version based array parsing.
+
+        $object                              = new self;
+        $object->headers                     = $array['headers'];
+        $object->date                        = $array['date'];
+        $object->defaultAccount              = $array['default_account'];
+        $object->delimiter                   = $array['delimiter'];
+        $object->ignoreDuplicateLines        = $array['ignore_duplicate_lines'];
+        $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
+        $object->rules                       = $array['rules'];
+        $object->skipForm                    = $array['skip_form'];
+        $object->specifics                   = $array['specifics'];
+        $object->roles                       = $array['roles'];
+        $object->mapping                     = $array['mapping'];
+        $object->doMapping                   = $array['do_mapping'];
+        $object->version                     = $version;
 
         return $object;
     }
@@ -145,20 +151,20 @@ class Configuration
      */
     public static function fromRequest(array $array): self
     {
-        $object                   = new self;
-        $object->headers          = $array['headers'];
-        $object->date             = $array['date'];
-        $object->defaultAccount   = $array['default_account'];
-        $object->delimiter        = $array['delimiter'];
-        $object->ignoreDuplicates = $array['ignore_duplicates'];
-        $object->ignoreLines      = $array['ignore_lines'];
-        $object->ignoreTransfers  = $array['ignore_transfers'];
-        $object->rules            = $array['rules'];
-        $object->skipForm         = $array['skip_form'];
-        $object->specifics        = $array['specifics'];
-        $object->roles            = $array['roles'];
-        $object->mapping          = $array['mapping'];
-        $object->doMapping        = $array['do_mapping'];
+        $object                              = new self;
+        $object->version                     = self::VERSION;
+        $object->headers                     = $array['headers'];
+        $object->date                        = $array['date'];
+        $object->defaultAccount              = $array['default_account'];
+        $object->delimiter                   = $array['delimiter'];
+        $object->ignoreDuplicateLines        = $array['ignore_duplicate_lines'];
+        $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
+        $object->rules                       = $array['rules'];
+        $object->skipForm                    = $array['skip_form'];
+        $object->specifics                   = $array['specifics'];
+        $object->roles                       = $array['roles'];
+        $object->mapping                     = $array['mapping'];
+        $object->doMapping                   = $array['do_mapping'];
 
         return $object;
     }
@@ -171,6 +177,9 @@ class Configuration
     public static function fromFile(array $data): self
     {
         Log::debug('Now in Configuration::fromClassic', $data);
+        $version = $data['version'] ?? 1;
+
+        // TODO now have room to handle different versions.
 
         // todo move to config file
         $validDelimiters = [
@@ -208,6 +217,7 @@ class Configuration
         $object->headers        = $data['has-headers'] ?? false;
         $object->rules          = $data['apply-rules'] ?? true;
         $object->specifics      = [];
+        $object->version        = $version;
 
         // some
 
@@ -257,19 +267,19 @@ class Configuration
     public function toArray(): array
     {
         return [
-            'date'             => $this->date,
-            'defaultAccount'   => $this->defaultAccount,
-            'delimiter'        => $this->delimiter,
-            'headers'          => $this->headers,
-            'ignoreDuplicates' => $this->ignoreDuplicates,
-            'ignoreLines'      => $this->ignoreLines,
-            'ignoreTransfers'  => $this->ignoreTransfers,
-            'rules'            => $this->rules,
-            'skipForm'         => $this->skipForm,
-            'specifics'        => $this->specifics,
-            'roles'            => $this->roles,
-            'do_mapping'       => $this->doMapping,
-            'mapping'          => $this->mapping,
+            'date'                          => $this->date,
+            'default_account'               => $this->defaultAccount,
+            'delimiter'                     => $this->delimiter,
+            'headers'                       => $this->headers,
+            'ignore_duplicate_lines'        => $this->ignoreDuplicateLines,
+            'ignore_duplicate_transactions' => $this->ignoreDuplicateTransactions,
+            'rules'                         => $this->rules,
+            'skip_form'                      => $this->skipForm,
+            'specifics'                     => $this->specifics,
+            'roles'                         => $this->roles,
+            'do_mapping'                    => $this->doMapping,
+            'mapping'                       => $this->mapping,
+            'version' => $this->version,
         ];
     }
 
@@ -316,30 +326,6 @@ class Configuration
     }
 
     /**
-     * @return bool
-     */
-    public function isIgnoreDuplicates(): bool
-    {
-        return $this->ignoreDuplicates;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isIgnoreLines(): bool
-    {
-        return $this->ignoreLines;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isIgnoreTransfers(): bool
-    {
-        return $this->ignoreTransfers;
-    }
-
-    /**
      * @return array
      */
     public function getDoMapping(): array
@@ -353,23 +339,6 @@ class Configuration
     public function getMapping(): array
     {
         return $this->mapping;
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function isRules(): bool
-    {
-        return $this->rules;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSkipForm(): bool
-    {
-        return $this->skipForm;
     }
 
     /**
