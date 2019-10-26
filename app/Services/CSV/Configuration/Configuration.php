@@ -24,6 +24,7 @@ namespace App\Services\CSV\Configuration;
 
 use App\Services\CSV\Specifics\SpecificService;
 use Log;
+use RuntimeException;
 
 /**
  * Class Configuration
@@ -172,57 +173,26 @@ class Configuration
     /**
      * @param array $data
      *
-     * @return $this
+     * @return static
      */
-    public static function fromFile(array $data): self
+    private static function fromClassicFile(array $data): self
     {
-        Log::debug('Now in Configuration::fromClassic', $data);
-        $version = $data['version'] ?? 1;
-
-        // TODO now have room to handle different versions.
-
-        // todo move to config file
-        $validDelimiters = [
-            ','   => 'comma',
-            ';'   => 'semicolon',
-            'tab' => 'tab',
-        ];
-        // todo move to config file
-        $replaceOldRoles = [
-            'original-source'    => 'original_source',
-            'sepa-cc'            => 'sepa_cc',
-            'sepa-ct-op'         => 'sepa_ct_op',
-            'sepa-ct-id'         => 'sepa_ct_id',
-            'sepa-db'            => 'sepa_db',
-            'sepa-country'       => 'sepa_country',
-            'sepa-ep'            => 'sepa_ep',
-            'sepa-ci'            => 'sepa_ci',
-            'sepa-batch-id'      => 'sepa_batch_id',
-            'internal-reference' => 'internal_reference',
-            'date-interest'      => 'date_interest',
-            'date-invoice'       => 'date_invoice',
-            'date-book'          => 'date_book',
-            'date-payment'       => 'date_payment',
-            'date-process'       => 'date_process',
-            'date-due'           => 'date_due',
-            'date-transaction'   => 'date_transaction',
-        ];
-
-
+        $delimiters             = config('csv_importer.delimiters');
+        $classicRoleNames       = config('csv_importer.classic_roles');
         $object                 = new self;
-        $object->date           = $data['date-format'] ?? $object->date;
-        $object->defaultAccount = $data['import-account'] ?? $object->defaultAccount;
-        $delimiter              = $data['delimiter'] ?? ',';
-        $object->delimiter      = $validDelimiters[$delimiter] ?? 'comma';
         $object->headers        = $data['has-headers'] ?? false;
+        $object->date           = $data['date-format'] ?? $object->date;
+        $object->delimiter      = $delimiters[$data['delimiter'] ?? ','];
+        $object->defaultAccount = $data['import-account'] ?? $object->defaultAccount;
         $object->rules          = $data['apply-rules'] ?? true;
-        $object->specifics      = [];
-        $object->version        = $version;
 
-        // some
+        // array values
+        $object->specifics = [];
+        $object->roles     = [];
+        $object->doMapping = [];
+        $object->mapping   = [];
 
-        Log::debug(sprintf('Has headers: %s', var_export($object->headers, true)));
-
+        // loop specifics from classic file:
         $specifics = array_keys($data['specifics'] ?? []);
         foreach ($specifics as $name) {
             $class = SpecificService::fullClass($name);
@@ -231,12 +201,11 @@ class Configuration
             }
         }
 
-        // loop roles:
+        // loop roles from classic file:
         $roles = $data['column-roles'] ?? [];
         foreach ($roles as $role) {
-
             // some roles have been given a new name some time in the past.
-            $role = $replaceOldRoles[$role] ?? $role;
+            $role = $classicRoleNames[$role] ?? $role;
 
             $config = config(sprintf('csv_importer.import_roles.%s', $role));
             if (null !== $config) {
@@ -244,21 +213,51 @@ class Configuration
             }
         }
 
-        // loop do mapping
+        // loop do mapping from classic file.
         $doMapping = $data['column-do-mapping'] ?? [];
         foreach ($doMapping as $index => $map) {
             $index                     = (int)$index;
             $object->doMapping[$index] = $map;
         }
 
-        // loop mapping
+        // loop mapping from classic file.
         $mapping = $data['column-mapping-config'] ?? [];
         foreach ($mapping as $index => $map) {
             $index                   = (int)$index;
             $object->mapping[$index] = $map;
         }
+        // set version to "2" and return.
+        $object->version = 2;
 
         return $object;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return $this
+     */
+    public static function fromFile(array $data): self
+    {
+        Log::debug('Now in Configuration::fromClassic', $data);
+        $version = $data['version'] ?? 1;
+        if (1 === $version) {
+            return self::fromClassicFile($data);
+        }
+        if (2 === $version) {
+            return self::fromVersionTwo($data);
+        }
+        throw new RuntimeException(sprintf('Configuration file version "%s" cannot be parsed.', $version));
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return static
+     */
+    private static function fromVersionTwo(array $data): self
+    {
+        return self::fromArray($data);
     }
 
     /**
@@ -274,7 +273,7 @@ class Configuration
             'ignore_duplicate_lines'        => $this->ignoreDuplicateLines,
             'ignore_duplicate_transactions' => $this->ignoreDuplicateTransactions,
             'rules'                         => $this->rules,
-            'skip_form'                      => $this->skipForm,
+            'skip_form'                     => $this->skipForm,
             'specifics'                     => $this->specifics,
             'roles'                         => $this->roles,
             'do_mapping'                    => $this->doMapping,
