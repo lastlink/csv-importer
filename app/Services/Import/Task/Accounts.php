@@ -42,7 +42,10 @@ class Accounts extends AbstractTask
      */
     public function process(array $group): array
     {
+        Log::debug('Now in process()');
+        $total = count($group['transactions']);
         foreach ($group['transactions'] as $index => $transaction) {
+            Log::debug(sprintf('Now processing transaction %d of %d', $index + 1, $total));
             $group['transactions'][$index] = $this->processTransaction($transaction);
         }
 
@@ -85,6 +88,7 @@ class Accounts extends AbstractTask
         $result = null;
         // search ID
         if (is_int($array['id']) && $array['id'] > 0) {
+            Log::debug('Find by ID field.');
             $result = $this->findByField('id', (string)$array['id']);
         }
 
@@ -230,6 +234,7 @@ class Accounts extends AbstractTask
      */
     private function processTransaction(array $transaction): array
     {
+        Log::debug('Now in processTransaction()');
         $sourceArray = $this->getSourceArray($transaction);
         $destArray   = $this->getDestinationArray($transaction);
         $source      = $this->findAccount($sourceArray, $this->account);

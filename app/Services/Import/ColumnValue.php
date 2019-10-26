@@ -23,8 +23,8 @@
 declare(strict_types=1);
 
 namespace App\Services\Import;
-
 use App\Services\CSV\Converter\ConverterService;
+use Log;
 
 /**
  * Class ColumnValue
@@ -114,11 +114,12 @@ class ColumnValue
     public function getParsedValue()
     {
         if (0 !== $this->mappedValue) {
-            return $this->mappedValue;
+            return (int)$this->mappedValue;
         }
 
         // run converter on data:
         $converterClass = (string)config(sprintf('csv_importer.import_roles.%s.converter', $this->role));
+        Log::debug(sprintf('getParsedValue will run %s', $converterClass));
         return ConverterService::convert($converterClass, $this->value, $this->configuration);
     }
 

@@ -22,6 +22,7 @@
 
 namespace App\Services\Import\Routine;
 
+use App\Services\CSV\Configuration\Configuration;
 use App\Services\Import\ColumnValue;
 use App\Services\Import\Support\ProgressInformation;
 use Log;
@@ -37,12 +38,16 @@ class ColumnValueConverter
 {
     use ProgressInformation;
 
+    /** @var Configuration */
+    private $configuration;
+
     /** @var array */
     private $roleToTransaction;
 
-    public function __construct()
+    public function __construct(Configuration $configuration)
     {
         $this->roleToTransaction = config('csv_importer.role_to_transaction');
+        $this->configuration     = $configuration;
     }
 
     /**
@@ -78,8 +83,9 @@ class ColumnValueConverter
         // make a new transaction:
         $transaction = [
             //'user'          => 1, // ??
-            'group_title'  => null,
-            'transactions' => [
+            'group_title'             => null,
+            'error_if_duplicate_hash' => $this->configuration->isIgnoreDuplicates(),
+            'transactions'            => [
                 [
                     //'user'=> 1,
                     'type'             => 'withdrawal',
@@ -172,7 +178,7 @@ class ColumnValueConverter
 
 
         }
-        Log::debug('Final transaction', $transaction);
+        Log::debug('Almost final transaction', $transaction);
 
         //$this->addWarning($index,'Warning from Column value converter.');
         //        $this->addMessage($index,'Message from Column value converter.');

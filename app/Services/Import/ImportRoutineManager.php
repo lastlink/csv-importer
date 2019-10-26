@@ -85,7 +85,7 @@ class ImportRoutineManager
         $this->configuration              = $configuration;
         $this->lineProcessor              = new LineProcessor($this->configuration);
         $this->pseudoTransactionProcessor = new PseudoTransactionProcessor($this->configuration->getDefaultAccount());
-        $this->columnValueConverter       = new ColumnValueConverter;
+        $this->columnValueConverter       = new ColumnValueConverter($this->configuration);
         $this->csvFileProcessor           = new CSVFileProcessor($this->configuration);
     }
 

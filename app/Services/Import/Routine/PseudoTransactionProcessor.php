@@ -148,6 +148,7 @@ class PseudoTransactionProcessor
         foreach ($this->tasks as $task) {
             /** @var AbstractTask $object */
             $object = app($task);
+            Log::debug(sprintf('Now running task %s', $task));
 
             if ($object->requiresDefaultAccount()) {
                 $object->setAccount($this->defaultAccount);
