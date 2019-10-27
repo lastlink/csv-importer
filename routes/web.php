@@ -44,6 +44,9 @@ Route::get('/import/php_date', ['uses' => 'Import\ConfigurationController@phpDat
 Route::get('/import/roles', ['uses' => 'Import\RoleController@index', 'as' => 'import.roles.index']);
 Route::post('/import/roles', ['uses' => 'Import\RoleController@postIndex', 'as' => 'import.roles.post']);
 
+// download config:
+Route::get('/configuration/download', ['uses' => 'Import\DownloadController@download', 'as' => 'import.job.configuration.download']);
+
 // mapping
 Route::get('/import/mapping', ['uses' => 'Import\MapController@index', 'as' => 'import.mapping.index']);
 Route::post('/import/mapping', ['uses' => 'Import\MapController@postIndex', 'as' => 'import.mapping.post']);

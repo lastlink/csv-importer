@@ -251,6 +251,24 @@ class Configuration
     }
 
     /**
+     * @return bool
+     */
+    public function isIgnoreDuplicateLines(): bool
+    {
+        return $this->ignoreDuplicateLines;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIgnoreDuplicateTransactions(): bool
+    {
+        return $this->ignoreDuplicateTransactions;
+    }
+
+
+
+    /**
      * @param array $data
      *
      * @return static

@@ -83,9 +83,9 @@ class ColumnValueConverter
         // make a new transaction:
         $transaction = [
             //'user'          => 1, // ??
-            'group_title'             => null,
-            'error_if_duplicate_hash' => $this->configuration->isIgnoreDuplicates(),
-            'transactions'            => [
+            'group_title' => null,
+            'error_if_duplicate_hash' => $this->configuration->isIgnoreDuplicateTransactions(),
+            'transactions' => [
                 [
                     //'user'=> 1,
                     'type'             => 'withdrawal',
@@ -169,7 +169,17 @@ class ColumnValueConverter
 
             // if append, append.
             if (true === $value->isAppendValue()) {
-                $transaction['transactions'][0][$transactionField] = sprintf('%s %s', $transaction['transactions'][0][$transactionField], $parsedValue);
+                if (is_array($parsedValue)) {
+                    $transaction['transactions'][0][$transactionField] = $transaction['transactions'][0][$transactionField] ?? [];
+                    $transaction['transactions'][0][$transactionField] += $parsedValue;
+                }
+                if (!is_array($parsedValue)) {
+                    $transaction['transactions'][0][$transactionField] = $transaction['transactions'][0][$transactionField] ?? '';
+                    $transaction['transactions'][0][$transactionField] = trim(
+                        sprintf('%s %s', $transaction['transactions'][0][$transactionField], $parsedValue)
+                    );
+                }
+
             }
             // if not, not.
             if (false === $value->isAppendValue()) {
@@ -179,10 +189,6 @@ class ColumnValueConverter
 
         }
         Log::debug('Almost final transaction', $transaction);
-
-        //$this->addWarning($index,'Warning from Column value converter.');
-        //        $this->addMessage($index,'Message from Column value converter.');
-        //        $this->addError($index,'Error from Column value converter.');
 
         return $transaction;
     }

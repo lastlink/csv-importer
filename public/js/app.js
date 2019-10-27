@@ -1937,6 +1937,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "ImportStatus",
 
@@ -1946,7 +1959,8 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       triedToStart: false,
-      status: ''
+      status: '',
+      downloadUri: window.configDownloadUri
     };
   },
   props: [],
@@ -1966,22 +1980,35 @@ __webpack_require__.r(__webpack_exports__);
 
         if (false === _this.triedToStart && 'waiting_to_start' === _this.status) {
           // call to job start.
-          console.log('Job hasnt started yet. Show user some info');
+          console.log('Job hasn\'t started yet. Show user some info');
           return;
         }
 
         if (true === _this.triedToStart && 'waiting_to_start' === _this.status) {
-          console.log('Job hasnt started yet, but wont try again.');
+          console.log('Job hasnt started yet.');
+        }
+
+        if ('job_done' === _this.status) {
+          console.log('Job is done!');
+          return;
         }
 
         setTimeout(function () {
+          console.log('Fired on setTimeout');
           this.getJobStatus();
-        }.bind(_this), 2000);
+        }.bind(_this), 1000);
       });
     },
     callStart: function callStart() {
+      var _this2 = this;
+
       console.log('Call job start URI: ' + jobStartUri);
-      axios.post(jobStartUri);
+      axios.post(jobStartUri).then(function (response) {
+        _this2.getJobStatus();
+      })["catch"](function (error) {
+        _this2.status = 'error';
+      });
+      this.getJobStatus();
       this.triedToStart = true;
     }
   },
@@ -37316,7 +37343,25 @@ var render = function() {
         _vm._v(" "),
         "waiting_to_start" === this.status && false === this.triedToStart
           ? _c("div", { staticClass: "card-body" }, [
-              _c("p", [_vm._v("Here is a link to your config. Press start.")]),
+              _c("p", [
+                _c(
+                  "a",
+                  {
+                    attrs: {
+                      href: this.downloadUri,
+                      title: "Download configuration file."
+                    }
+                  },
+                  [
+                    _vm._v(
+                      "\n                        You can download a configuration file of your import"
+                    )
+                  ]
+                ),
+                _vm._v(
+                  ", so you can make a quick start the next time you import.\n                "
+                )
+              ]),
               _vm._v(" "),
               _c("p", [
                 _c(
@@ -37336,6 +37381,26 @@ var render = function() {
           ? _c("div", { staticClass: "card-body" }, [
               _c("p", [
                 _vm._v("Waiting for the job to start..\n                ")
+              ])
+            ])
+          : _vm._e(),
+        _vm._v(" "),
+        "job_done" === this.status
+          ? _c("div", { staticClass: "card-body" }, [
+              _c("p", [
+                _vm._v(
+                  "\n                    Job is done, give user some feedback.\n                "
+                )
+              ])
+            ])
+          : _vm._e(),
+        _vm._v(" "),
+        "error" === this.status && true === this.triedToStart
+          ? _c("div", { staticClass: "card-body" }, [
+              _c("p", { staticClass: "text-danger" }, [
+                _vm._v(
+                  "\n                    The job could not be started or failed due to an error. Please check the log files. Sorry about this :(.\n                "
+                )
               ])
             ])
           : _vm._e()

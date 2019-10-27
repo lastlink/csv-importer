@@ -25,7 +25,10 @@
             <div class="card">
                 <div class="card-header">Import status</div>
                 <div class="card-body" v-if="'waiting_to_start' === this.status && false === this.triedToStart">
-                    <p>Here is a link to your config. Press start.</p>
+                    <p>
+                        <a :href="this.downloadUri" title="Download configuration file.">
+                            You can download a configuration file of your import</a>, so you can make a quick start the next time you import.
+                    </p>
                     <p>
                         <button
                             class="btn btn-success"
@@ -35,6 +38,16 @@
                 </div>
                 <div class="card-body" v-if="'waiting_to_start' === this.status && true === this.triedToStart">
                     <p>Waiting for the job to start..
+                    </p>
+                </div>
+                <div class="card-body" v-if="'job_done' === this.status ">
+                    <p>
+                        Job is done, give user some feedback.
+                    </p>
+                </div>
+                <div class="card-body" v-if="'error' === this.status && true === this.triedToStart">
+                    <p class="text-danger">
+                        The job could not be started or failed due to an error. Please check the log files. Sorry about this :(.
                     </p>
                 </div>
             </div>
@@ -51,7 +64,8 @@
         data() {
             return {
                 triedToStart: false,
-                status: ''
+                status: '',
+                downloadUri: window.configDownloadUri
             };
         },
         props: [],
@@ -68,21 +82,31 @@
                     console.log(`Job status is ${this.status}.`);
                     if (false === this.triedToStart && 'waiting_to_start' === this.status) {
                         // call to job start.
-                        console.log('Job hasnt started yet. Show user some info');
+                        console.log('Job hasn\'t started yet. Show user some info');
                         return;
                     }
                     if (true === this.triedToStart && 'waiting_to_start' === this.status) {
-                        console.log('Job hasnt started yet, but wont try again.');
+                        console.log('Job hasnt started yet.');
+                    }
+                    if ('job_done' === this.status) {
+                        console.log('Job is done!');
+                        return;
                     }
 
                     setTimeout(function () {
+                        console.log('Fired on setTimeout');
                         this.getJobStatus();
-                    }.bind(this), 2000)
+                    }.bind(this), 1000);
                 });
             },
             callStart: function () {
                 console.log('Call job start URI: ' + jobStartUri);
-                axios.post(jobStartUri);
+                axios.post(jobStartUri).then((response) => {
+                    this.getJobStatus();
+                }).catch((error) => {
+                    this.status = 'error';
+                });
+                this.getJobStatus();
                 this.triedToStart = true;
             },
         },

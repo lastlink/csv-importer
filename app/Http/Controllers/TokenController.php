@@ -47,6 +47,8 @@ class TokenController extends Controller
             $response = ['result' => 'NOK', 'message' => $e->getMessage()];
         }
 
+        // TODO verify version of Firefly III
+
         return response()->json($response);
     }
 

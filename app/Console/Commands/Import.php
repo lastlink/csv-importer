@@ -129,7 +129,7 @@ class Import extends Command
     {
         Log::debug(sprintf('Now in %s', __METHOD__));
         $configObject = Configuration::fromFile($configuration);
-        $manager      = new ImportRoutineManager();
+        $manager      = new ImportRoutineManager;
 
         try {
             $manager->setConfiguration($configObject);

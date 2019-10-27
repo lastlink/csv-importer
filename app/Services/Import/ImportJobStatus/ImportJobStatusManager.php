@@ -23,27 +23,74 @@
 namespace App\Services\Import\ImportJobStatus;
 
 use App\Services\Session\Constants;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Log;
+use Storage;
 
 /**
  * Class ImportJobStatusManager
  */
 class ImportJobStatusManager
 {
-
-    public static function startOrFindJob(): ImportJobStatus
+    /**
+     * @param string $identifier
+     *
+     * @return ImportJobStatus
+     */
+    public static function startOrFindJob(string $identifier): ImportJobStatus
     {
-        $sessionData = session()->get(Constants::JOB_STATUS);
-        if (null !== $sessionData) {
-            $importJobStatus = ImportJobStatus::fromArray($sessionData);
-        }
-        if (null === $sessionData) {
-            // store new job status thing in session.
-            $importJobStatus = new ImportJobStatus;
+        Log::debug(sprintf('Now in startOrFindJob(%s)', $identifier));
+        $disk = Storage::disk('jobs');
+        try {
+            Log::debug('Try to see if file exists.');
+            if ($disk->exists($identifier)) {
+                Log::debug('File exists.');
 
-            // store import job status in session
-            session()->put(Constants::JOB_STATUS, $importJobStatus->toArray());
+                return ImportJobStatus::fromArray(json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR));
+            }
+        } catch (FileNotFoundException $e) {
+            Log::error('Could not find file, write a new one.');
+            Log::error($e->getMessage());
         }
+        Log::debug('File does not exist or error, create a new one.');
+        $status = new ImportJobStatus;
+        $disk->put($identifier, json_encode($status->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
 
-        return $importJobStatus;
+        Log::debug('Return status.', $status->toArray());
+
+        return $status;
+    }
+
+    /**
+     * @param string $status
+     *
+     * @return ImportJobStatus
+     */
+    public static function setJobStatus(string $status): ImportJobStatus
+    {
+        $identifier = session()->get(Constants::JOB_IDENTIFIER);
+        Log::debug(sprintf('Now in setJobStatus(%s)', $status));
+        Log::debug(sprintf('Found "%s" in the session', $identifier));
+
+        $jobStatus         = self::startOrFindJob($identifier);
+        $jobStatus->status = $status;
+
+        self::storeJobStatus($identifier, $jobStatus);
+
+        return $jobStatus;
+    }
+
+    /**
+     * @param string          $identifier
+     * @param ImportJobStatus $status
+     */
+    private static function storeJobStatus(string $identifier, ImportJobStatus $status): void
+    {
+        Log::debug(sprintf('Now in storeJobStatus(%s)', $identifier));
+        $array = $status->toArray();
+        Log::debug('Going to store', $array);
+        $disk = Storage::disk('jobs');
+        $disk->put($identifier, json_encode($status->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
+        Log::debug('Done with storing.');
     }
 }

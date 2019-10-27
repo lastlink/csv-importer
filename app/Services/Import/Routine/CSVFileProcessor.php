@@ -152,7 +152,7 @@ class CSVFileProcessor
         Log::info(sprintf('Parsed all %d lines.', $count));
 
         // exclude double lines.
-        if ($this->configuration->isIgnoreLines()) {
+        if ($this->configuration->isIgnoreDuplicateLines()) {
             Log::info('Going to remove duplicate lines.');
             $updatedRecords = $this->removeDuplicateLines($updatedRecords);
         }

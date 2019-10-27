@@ -33,6 +33,8 @@ class ImportJobStatus
     public const JOB_RUNNING = 'job_running';
     /** @var string */
     public const JOB_ERRORED = 'job_errored';
+    /** @var string */
+    public const JOB_DONE = 'job_done';
 
     /** @var string */
     public $status;

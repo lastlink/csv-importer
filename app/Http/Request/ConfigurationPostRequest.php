@@ -51,19 +51,18 @@ class ConfigurationPostRequest extends Request
 
 
         $result = [
-            'headers'           => $this->convertBoolean($this->get('headers')),
-            'delimiter'         => $this->string('delimiter'),
-            'date'              => $this->string('date'),
-            'default_account'   => $this->integer('default_account'),
-            'rules'             => $this->convertBoolean($this->get('rules')),
-            'ignore_lines'      => $this->convertBoolean($this->get('ignore_lines')),
-            'ignore_duplicates' => $this->convertBoolean($this->get('ignore_duplicates')),
-            'ignore_transfers'  => $this->convertBoolean($this->get('ignore_transfers')),
-            'skip_form'         => $this->convertBoolean($this->get('skip_form')),
-            'specifics'         => [],
-            'roles'             => $roles,
-            'mapping'           => $mapping,
-            'do_mapping'        => $doMapping,
+            'headers'                       => $this->convertBoolean($this->get('headers')),
+            'delimiter'                     => $this->string('delimiter'),
+            'date'                          => $this->string('date'),
+            'default_account'               => $this->integer('default_account'),
+            'rules'                         => $this->convertBoolean($this->get('rules')),
+            'ignore_duplicate_lines'        => $this->convertBoolean($this->get('ignore_duplicate_lines')),
+            'ignore_duplicate_transactions' => $this->convertBoolean($this->get('ignore_duplicate_transactions')),
+            'skip_form'                     => $this->convertBoolean($this->get('skip_form')),
+            'specifics'                     => [],
+            'roles'                         => $roles,
+            'mapping'                       => $mapping,
+            'do_mapping'                    => $doMapping,
         ];
         // rules for specifics:
         $specifics = SpecificService::getSpecifics();
@@ -81,15 +80,14 @@ class ConfigurationPostRequest extends Request
     {
         $rules = [
             //'some_weird_field' => 'required',
-            'headers'           => 'numeric|between:0,1',
-            'delimiter'         => 'required|in:comma,semicolon,tab',
-            'date'              => 'required|between:1,15',
-            'default_account'   => 'required|numeric|min:1|max:100000',
-            'rules'             => 'numeric|between:0,1',
-            'ignore_lines'      => 'numeric|between:0,1',
-            'ignore_duplicates' => 'numeric|between:0,1',
-            'ignore_transfers'  => 'numeric|between:0,1',
-            'skip_form'         => 'numeric|between:0,1',
+            'headers'                       => 'numeric|between:0,1',
+            'delimiter'                     => 'required|in:comma,semicolon,tab',
+            'date'                          => 'required|between:1,15',
+            'default_account'               => 'required|numeric|min:1|max:100000',
+            'rules'                         => 'numeric|between:0,1',
+            'ignore_duplicate_lines'        => 'numeric|between:0,1',
+            'ignore_duplicate_transactions' => 'numeric|between:0,1',
+            'skip_form'                     => 'numeric|between:0,1',
         ];
         // rules for specifics:
         $specifics = SpecificService::getSpecifics();

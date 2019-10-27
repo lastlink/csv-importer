@@ -96,12 +96,17 @@ class Date implements ConverterInterface
         $string  = str_replace($search, $replace, $value);
         $string  = trim(str_replace(["\n", "\t", "\r"], "\x20", $string));
 
-        // TODO convert to date, based on config?
         /** @var Carbon $carbon */
-        try {
-            $carbon = Carbon::createFromFormat($this->dateFormat, $string);
-        } catch (InvalidArgumentException $e) {
-            throw new ImportException(sprintf('Could not convert date "%s" using format "%s".', $string, $this->dateFormat));
+
+        if ('' === $string) {
+            $carbon = Carbon::today();
+        }
+        if ('' !== $string) {
+            try {
+                $carbon = Carbon::createFromFormat($this->dateFormat, $string);
+            } catch (InvalidArgumentException $e) {
+                throw new ImportException(sprintf('Could not convert date "%s" using format "%s".', $string, $this->dateFormat));
+            }
         }
 
         return $carbon->format('Y-m-d');

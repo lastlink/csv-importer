@@ -115,26 +115,18 @@
                                 <div class="col-sm-9">
 
                                     <div class="form-check">
-                                        <input class="form-check-input" {% if configuration.isIgnoreLines %}checked{% endif %} type="checkbox" value="1" id="ignore_lines" name="ignore_lines" aria-describedby="duplicateHelp">
-                                        <label class="form-check-label" for="ignore_lines">
-                                            Verification: Ignore duplicate lines in the CSV file.
+                                        <input class="form-check-input" {% if configuration.isIgnoreDuplicateLines %}checked{% endif %} type="checkbox" value="1" id="ignore_duplicate_lines" name="ignore_duplicate_lines" aria-describedby="duplicateHelp">
+                                        <label class="form-check-label" for="ignore_duplicate_lines">
+                                            Do not import duplicate lines in the CSV file.
                                         </label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" {% if configuration.isIgnoreDuplicates %}checked{% endif %} type="checkbox" value="1" id="ignore_duplicates" name="ignore_duplicates" aria-describedby="duplicateHelp">
-                                        <label class="form-check-label" for="ignore_duplicates">
-                                            Validation: Ignore already existing duplicate transactions.
+                                        <input class="form-check-input" {% if configuration.isIgnoreDuplicateTransactions %}checked{% endif %} type="checkbox" value="1" id="ignore_duplicate_transactions" name="ignore_duplicate_transactions" aria-describedby="duplicateHelp">
+                                        <label class="form-check-label" for="ignore_duplicate_transactions">
+                                            Do not import already existing transactions.
                                         </label>
                                     </div>
-
-                                    <div class="form-check">
-                                        <input class="form-check-input" {% if configuration.isIgnoreTransfers %}checked{% endif %} type="checkbox" value="1" id="ignore_transfers" name="ignore_transfers" aria-describedby="duplicateHelp">
-                                        <label class="form-check-label" for="ignore_transfers">
-                                            Analysis: Ignore existing transfers with reversed accounts.
-                                        </label>
-                                    </div>
-
 
                                     <small class="form-text text-muted" id="duplicateHelp">
                                         The import routine has several ways of checking if transactions are unique. Select how strict the import
@@ -193,8 +185,10 @@
     <script type="text/javascript">
 
         var phpFormatRoute = '{{ route('import.configure.php_date') }}';
-
-        $('#date').on('change', function () {
+        $( document ).ready(function() {
+            updateDateExample();
+        });
+        function updateDateExample() {
             $('#date_example').text('...');
             var format = $('#date').val();
             $.getJSON(phpFormatRoute, {format: format}).done(function (data) {
@@ -202,6 +196,8 @@
             }).fail(function () {
                 $('#date_example').text(':(');
             });
-        });
+        }
+
+        $('#date').on('change',updateDateExample);
     </script>
 {% endblock %}

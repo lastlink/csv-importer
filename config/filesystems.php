@@ -21,7 +21,6 @@
  */
 
 declare(strict_types=1);
-
 return [
 
     /*
@@ -73,7 +72,10 @@ return [
             'driver' => 'local',
             'root'   => storage_path('uploads'),
         ],
-
+        'jobs' => [
+            'driver' => 'local',
+            'root'   => storage_path('jobs'),
+        ],
         'public' => [
             'driver'     => 'local',
             'root'       => storage_path('app/public'),

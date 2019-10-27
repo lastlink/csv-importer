@@ -24,6 +24,7 @@ namespace App\Services\Import;
 
 use App\Exceptions\ImportException;
 use App\Services\CSV\Configuration\Configuration;
+use App\Services\Import\ImportJobStatus\ImportJobStatusManager;
 use App\Services\Import\Routine\APISubmitter;
 use App\Services\Import\Routine\ColumnValueConverter;
 use App\Services\Import\Routine\CSVFileProcessor;
@@ -31,6 +32,8 @@ use App\Services\Import\Routine\LineProcessor;
 use App\Services\Import\Routine\PseudoTransactionProcessor;
 use League\Csv\Reader;
 use Log;
+use Storage;
+use Str;
 
 /**
  * Class ImportRoutineManager
@@ -41,8 +44,6 @@ class ImportRoutineManager
     private $configuration;
     /** @var LineProcessor */
     private $lineProcessor;
-    /** @var Reader */
-    private $reader;
     /** @var ColumnValueConverter */
     private $columnValueConverter;
     /** @var PseudoTransactionProcessor */
@@ -51,7 +52,8 @@ class ImportRoutineManager
     private $apiSubmitter;
     /** @var CSVFileProcessor */
     private $csvFileProcessor;
-
+    /** @var string */
+    private $identifier;
     /** @var array */
     private $allMessages;
     /** @var array */
@@ -73,6 +75,8 @@ class ImportRoutineManager
         $this->allMessages      = [];
         $this->allWarnings      = [];
         $this->allErrors        = [];
+        $this->generateIdentifier();
+        ImportJobStatusManager::startOrFindJob($this->identifier);
     }
 
     /**
@@ -152,6 +156,31 @@ class ImportRoutineManager
         $this->mergeMessages($count);
         $this->mergeWarnings($count);
         $this->mergeErrors($count);
+    }
+
+    /**
+     *
+     */
+    private function generateIdentifier(): void
+    {
+        Log::debug('Going to generate identifier.');
+        $disk  = Storage::disk('jobs');
+        $count = 0;
+        do {
+            $identifier = Str::random(16);
+            $count++;
+            Log::debug(sprintf('Attempt #%d results in "%s"', $count, $identifier));
+        } while ($count < 30 && $disk->exists($identifier));
+        $this->identifier = $identifier;
+        Log::info(sprintf('Job identifier is "%s"', $identifier));
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
     }
 
     /**

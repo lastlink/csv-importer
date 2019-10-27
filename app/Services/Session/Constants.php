@@ -44,4 +44,6 @@ class Constants
     /** @var string */
     public const JOB_STATUS = 'import_job_status';
 
+    public const JOB_IDENTIFIER = 'import_job_id';
+
 }

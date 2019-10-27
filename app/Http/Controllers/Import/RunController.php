@@ -23,13 +23,16 @@
 namespace App\Http\Controllers\Import;
 
 
+use App\Exceptions\ImportException;
 use App\Http\Controllers\Controller;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\File\FileReader;
+use App\Services\Import\ImportJobStatus\ImportJobStatus;
 use App\Services\Import\ImportJobStatus\ImportJobStatusManager;
 use App\Services\Import\ImportRoutineManager;
 use App\Services\Session\Constants;
 use Illuminate\Http\JsonResponse;
+use Log;
 
 /**
  * Class RunController
@@ -53,20 +56,43 @@ class RunController extends Controller
      */
     public function start(): JsonResponse
     {
-        $importJobStatus = ImportJobStatusManager::startOrFindJob();
-        // TODO also start job.
-        $routine = new ImportRoutineManager;
-        $routine->setConfiguration(Configuration::fromArray(session()->get(Constants::CONFIGURATION)));
-        $routine->setReader(FileReader::getReaderFromSession());
-        $routine->start();
+        Log::debug('Now in RunController::start()');
+        $routine    = new ImportRoutineManager;
+        $identifier = $routine->getIdentifier();
 
+        Log::debug(sprintf('Import routine manager identifier is "%s"', $identifier));
+
+        // store identifier in session so the status can get it.
+        session()->put(Constants::JOB_IDENTIFIER, $identifier);
+        Log::debug(sprintf('Stored "%s" under "%s"', $identifier, Constants::JOB_IDENTIFIER));
+
+        $importJobStatus = ImportJobStatusManager::startOrFindJob($identifier);
+        ImportJobStatusManager::setJobStatus(ImportJobStatus::JOB_RUNNING);
+
+        try {
+            $routine->setConfiguration(Configuration::fromArray(session()->get(Constants::CONFIGURATION)));
+            $routine->setReader(FileReader::getReaderFromSession());
+            $routine->start();
+        } catch (ImportException $e) {
+        }
+
+        // set done:
+        ImportJobStatusManager::setJobStatus(ImportJobStatus::JOB_DONE);
 
         return response()->json($importJobStatus->toArray());
     }
 
     public function status(): JsonResponse
     {
-        $importJobStatus = ImportJobStatusManager::startOrFindJob();
+        $identifier = session()->get(Constants::JOB_IDENTIFIER);
+        if (null === $identifier) {
+            // no status is known yet because no identifier is in the session.
+            // As a fallback, return empty status
+            $fakeStatus = new ImportJobStatus;
+
+            return response()->json($fakeStatus->toArray());
+        }
+        $importJobStatus = ImportJobStatusManager::startOrFindJob($identifier);
 
         return response()->json($importJobStatus->toArray());
     }
