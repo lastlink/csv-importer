@@ -71,7 +71,6 @@ class ImportRoutineManager
         Log::debug('Constructed ImportRoutineManager');
 
         // get line converter
-        $this->apiSubmitter     = new APISubmitter;
         $this->allMessages      = [];
         $this->allWarnings      = [];
         $this->allErrors        = [];
@@ -87,10 +86,19 @@ class ImportRoutineManager
     public function setConfiguration(Configuration $configuration): void
     {
         $this->configuration              = $configuration;
+        $this->apiSubmitter               = new APISubmitter;
         $this->lineProcessor              = new LineProcessor($this->configuration);
         $this->pseudoTransactionProcessor = new PseudoTransactionProcessor($this->configuration->getDefaultAccount());
         $this->columnValueConverter       = new ColumnValueConverter($this->configuration);
         $this->csvFileProcessor           = new CSVFileProcessor($this->configuration);
+
+        // set the identifier:
+        $this->apiSubmitter->setIdentifier($this->identifier);
+        $this->lineProcessor->setIdentifier($this->identifier);
+        $this->pseudoTransactionProcessor->setIdentifier($this->identifier);
+        $this->columnValueConverter->setIdentifier($this->identifier);
+        $this->csvFileProcessor->setIdentifier($this->identifier);
+
     }
 
     /**

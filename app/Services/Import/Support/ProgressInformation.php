@@ -22,6 +22,8 @@
 
 namespace App\Services\Import\Support;
 
+use App\Services\Import\ImportJobStatus\ImportJobStatusManager;
+
 /**
  * Trait ProgressInformation
  */
@@ -33,6 +35,16 @@ trait ProgressInformation
     protected $messages;
     /** @var array */
     protected $warnings;
+    /** @var string */
+    protected $identifier;
+
+    /**
+     * @param string $identifier
+     */
+    public function setIdentifier(string $identifier): void
+    {
+        $this->identifier = $identifier;
+    }
 
     /**
      * @param int    $index
@@ -43,6 +55,9 @@ trait ProgressInformation
         $this->errors           = $this->errors ?? [];
         $this->errors[$index]   = $this->errors[$index] ?? [];
         $this->errors[$index][] = $error;
+
+        // write errors
+        ImportJobStatusManager::addError($this->identifier, $index, $error);
     }
 
     /**
@@ -54,6 +69,9 @@ trait ProgressInformation
         $this->messages           = $this->messages ?? [];
         $this->messages[$index]   = $this->messages[$index] ?? [];
         $this->messages[$index][] = $message;
+
+        // write message
+        ImportJobStatusManager::addMessage($this->identifier, $index, $message);
     }
 
     /**
@@ -65,6 +83,9 @@ trait ProgressInformation
         $this->warnings           = $this->warnings ?? [];
         $this->warnings[$index]   = $this->warnings[$index] ?? [];
         $this->warnings[$index][] = $warning;
+
+        // write warning
+        ImportJobStatusManager::addWarning($this->identifier, $index, $warning);
     }
 
     /**

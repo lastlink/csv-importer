@@ -62,6 +62,67 @@ class ImportJobStatusManager
     }
 
     /**
+     * @param string $identifier
+     * @param int    $index
+     * @param string $error
+     */
+    public static function addError(string $identifier, int $index, string $error): void
+    {
+        $disk = Storage::disk('jobs');
+        try {
+            if ($disk->exists($identifier)) {
+                $status                   = ImportJobStatus::fromArray(json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR));
+                $status->errors[$index]   = $status->errors[$index] ?? [];
+                $status->errors[$index][] = $error;
+                self::storeJobStatus($identifier, $status);
+            }
+        } catch (FileNotFoundException $e) {
+            Log::error($e);
+        }
+    }
+
+    /**
+     * @param string $identifier
+     * @param int    $index
+     * @param string $warning
+     */
+    public static function addWarning(string $identifier, int $index, string $warning): void
+    {
+        $disk = Storage::disk('jobs');
+        try {
+            if ($disk->exists($identifier)) {
+                $status                     = ImportJobStatus::fromArray(json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR));
+                $status->warnings[$index]   = $status->warnings[$index] ?? [];
+                $status->warnings[$index][] = $warning;
+                self::storeJobStatus($identifier, $status);
+            }
+        } catch (FileNotFoundException $e) {
+            Log::error($e);
+        }
+    }
+
+    /**
+     * @param string $identifier
+     * @param int    $index
+     * @param string $message
+     */
+    public static function addMessage(string $identifier, int $index, string $message): void
+    {
+        $disk = Storage::disk('jobs');
+        try {
+            if ($disk->exists($identifier)) {
+                $status                     = ImportJobStatus::fromArray(json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR));
+                $status->messages[$index]   = $status->messages[$index] ?? [];
+                $status->messages[$index][] = $message;
+                self::storeJobStatus($identifier, $status);
+            }
+        } catch (FileNotFoundException $e) {
+            Log::error($e);
+        }
+    }
+
+
+    /**
      * @param string $status
      *
      * @return ImportJobStatus

@@ -38,19 +38,31 @@ class ImportJobStatus
 
     /** @var string */
     public $status;
+    /** @var array */
+    public $errors;
+    /** @var array */
+    public $warnings;
+    /** @var array */
+    public $messages;
 
     /**
      * ImportJobStatus constructor.
      */
     public function __construct()
     {
-        $this->status = self::JOB_WAITING;
+        $this->status   = self::JOB_WAITING;
+        $this->errors   = [];
+        $this->warnings = [];
+        $this->messages = [];
     }
 
     public static function fromArray(array $array): self
     {
-        $config         = new self;
-        $config->status = $array['status'];
+        $config           = new self;
+        $config->status   = $array['status'];
+        $config->errors   = $array['errors'] ?? [];
+        $config->warnings = $array['warnings'] ?? [];
+        $config->messages = $array['messages'] ?? [];
 
         return $config;
     }
@@ -61,7 +73,10 @@ class ImportJobStatus
     public function toArray(): array
     {
         return [
-            'status' => $this->status,
+            'status'   => $this->status,
+            'errors'   => $this->errors,
+            'warnings' => $this->warnings,
+            'messages' => $this->messages,
         ];
     }
 }
