@@ -26,6 +26,7 @@
                 <div class="card-header">Import status</div>
                 <div class="card-body" v-if="'waiting_to_start' === this.status && false === this.triedToStart">
                     <p>
+                        The tool is ready to import your data. Press "start job" to start.
                         <a :href="this.downloadUri" title="Download configuration file.">
                             You can download a configuration file of your import</a>, so you can make a quick start the next time you import.
                     </p>

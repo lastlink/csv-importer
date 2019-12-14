@@ -25,6 +25,8 @@ namespace App\Http\Controllers\Import;
 
 use App\Exceptions\ImportException;
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\ReadyForImport;
+use App\Http\Middleware\UploadedFiles;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\File\FileReader;
 use App\Services\Import\ImportJobStatus\ImportJobStatus;
@@ -42,12 +44,22 @@ class RunController extends Controller
 {
 
     /**
+     * StartController constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        app('view')->share('pageTitle', 'Importing data...');
+        $this->middleware(ReadyForImport::class);
+    }
+
+    /**
      *
      */
     public function index()
     {
-        $mainTitle = 'Importing';
-        $subTitle  = 'Import subtitle';
+        $mainTitle = 'Import the data';
+        $subTitle  = 'Connect to Firefly III and store your data';
 
         // job ID may be in session:
         $identifier = session()->get(Constants::JOB_IDENTIFIER);
