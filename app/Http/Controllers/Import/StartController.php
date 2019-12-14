@@ -25,6 +25,7 @@ namespace App\Http\Controllers\Import;
 
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\UploadedFiles;
+use Log;
 
 /**
  * Class StartController
@@ -46,6 +47,7 @@ class StartController extends Controller
      */
     public function index()
     {
+        Log::debug(sprintf('Now at %s', __METHOD__));
         $mainTitle = 'Import routine';
         $subTitle  = 'Start page and instructions';
 

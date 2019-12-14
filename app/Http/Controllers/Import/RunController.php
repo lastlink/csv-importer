@@ -32,6 +32,7 @@ use App\Services\Import\ImportJobStatus\ImportJobStatusManager;
 use App\Services\Import\ImportRoutineManager;
 use App\Services\Session\Constants;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Log;
 
 /**
@@ -48,23 +49,36 @@ class RunController extends Controller
         $mainTitle = 'Importing';
         $subTitle  = 'Import subtitle';
 
-        return view('import.run.index', compact('mainTitle', 'subTitle'));
-    }
-
-    /**
-     * @return JsonResponse
-     */
-    public function start(): JsonResponse
-    {
-        Log::debug('Now in RunController::start()');
-        $routine    = new ImportRoutineManager;
-        $identifier = $routine->getIdentifier();
+        // job ID may be in session:
+        $identifier = session()->get(Constants::JOB_IDENTIFIER);
+        if(null !== $identifier) {
+            // create a new import job:
+            $routine    = new ImportRoutineManager($identifier);
+        }
+        if(null === $identifier) {
+            // create a new import job:
+            $routine    = new ImportRoutineManager();
+            $identifier = $routine->getIdentifier();
+        }
 
         Log::debug(sprintf('Import routine manager identifier is "%s"', $identifier));
 
         // store identifier in session so the status can get it.
         session()->put(Constants::JOB_IDENTIFIER, $identifier);
         Log::debug(sprintf('Stored "%s" under "%s"', $identifier, Constants::JOB_IDENTIFIER));
+
+        return view('import.run.index', compact('mainTitle', 'subTitle','identifier'));
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function start(Request $request): JsonResponse
+    {
+        Log::debug(sprintf('Now at %s', __METHOD__));
+        $identifier = $request->get('identifier');
+        $routine    = new ImportRoutineManager($identifier);
+
 
         $importJobStatus = ImportJobStatusManager::startOrFindJob($identifier);
         ImportJobStatusManager::setJobStatus(ImportJobStatus::JOB_RUNNING);
@@ -82,10 +96,18 @@ class RunController extends Controller
         return response()->json($importJobStatus->toArray());
     }
 
-    public function status(): JsonResponse
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function status(Request $request): JsonResponse
     {
-        $identifier = session()->get(Constants::JOB_IDENTIFIER);
+
+        $identifier = $request->get('identifier');
+        Log::debug(sprintf('Now at %s(%s)', __METHOD__, $identifier));
         if (null === $identifier) {
+            Log::warning('Identifier is NULL.');
             // no status is known yet because no identifier is in the session.
             // As a fallback, return empty status
             $fakeStatus = new ImportJobStatus;

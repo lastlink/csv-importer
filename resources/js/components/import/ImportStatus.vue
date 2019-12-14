@@ -31,8 +31,8 @@
                     </p>
                     <p>
                         <button
-                            class="btn btn-success"
-                            v-on:click="callStart" type="button">Start job
+                                class="btn btn-success"
+                                v-on:click="callStart" type="button">Start job
                         </button>
                     </p>
                 </div>
@@ -40,15 +40,39 @@
                     <p>Waiting for the job to start..
                     </p>
                 </div>
+                <div class="card-body" v-if="'job_running' === this.status">
+                    <p>
+                        Job is running, please wait.
+                    </p>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0"
+                             aria-valuemax="100" style="width: 100%"></div>
+                    </div>
+                    <import-messages
+                            :messages="this.messages"
+                            :warnings="this.warnings"
+                            :errors="this.errors"
+                    ></import-messages>
+                </div>
                 <div class="card-body" v-if="'job_done' === this.status ">
                     <p>
-                        Job is done, give user some feedback.
+                        The import routine has finished.
                     </p>
+                    <import-messages
+                            :messages="this.messages"
+                            :warnings="this.warnings"
+                            :errors="this.errors"
+                    ></import-messages>
                 </div>
                 <div class="card-body" v-if="'error' === this.status && true === this.triedToStart">
                     <p class="text-danger">
                         The job could not be started or failed due to an error. Please check the log files. Sorry about this :(.
                     </p>
+                    <import-messages
+                            :messages="this.messages"
+                            :warnings="this.warnings"
+                            :errors="this.errors"
+                    ></import-messages>
                 </div>
             </div>
         </div>
@@ -65,6 +89,9 @@
             return {
                 triedToStart: false,
                 status: '',
+                messages: [],
+                warnings: [],
+                errors: [],
                 downloadUri: window.configDownloadUri
             };
         },
@@ -79,6 +106,9 @@
                 axios.get(jobStatusUri).then((response) => {
                     // handle success
                     this.status = response.data.status;
+                    this.errors = response.data.errors;
+                    this.warnings = response.data.warnings;
+                    this.messages = response.data.messages;
                     console.log(`Job status is ${this.status}.`);
                     if (false === this.triedToStart && 'waiting_to_start' === this.status) {
                         // call to job start.

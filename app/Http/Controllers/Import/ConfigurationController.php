@@ -35,6 +35,7 @@ use App\Services\Storage\StorageService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Log;
 
 /**
  * Class ConfigurationController
@@ -52,14 +53,25 @@ class ConfigurationController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
      * @throws \App\Exceptions\ApiHttpException
      */
     public function index()
     {
+        Log::debug(sprintf('Now at %s', __METHOD__));
         $mainTitle = 'Import routine';
         $subTitle  = 'Configure your CSV file import';
         $accounts  = [];
+
+        $configuration = null;
+        if (session()->has(Constants::CONFIGURATION)) {
+            $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
+        }
+        // if config says to skip it, skip it:
+        if (null !== $configuration && true === $configuration->isSkipForm()) {
+            // skipForm
+            return redirect()->route('import.roles.index');
+        }
 
         // get list of asset accounts:
         $request = new GetAccountsRequest;
@@ -74,15 +86,17 @@ class ConfigurationController extends Controller
             $accounts[$account->id] = $account;
         }
 
-        $configuration = null;
-        if (session()->has(Constants::CONFIGURATION)) {
-            $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
-        }
 
         // send other values through the form. A bit of a hack but OK.
-        $roles     = base64_encode(json_encode($configuration->getRoles()));
-        $doMapping = base64_encode(json_encode($configuration->getDoMapping()));
-        $mapping   = base64_encode(json_encode($configuration->getMapping()));
+        $roles     = '{}';
+        $doMapping = '{}';
+        $mapping   = '{}';
+        if (null !== $configuration) {
+            $roles     = base64_encode(json_encode($configuration->getRoles()));
+            $doMapping = base64_encode(json_encode($configuration->getDoMapping()));
+            $mapping   = base64_encode(json_encode($configuration->getMapping()));
+        }
+
         // update configuration with old values if present? TODO
 
         return view(
@@ -98,6 +112,7 @@ class ConfigurationController extends Controller
      */
     public function phpDate(Request $request): JsonResponse
     {
+        Log::debug(sprintf('Now at %s', __METHOD__));
         $format = $request->get('format');
         $date   = Carbon::make('1984-09-17');
 
@@ -111,6 +126,7 @@ class ConfigurationController extends Controller
      */
     public function postIndex(ConfigurationPostRequest $request)
     {
+        Log::debug(sprintf('Now at %s', __METHOD__));
         // store config on drive.
         $fromRequest   = $request->getAll();
         $configuration = Configuration::fromRequest($fromRequest);

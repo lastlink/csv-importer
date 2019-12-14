@@ -53,6 +53,7 @@ class UploadController extends Controller
      */
     public function upload(Request $request)
     {
+        Log::debug(sprintf('Now at %s', __METHOD__));
         $csvFile    = $request->file('csv_file');
         $configFile = $request->file('config_file');
         $errors     = new MessageBag;
@@ -108,6 +109,7 @@ class UploadController extends Controller
      */
     private function getError(int $error): string
     {
+        Log::debug(sprintf('Now at %s', __METHOD__));
         $errors = [
             UPLOAD_ERR_OK         => 'There is no error, the file uploaded with success.',
             UPLOAD_ERR_INI_SIZE   => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',

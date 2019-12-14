@@ -42,11 +42,14 @@ class ImportJobStatusManager
         Log::debug(sprintf('Now in startOrFindJob(%s)', $identifier));
         $disk = Storage::disk('jobs');
         try {
-            Log::debug('Try to see if file exists.');
+            Log::debug(sprintf('Try to see if file exists for job %s.', $identifier));
             if ($disk->exists($identifier)) {
-                Log::debug('File exists.');
+                Log::debug(sprintf('Status file exists for job %s.', $identifier));
+                $array = json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR);
+                $status = ImportJobStatus::fromArray($array);
+                Log::debug(sprintf('Status found for job %s', $identifier), $array);
 
-                return ImportJobStatus::fromArray(json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR));
+                return $status;
             }
         } catch (FileNotFoundException $e) {
             Log::error('Could not find file, write a new one.');
@@ -147,7 +150,7 @@ class ImportJobStatusManager
      */
     private static function storeJobStatus(string $identifier, ImportJobStatus $status): void
     {
-        Log::debug(sprintf('Now in storeJobStatus(%s)', $identifier));
+        Log::debug(sprintf('Now in storeJobStatus(%s): %s', $identifier, $status->status));
         $array = $status->toArray();
         Log::debug('Going to store', $array);
         $disk = Storage::disk('jobs');

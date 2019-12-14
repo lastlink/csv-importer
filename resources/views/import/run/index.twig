@@ -19,9 +19,9 @@
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript">
-        var jobStatusUri = '{{ route('import.job.status') }}';
-        var jobStartUri = '{{ route('import.job.start') }}';
-        var configDownloadUri = '{{ route('import.job.configuration.download') }}';
+        var jobStatusUri = '{{ route('import.job.status') }}?identifier={{ identifier }}';
+        var jobStartUri = '{{ route('import.job.start') }}?identifier={{ identifier }}';
+        var configDownloadUri = '{{ route('import.job.configuration.download') }}?identifier={{ identifier }}';
     </script>
     <script src="js/app.js" type="text/javascript"></script>
 {% endblock %}

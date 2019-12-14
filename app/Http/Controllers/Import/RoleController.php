@@ -89,6 +89,7 @@ class RoleController extends Controller
 
         // get configuration object.
         $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
+        $needsMapping  = $this->needMapping($data['do_mapping']);
         $configuration->setRoles($data['roles']);
         $configuration->setDoMapping($data['do_mapping']);
 
@@ -98,6 +99,32 @@ class RoleController extends Controller
         session()->put(Constants::ROLES_COMPLETE_INDICATOR, true);
 
         // redirect to mapping thing.
-        return redirect()->route('import.mapping.index');
+        if (true === $needsMapping) {
+            return redirect()->route('import.mapping.index');
+        }
+        // otherwise, store empty mapping, and continue:
+        // set map config as complete.
+        session()->put(Constants::MAPPING_COMPLETE_INDICATOR, true);
+
+        return redirect()->route('import.run.index');
+    }
+
+    /**
+     * Will tell you if any role needs mapping.
+     *
+     * @param array $array
+     *
+     * @return bool
+     */
+    private function needMapping(array $array): bool
+    {
+        $need = false;
+        foreach ($array as $value) {
+            if (true === $value) {
+                $need = true;
+            }
+        }
+
+        return $need;
     }
 }

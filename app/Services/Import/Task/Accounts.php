@@ -235,19 +235,25 @@ class Accounts extends AbstractTask
     private function processTransaction(array $transaction): array
     {
         Log::debug('Now in processTransaction()');
+
+        /*
+         * Try to find the source and destination accounts in the transaction.
+         *
+         * The source account will default back to the user's submitted default account.
+         * So when everything fails, the transaction will be a deposit for amount X.
+         */
         $sourceArray = $this->getSourceArray($transaction);
         $destArray   = $this->getDestinationArray($transaction);
         $source      = $this->findAccount($sourceArray, $this->account);
         $destination = $this->findAccount($destArray, null);
 
-        if (-1 === bccomp('0', $transaction['amount'])) {
+        /*
+         * If the amount is positive, the transaction is a deposit. We switch Source
+         * and Destination and see if we can still handle the transaction:
+         */
+        if (1 === bccomp($transaction['amount'], '0')) {
             // amount is positive
-            $transaction         = $this->setSource($transaction, $source);
-            $transaction         = $this->setDestination($transaction, $destination);
-            $transaction['type'] = $this->determineType($source['type'], $destination['type']);
-        }
-
-        if (1 === bccomp('0', $transaction['amount'])) {
+            Log::debug(sprintf('%s is positive.', $transaction['amount']));
             $transaction           = $this->setSource($transaction, $destination);
             $transaction           = $this->setDestination($transaction, $source);
             $transaction['amount'] = Amount::positive($transaction['amount']);
@@ -259,13 +265,14 @@ class Accounts extends AbstractTask
             }
         }
 
-        // if new source ID is filled in, drop the other fields:
+        /*
+         * if new source or destination ID is filled in, drop the other fields:
+         */
         if (0 !== $transaction['source_id'] && null !== $transaction['source_id']) {
             $transaction['source_name']   = null;
             $transaction['source_iban']   = null;
             $transaction['source_number'] = null;
         }
-        // if new source ID is filled in, drop the other fields:
         if (0 !== $transaction['destination_id'] && null !== $transaction['destination_id']) {
             $transaction['destination_name']   = null;
             $transaction['destination_iban']   = null;

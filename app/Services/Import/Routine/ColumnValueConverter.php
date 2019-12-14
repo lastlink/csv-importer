@@ -64,6 +64,7 @@ class ColumnValueConverter
         Log::info(sprintf('Now parsing and combining %d lines.', $count));
         foreach ($lines as $index => $line) {
             $processed[] = $this->processValueArray($index, $line);
+            sleep(1); // TODO DEBUG
         }
         Log::info(sprintf('Done parsing and combining %d lines.', $count));
 
@@ -160,11 +161,11 @@ class ColumnValueConverter
                 throw new RuntimeException(sprintf('No place for role "%s"', $value->getRole()));
             }
             if (null === $parsedValue) {
-                Log::debug(sprintf('Skip column #%d with role "%s" (in field "%s")', $columnIndex, $role, $transactionField));
+                Log::debug(sprintf('Skip column #%d with role "%s" (in field "%s")', $columnIndex+1, $role, $transactionField));
                 continue;
             }
             Log::debug(
-                sprintf('Stored column #%d with value "%s" and role "%s" in field "%s"', $columnIndex, $this->toString($parsedValue), $role, $transactionField)
+                sprintf('Stored column #%d with value "%s" and role "%s" in field "%s"', $columnIndex+1, $this->toString($parsedValue), $role, $transactionField)
             );
 
             // if append, append.

@@ -23,6 +23,8 @@
 declare(strict_types=1);
 
 namespace App\Http\Controllers;
+use Log;
+use Artisan;
 
 /**
  *
@@ -44,12 +46,15 @@ class IndexController extends Controller
      */
     public function index()
     {
+        Log::debug(sprintf('Now at %s', __METHOD__));
         return view('index');
     }
 
     public function flush()
     {
+        Log::debug(sprintf('Now at %s', __METHOD__));
         session()->flush();
+        Artisan::call('cache:clear');
 
         return redirect(route('index'));
     }

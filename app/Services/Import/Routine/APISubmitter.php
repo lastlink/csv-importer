@@ -104,7 +104,8 @@ class APISubmitter
             foreach ($response->errors->messages() as $key => $errors) {
                 foreach ($errors as $error) {
                     $msg = sprintf('%s: %s (original value: "%s")', $key, $error, $this->getOriginalValue($key, $line));
-                    $this->addError($index, $msg);
+                    // plus 1 to keep the count.
+                    $this->addError($index+1, $msg);
                     Log::error($msg);
                 }
             }
@@ -118,7 +119,8 @@ class APISubmitter
             $message     = sprintf(
                 'Created %s #%d "%s" (%s %s)', $transaction->type, $group->id, $transaction->description, $transaction->currencyCode, $transaction->amount
             );
-            $this->addMessage($index, $message);
+            // plus 1 to keep the count.
+            $this->addMessage($index+1, $message);
             $this->compareArrays($index, $line, $group);
             Log::info($message);
         }

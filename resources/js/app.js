@@ -21,6 +21,7 @@ window.Vue = require('vue');
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('import-status', require('./components/import/ImportStatus.vue').default);
+Vue.component('import-messages', require('./components/import/ImportMessages.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

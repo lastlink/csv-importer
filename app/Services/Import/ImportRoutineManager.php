@@ -65,16 +65,23 @@ class ImportRoutineManager
      * Collect info on the current job, hold it in memory.
      *
      * ImportRoutineManager constructor.
+     *
+     * @param string|null $identifier
      */
-    public function __construct()
+    public function __construct(string $identifier = null)
     {
         Log::debug('Constructed ImportRoutineManager');
 
         // get line converter
-        $this->allMessages      = [];
-        $this->allWarnings      = [];
-        $this->allErrors        = [];
-        $this->generateIdentifier();
+        $this->allMessages = [];
+        $this->allWarnings = [];
+        $this->allErrors   = [];
+        if (null === $identifier) {
+            $this->generateIdentifier();
+        }
+        if (null !== $identifier) {
+            $this->identifier = $identifier;
+        }
         ImportJobStatusManager::startOrFindJob($this->identifier);
     }
 
@@ -147,6 +154,7 @@ class ImportRoutineManager
         $this->csvFileProcessor->setHasHeaders($this->configuration->isHeaders());
         $this->csvFileProcessor->setDelimiter($this->configuration->getDelimiter());
         $CSVLines = $this->csvFileProcessor->processCSVFile();
+
 
         // convert raw lines into arrays with individual ColumnValues
         $valueArrays = $this->lineProcessor->processCSVLines($CSVLines);

@@ -84,6 +84,16 @@ class Configuration
     }
 
     /**
+     * @return bool
+     */
+    public function isSkipForm(): bool
+    {
+        return $this->skipForm;
+    }
+
+
+
+    /**
      * @param array $array
      *
      * @return static
@@ -142,7 +152,7 @@ class Configuration
      */
     public function getRoles(): array
     {
-        return $this->roles;
+        return $this->roles ?? [];
     }
 
     /**
@@ -266,8 +276,6 @@ class Configuration
         return $this->ignoreDuplicateTransactions;
     }
 
-
-
     /**
      * @param array $data
      *
@@ -347,7 +355,7 @@ class Configuration
      */
     public function getDoMapping(): array
     {
-        return $this->doMapping;
+        return $this->doMapping ?? [];
     }
 
     /**
@@ -355,7 +363,7 @@ class Configuration
      */
     public function getMapping(): array
     {
-        return $this->mapping;
+        return $this->mapping ?? [];
     }
 
     /**

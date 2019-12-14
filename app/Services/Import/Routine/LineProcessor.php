@@ -73,11 +73,16 @@ class LineProcessor
         $processed = [];
         $count     = count($lines);
 
+        $this->addMessage(1, 'I am a message on line 1');
+        $this->addWarning(1, 'I am a warning on line 1');
+        $this->addError(1, 'I am a error on line 1');
+
         Log::info(sprintf('Now processing the data in the %d CSV lines...', $count));
 
         foreach ($lines as $index => $line) {
             Log::debug(sprintf('Now processing CSV line #%d/#%d', $index + 1, $count));
             $processed[] = $this->process($index, $line);
+            sleep(1); // TODO DEBUG
         }
 
         Log::info(sprintf('Done processing data in %d CSV lines...', $count));
@@ -142,7 +147,7 @@ class LineProcessor
         $columnValue->setAppendValue(false);
         $columnValue->setRole('original-source');
         $return[] = $columnValue;
-        Log::debug(sprintf('Added column #%d to denote the original source.', count($return) - 1));
+        Log::debug(sprintf('Added column #%d to denote the original source.', count($return)));
 
         //$this->addError($index, 'Error from line processor.');
 
