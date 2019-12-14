@@ -11,13 +11,15 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title text-danger">Error :(</h5>
-                        <p class="card-text text-danger">
+                        <p class="card-text">
                             The personal access token you added to the <code>.env</code> file is invalid. The error returned is:
                         </p>
                         <p class="card-text text-info">
                             {{ errorMessage }}
                         </p>
-                        <p class="card-text text-danger">
+                        <p class="card-text">
+                            This error can be a bit cryptic, and you can find common errors on <a href="https://firefly-iii.gitbook.io/firefly-iii-csv-importer/errors-and-trouble-shooting/token_errors" target="_blank">
+                                this page in the documentation</a>.
                             Please refresh the page to validate your token again.
                         </p>
                     </div>

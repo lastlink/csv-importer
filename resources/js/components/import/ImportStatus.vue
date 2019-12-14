@@ -57,13 +57,18 @@
                 </div>
                 <div class="card-body" v-if="'job_done' === this.status ">
                     <p>
-                        The import routine has finished.
+                        The import routine has finished 🎉. You can <a :href="this.flushUri" class="btn btn-success btn-sm">start a new import</a>,
+                        <a class="btn btn-info btn-sm" :href="this.downloadUri" title="Download configuration file.">download the import configuration</a>
+                        or inspect the results of the import further below:
                     </p>
                     <import-messages
                             :messages="this.messages"
                             :warnings="this.warnings"
                             :errors="this.errors"
                     ></import-messages>
+                    <p>
+                        Thank you for using this tool. <a href="https://github.com/firefly-iii/firefly-iii-csv-importer" target="_blank">Please share any feedback you may have</a>.
+                    </p>
                 </div>
                 <div class="card-body" v-if="'error' === this.status && true === this.triedToStart">
                     <p class="text-danger">
@@ -93,7 +98,8 @@
                 messages: [],
                 warnings: [],
                 errors: [],
-                downloadUri: window.configDownloadUri
+                downloadUri: window.configDownloadUri,
+                flushUri: window.flushUri
             };
         },
         props: [],

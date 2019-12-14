@@ -1949,9 +1949,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "ImportMessages",
   props: {
@@ -1972,6 +1969,15 @@ __webpack_require__.r(__webpack_exports__);
       "default": function _default() {
         return {};
       }
+    }
+  },
+  methods: {
+    isEmpty: function isEmpty(obj) {
+      for (var x in obj) {
+        return false;
+      }
+
+      return true;
     }
   }
 });
@@ -2068,6 +2074,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "ImportStatus",
 
@@ -2081,7 +2093,8 @@ __webpack_require__.r(__webpack_exports__);
       messages: [],
       warnings: [],
       errors: [],
-      downloadUri: window.configDownloadUri
+      downloadUri: window.configDownloadUri,
+      flushUri: window.flushUri
     };
   },
   props: [],
@@ -37558,11 +37571,11 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return this.errors !== {} || this.warnings !== {} || this.messages !== {}
+  return !this.isEmpty(this.errors) ||
+    !this.isEmpty(this.warnings) ||
+    !this.isEmpty(this.messages)
     ? _c("div", [
-        _vm._m(0),
-        _vm._v(" "),
-        this.errors !== {}
+        !this.isEmpty(this.errors)
           ? _c("div", [
               _c("strong", { staticClass: "text-danger" }, [
                 _vm._v("Error(s)")
@@ -37587,7 +37600,7 @@ var render = function() {
             ])
           : _vm._e(),
         _vm._v(" "),
-        this.warnings !== {}
+        !this.isEmpty(this.warnings)
           ? _c("div", [
               _c("strong", { staticClass: "text-warning" }, [
                 _vm._v("Warning(s)")
@@ -37612,7 +37625,7 @@ var render = function() {
             ])
           : _vm._e(),
         _vm._v(" "),
-        this.messages !== {}
+        !this.isEmpty(this.messages)
           ? _c("div", [
               _c("strong", { staticClass: "text-info" }, [
                 _vm._v("Message(s)")
@@ -37626,7 +37639,9 @@ var render = function() {
                     _c(
                       "ul",
                       _vm._l(messageList, function(message) {
-                        return _c("li", [_vm._v(_vm._s(message))])
+                        return _c("li", {
+                          domProps: { innerHTML: _vm._s(message) }
+                        })
                       }),
                       0
                     )
@@ -37639,19 +37654,7 @@ var render = function() {
       ])
     : _vm._e()
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("p", [
-      _c("br"),
-      _vm._v(
-        "\n        During the import, messages, warnings and errors may appear. They are listed here.\n    "
-      )
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -37681,6 +37684,9 @@ var render = function() {
         "waiting_to_start" === this.status && false === this.triedToStart
           ? _c("div", { staticClass: "card-body" }, [
               _c("p", [
+                _vm._v(
+                  '\n                    The tool is ready to import your data. Press "start job" to start.\n                    '
+                ),
                 _c(
                   "a",
                   {
@@ -37754,7 +37760,30 @@ var render = function() {
               [
                 _c("p", [
                   _vm._v(
-                    "\n                    The import routine has finished.\n                "
+                    "\n                    The import routine has finished 🎉. You can "
+                  ),
+                  _c(
+                    "a",
+                    {
+                      staticClass: "btn btn-success btn-sm",
+                      attrs: { href: this.flushUri }
+                    },
+                    [_vm._v("start a new import")]
+                  ),
+                  _vm._v(",\n                    "),
+                  _c(
+                    "a",
+                    {
+                      staticClass: "btn btn-info btn-sm",
+                      attrs: {
+                        href: this.downloadUri,
+                        title: "Download configuration file."
+                      }
+                    },
+                    [_vm._v("download the import configuration")]
+                  ),
+                  _vm._v(
+                    "\n                    or inspect the results of the import further below:\n                "
                   )
                 ]),
                 _vm._v(" "),
@@ -37764,7 +37793,9 @@ var render = function() {
                     warnings: this.warnings,
                     errors: this.errors
                   }
-                })
+                }),
+                _vm._v(" "),
+                _vm._m(1)
               ],
               1
             )
@@ -37812,6 +37843,25 @@ var staticRenderFns = [
           "aria-valuemax": "100"
         }
       })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("p", [
+      _vm._v("\n                    Thank you for using this tool. "),
+      _c(
+        "a",
+        {
+          attrs: {
+            href: "https://github.com/firefly-iii/firefly-iii-csv-importer",
+            target: "_blank"
+          }
+        },
+        [_vm._v("Please share any feedback you may have")]
+      ),
+      _vm._v(".\n                ")
     ])
   }
 ]

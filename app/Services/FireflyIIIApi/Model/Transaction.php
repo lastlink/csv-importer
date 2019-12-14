@@ -41,6 +41,8 @@ class Transaction
     public $currencyCode;
     /** @var int */
     public $currencyId;
+    /** @var int */
+    public $currencyDecimalPlaces;
     /**
      * Transaction constructor.
      *
@@ -55,6 +57,7 @@ class Transaction
         $this->amount       = $data['amount'];
         $this->currencyCode = $data['currency_code'];
         $this->currencyId   = $data['currency_id'];
+        $this->currencyDecimalPlaces= $data['currency_decimal_places'];
     }
 
 }

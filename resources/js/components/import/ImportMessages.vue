@@ -20,11 +20,8 @@
   -->
 
 <template>
-    <div v-if="this.errors !== {} || this.warnings !== {} || this.messages !== {}">
-        <p><br />
-            During the import, messages, warnings and errors may appear. They are listed here.
-        </p>
-        <div v-if="this.errors !== {}">
+    <div v-if="!this.isEmpty(this.errors) || !this.isEmpty(this.warnings) || !this.isEmpty(this.messages)">
+        <div v-if="!this.isEmpty(this.errors)">
             <strong class="text-danger">Error(s)</strong>
             <ul>
                 <li v-for="(errorList, line) in this.errors">Line #{{ line }}:
@@ -34,7 +31,7 @@
                 </li>
             </ul>
         </div>
-        <div v-if="this.warnings !== {}">
+        <div v-if="!this.isEmpty(this.warnings)">
             <strong class="text-warning">Warning(s)</strong>
             <ul>
                 <li v-for="(warningList, line) in this.warnings">Line #{{ line }}:
@@ -44,12 +41,12 @@
                 </li>
             </ul>
         </div>
-        <div v-if="this.messages !== {}">
+        <div v-if="!this.isEmpty(this.messages)">
             <strong class="text-info">Message(s)</strong>
             <ul>
                 <li v-for="(messageList, line) in this.messages">Line #{{ line }}:
                     <ul>
-                        <li v-for="(message) in messageList">{{ message }}</li>
+                        <li v-for="(message) in messageList" v-html="message"/>
                     </ul>
                 </li>
             </ul>
@@ -80,6 +77,14 @@
                 }
             },
         },
+        methods: {
+            isEmpty(obj) {
+                for (let x in obj) {
+                    return false;
+                }
+                return true;
+            }
+        }
     }
 </script>
 

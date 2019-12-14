@@ -49,6 +49,7 @@ class APISubmitter
          */
         foreach ($lines as $index => $line) {
             $this->processTransaction($index, $line);
+            sleep(1); // DEBUG
         }
         Log::info(sprintf('Done submitting %d transactions to your Firefly III instance.', $count));
     }
@@ -117,7 +118,13 @@ class APISubmitter
             /** @var Transaction $transaction */
             $transaction = $group->transactions[0];
             $message     = sprintf(
-                'Created %s #%d "%s" (%s %s)', $transaction->type, $group->id, $transaction->description, $transaction->currencyCode, $transaction->amount
+                'Created %s <a target="_blank" href="%s">#%d "%s"</a> (%s %s)',
+                $transaction->type,
+                sprintf('%s/transactions/show/%d', env('FIREFLY_III_URI'), $group->id),
+                $group->id,
+                e($transaction->description),
+                $transaction->currencyCode,
+                round($transaction->amount, $transaction->currencyDecimalPlaces)
             );
             // plus 1 to keep the count.
             $this->addMessage($index+1, $message);

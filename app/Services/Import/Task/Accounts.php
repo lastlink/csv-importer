@@ -85,6 +85,13 @@ class Accounts extends AbstractTask
     private function findAccount(array $array, ?Account $defaultAccount): array
     {
         Log::debug('Now in findAccount', $array);
+        if (null === $defaultAccount) {
+            Log::debug('findAccount() default account is NULL.');
+        }
+        if (null !== $defaultAccount) {
+            Log::debug(sprintf('Default account is #%d ("%s")', $defaultAccount->id, $defaultAccount->name));
+        }
+
         $result = null;
         // search ID
         if (is_int($array['id']) && $array['id'] > 0) {
@@ -94,20 +101,26 @@ class Accounts extends AbstractTask
 
         // search name
         if (null === $result && is_string($array['name']) && '' !== $array['name']) {
+            Log::debug('Find by name field.');
             $result = $this->findByField('name', $array['name']);
         }
 
         // search IBAN
         if (null === $result && is_string($array['iban']) && '' !== $array['iban']) {
+            Log::debug('Find by IBAN field.');
             $result = $this->findByField('iban', $array['iban']);
         }
 
         // search number
         if (null === $result && is_string($array['number']) && '' !== $array['number']) {
+            Log::debug('Find by account number field.');
             $result = $this->findByField('number', $array['number']);
         }
         if (null !== $result) {
-            return $result->toArray();
+            $return = $result->toArray();
+            Log::debug('Result of findByX is not null, returning:', $return);
+
+            return $return;
         }
 
         Log::debug('Found no account or haven\'t searched for one.');
@@ -118,8 +131,12 @@ class Accounts extends AbstractTask
 
         // if the default account is not NULL, return that one instead:
         if (null !== $defaultAccount) {
-            return $defaultAccount->toArray();
+            $default = $defaultAccount->toArray();
+            Log::debug('Default account is not null, so will return:', $default);
+
+            return $default;
         }
+        Log::debug('Default account is NULL, so will return: ', $array);
 
         return $array;
     }
@@ -248,6 +265,13 @@ class Accounts extends AbstractTask
         $destination = $this->findAccount($destArray, null);
 
         /*
+         * First, set source and destination in the transaction array:
+         */
+        $transaction           = $this->setSource($transaction, $source);
+        $transaction           = $this->setDestination($transaction, $destination);
+        $transaction['type']   = $this->determineType($source['type'], $destination['type']);
+
+        /*
          * If the amount is positive, the transaction is a deposit. We switch Source
          * and Destination and see if we can still handle the transaction:
          */
@@ -256,13 +280,7 @@ class Accounts extends AbstractTask
             Log::debug(sprintf('%s is positive.', $transaction['amount']));
             $transaction           = $this->setSource($transaction, $destination);
             $transaction           = $this->setDestination($transaction, $source);
-            $transaction['amount'] = Amount::positive($transaction['amount']);
             $transaction['type']   = $this->determineType($destination['type'], $source['type']);
-
-            // also fix foreign amount
-            if (isset($transaction['foreign_amount']) && null !== $transaction['foreign_amount']) {
-                $transaction['foreign_amount'] = Amount::positive($transaction['foreign_amount']);
-            }
         }
 
         /*
