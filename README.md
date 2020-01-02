@@ -42,33 +42,34 @@ Anybody who uses Firefly III and wants to automatically import files.
 
 You can use this tool in several ways.
 
-1. [Install it on your server using composer](#).
-2. [Use the Docker-image](#).
+1. [Install it on your server using composer](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/self-hosted).
+2. [Use the Docker-image](#https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/docker).
 
 Generally speaking, it's easiest to use and install this tool the same way as you use Firefly III. And although it features an excellent web-interface, you can also use the command line to import your data.
 
 ### Upgrade
 
-There are [upgrade instructions](#) for boths methods of installation.
+There are [upgrade instructions](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/upgrading/upgrade) for boths methods of installation.
 
 ## Usage
 
-The [full usage instructions](#) can be found in the documentation. Basically, this is the workflow.
+The [full usage instructions](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/) can be found in the documentation. Basically, this is the workflow.
 
-1. [Set up and configure your Personal Access Token and Firefly III URL](#).
-2. [Upload your CSV file](#).
-3. [Tell the importer what your CSV file looks like. Date format, data types, etc](#).
-4. [Set each column's data type](#).
-5. [Map values in the CSV file to existing values in your database](#).
-6. [Enjoy the result in Firefly III](#).
+1. [Set up and configure your Personal Access Token and Firefly III URL](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/configure).
+2. [Upload your CSV file](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/upload).
+3. [Tell the importer what your CSV file looks like. Date format, data types, etc](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/configure).
+4. [Set each column's role and data type](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/roles).
+5. [Map values in the CSV file to existing values in your database](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/map).
+6. [Enjoy the result in Firefly III](https://github.com/firefly-iii/firefly-iii).
 
 ## Known issues and problems
 
 Most people run into the same problems when importing data into Firefly III. Read more about those on the following pages:
 
-1. [Often seen errors and issues](#).
-2. [Frequently asked questions](#).
-3. [My bank delivers shitty CSV files, what do I do now?](#)
+1. [Issues with your Personal Access Token](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/errors-and-trouble-shooting/token_errors)
+1. [Often seen errors and issues](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/errors-and-trouble-shooting/freq_errors).
+2. [Frequently asked questions](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/errors-and-trouble-shooting/freq_questions).
+3. [My bank delivers bad CSV files, what do I do now?](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/errors-and-trouble-shooting/bad_files)
 
 ## Other stuff
 
