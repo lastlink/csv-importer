@@ -24,6 +24,7 @@ namespace App\Services\CSV\Mapper;
 
 use App\Services\FireflyIIIApi\Model\Account;
 use App\Services\FireflyIIIApi\Request\GetAccountsRequest;
+use Log;
 
 /**
  * Class OpposingAccountIbans
@@ -41,6 +42,7 @@ class OpposingAccountIbans implements MapperInterface
      */
     public function getMap(): array
     {
+        Log::debug('Now in OpposingAccountIbans');
         $result = [];
         // get list of asset accounts:
         $request = new GetAccountsRequest;

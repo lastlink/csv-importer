@@ -31,6 +31,7 @@ use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * Class SystemInformationRequest
+ * Get system info.
  */
 class SystemInformationRequest extends Request
 {

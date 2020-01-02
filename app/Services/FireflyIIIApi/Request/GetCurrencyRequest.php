@@ -31,6 +31,8 @@ use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * Class GetCurrencyRequest
+ *
+ * Gets a single currency.
  */
 class GetCurrencyRequest extends Request
 {

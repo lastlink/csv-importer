@@ -33,6 +33,7 @@ use Log;
 
 /**
  * Class PostTransactionRequest
+ * POST a transaction.
  */
 class PostTransactionRequest extends Request
 {

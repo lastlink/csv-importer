@@ -59,8 +59,8 @@ class RoleController extends Controller
 
         // get columns from file
         $content  = StorageService::getContent(session()->get(Constants::UPLOAD_CSV_FILE));
-        $columns  = RoleService::getColumns($content, $configuration->isHeaders(), $configuration->getSpecifics());
-        $examples = RoleService::getExampleData($content, $configuration->isHeaders(), $configuration->getSpecifics());
+        $columns  = RoleService::getColumns($content, $configuration);
+        $examples = RoleService::getExampleData($content, $configuration);
 
         // submit mapping from config.
         $mapping = base64_encode(json_encode($configuration->getMapping()));

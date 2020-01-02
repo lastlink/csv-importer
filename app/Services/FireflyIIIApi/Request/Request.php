@@ -80,7 +80,7 @@ abstract class Request
      */
     public function getParameters(): array
     {
-        return $this->parameters;
+        return $this->parameters ?? [];
     }
 
     /**
@@ -110,12 +110,13 @@ abstract class Request
     protected function authenticatedGet(): array
     {
         $cacheKey = $this->getCacheKey();
-        if (Cache::has($cacheKey)) {
+        if (Cache::has($cacheKey) && config('csv_importer.cache_api_calls')) {
             Log::debug(sprintf('%s is present in cache.', substr($cacheKey, 0, 5)));
+
             return Cache::get($cacheKey);
         }
 
-        Log::debug(sprintf('%s is NOT present in cache.', substr($cacheKey, 0, 5)));
+        Log::debug(sprintf('%s is NOT present in cache or ignore cache.', substr($cacheKey, 0, 5)));
 
         return $this->freshAuthenticatedGet();
     }
@@ -191,14 +192,12 @@ abstract class Request
      */
     private function freshAuthenticatedGet(): array
     {
-        Log::debug('freshAuthenticatedGet()');
-        $fullUri  = sprintf('%s/api/v1/%s', $this->getBase(), $this->getUri());
+        $fullUri = sprintf('%s/api/v1/%s', $this->getBase(), $this->getUri());
         $cacheKey = $this->getCacheKey();
         if (null !== $this->parameters) {
             $fullUri = sprintf('%s?%s', $fullUri, http_build_query($this->parameters));
         }
-        //Log::debug(sprintf('Full URI is %s', $fullUri));
-        //Log::debug(sprintf('Now in freshAuthenticatedGet(%s): %s', $cacheKey, $fullUri));
+        Log::debug(sprintf('freshAuthenticatedGet(%s)', $fullUri));
 
         $client = $this->getClient();
         $res    = $client->request(

@@ -22,6 +22,7 @@
 
 namespace App\Services\CSV\Roles;
 
+use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Specifics\SpecificInterface;
 use App\Services\CSV\Specifics\SpecificService;
 use League\Csv\Exception;
@@ -40,17 +41,30 @@ class RoleService
 
     /**
      * @param string $content
-     * @param bool   $hasHeaders
-     *
-     * @param array  $specifics
+     * @param Configuration $configuration
      *
      * @return array
      */
-    public static function getColumns(string $content, bool $hasHeaders, array $specifics): array
+    public static function getColumns(string $content, Configuration $configuration): array
     {
         $reader  = Reader::createFromString($content);
+
+        // configure reader:
+        $delimiter = $configuration->getDelimiter();
+        switch($delimiter) {
+            case 'semicolon':
+                $reader->setDelimiter(';');
+                break;
+            case 'comma':
+                $reader->setDelimiter(',');
+                break;
+            case 'tab':
+                $reader->setDelimiter("\t");
+                break;
+        }
+
         $headers = [];
-        if (true === $hasHeaders) {
+        if (true === $configuration->isHeaders()) {
             try {
                 $stmt    = (new Statement)->limit(1)->offset(0);
                 $records = $stmt->process($reader);
@@ -63,7 +77,7 @@ class RoleService
             // @codeCoverageIgnoreEnd
             Log::debug('Detected file headers:', $headers);
         }
-        if (false === $hasHeaders) {
+        if (false === $configuration->isHeaders()) {
             try {
                 $stmt    = (new Statement)->limit(1)->offset(0);
                 $records = $stmt->process($reader);
@@ -82,7 +96,7 @@ class RoleService
         // specific processors may add or remove headers.
         // so those must be processed as well.
         /** @var string $name */
-        foreach ($specifics as $name => $enabled) {
+        foreach ($configuration->getSpecifics() as $name => $enabled) {
             if ($enabled && SpecificService::exists($name)) {
                 /** @var SpecificInterface $object */
                 $object  = app(SpecificService::fullClass($name));
@@ -95,16 +109,29 @@ class RoleService
 
     /**
      * @param string $content
-     * @param bool   $hasHeaders
-     *
-     * @param array  $specifics
+     * @param Configuration $configuration
      *
      * @return array
      */
-    public static function getExampleData(string $content, bool $hasHeaders, array $specifics): array
+    public static function getExampleData(string $content, Configuration $configuration): array
     {
         $reader   = Reader::createFromString($content);
-        $offset   = $hasHeaders ? 1 : 0;
+
+        // configure reader:
+        $delimiter = $configuration->getDelimiter();
+        switch($delimiter) {
+            case 'semicolon':
+                $reader->setDelimiter(';');
+                break;
+            case 'comma':
+                $reader->setDelimiter(',');
+                break;
+            case 'tab':
+                $reader->setDelimiter("\t");
+                break;
+        }
+
+        $offset   = $configuration->isHeaders() ? 1 : 0;
         $examples = [];
         // make statement.
         try {
@@ -121,7 +148,7 @@ class RoleService
         /** @var array $line */
         foreach ($records as $line) {
             $line = array_values($line);
-            $line = SpecificService::runSpecifics($line, $specifics);
+            $line = SpecificService::runSpecifics($line, $configuration->getSpecifics());
             foreach ($line as $index => $cell) {
                 if (strlen($cell) > self::EXAMPLE_LENGTH) {
                     $cell = sprintf('%s...', substr($cell, 0, self::EXAMPLE_LENGTH));

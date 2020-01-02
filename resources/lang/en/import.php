@@ -78,4 +78,6 @@ return [
     'column_internal_reference'     => 'Internal reference',
     'account_types_asset'           => 'Asset accounts',
     'account_types_liabilities'     => 'Liabilities',
+    'account_types_revenue'     => 'Revenue accounts',
+    'account_types_expense'     => 'Expense accounts',
 ];

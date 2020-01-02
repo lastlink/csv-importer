@@ -28,9 +28,12 @@ use App\Exceptions\ApiHttpException;
 use App\Services\FireflyIIIApi\Response\GetAccountResponse;
 use App\Services\FireflyIIIApi\Response\Response;
 use GuzzleHttp\Exception\GuzzleException;
+use Log;
 
 /**
  * Class GetAccountRequest
+ *
+ * Returns a single account.
  */
 class GetAccountRequest extends Request
 {

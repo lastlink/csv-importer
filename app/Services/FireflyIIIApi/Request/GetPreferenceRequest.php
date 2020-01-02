@@ -31,6 +31,8 @@ use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * Class GetPreferenceRequest
+ *
+ * Returns a single preference.
  */
 class GetPreferenceRequest extends Request
 {

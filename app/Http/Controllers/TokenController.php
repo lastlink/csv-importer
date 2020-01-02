@@ -71,8 +71,9 @@ class TokenController extends Controller
         if (!$isError) {
             return redirect(route('index'));
         }
+        $pageTitle = 'Token error';
 
-        return view('token.index', compact('errorMessage'));
+        return view('token.index', compact('errorMessage', 'pageTitle'));
     }
 
 }

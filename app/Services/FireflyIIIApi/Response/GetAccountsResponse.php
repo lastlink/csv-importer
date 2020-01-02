@@ -26,6 +26,7 @@ use App\Services\FireflyIIIApi\Model\Account;
 use Countable;
 use Illuminate\Support\Collection;
 use Iterator;
+use Log;
 
 /**
  * Class GetAccountsResponse
@@ -44,13 +45,17 @@ class GetAccountsResponse extends Response implements Iterator, Countable
      */
     public function __construct(array $data)
     {
+        $total = count($data);
+        Log::debug(sprintf('Created new GetAccountsResponse(%d entries)', $total));
         $this->collection = new Collection;
 
         /** @var array $row */
-        foreach ($data as $row) {
+        foreach ($data as $index => $row) {
             $model = Account::fromArray($row);
             $this->collection->push($model);
+            //Log::debug(sprintf('Found entry %d/%d: "%s"', $index + 1, $total, $model->name));
         }
+        Log::debug('Done!');
     }
 
     /**

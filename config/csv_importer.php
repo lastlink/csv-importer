@@ -33,6 +33,7 @@ use App\Services\CSV\Specifics\SnsDescription;
 use App\Services\Import\Task\Accounts;
 use App\Services\Import\Task\Amount;
 use App\Services\Import\Task\Currency;
+use App\Services\Import\Task\EmptyDescription;
 use App\Services\Import\Task\PositiveAmount;
 use App\Services\Import\Task\Tags;
 
@@ -41,6 +42,7 @@ return [
     'access_token'      => env('FIREFLY_III_ACCESS_TOKEN'),
     'uri'               => env('FIREFLY_III_URI'),
     'upload_path'       => storage_path('uploads'),
+    'cache_api_calls'   => false,
     'delimiters'        => [
         'comma'     => ',',
         'semicolon' => ';',
@@ -82,7 +84,8 @@ return [
         Tags::class,
         Currency::class,
         Accounts::class,
-        PositiveAmount::class
+        PositiveAmount::class,
+        EmptyDescription::class,
     ],
 
     /*

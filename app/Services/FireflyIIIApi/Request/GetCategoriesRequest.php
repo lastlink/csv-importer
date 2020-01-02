@@ -28,6 +28,7 @@ use App\Exceptions\ApiHttpException;
 use App\Services\FireflyIIIApi\Response\GetCategoriesResponse;
 use App\Services\FireflyIIIApi\Response\Response;
 use GuzzleHttp\Exception\GuzzleException;
+use Log;
 
 /**
  * Class GetCategoriesRequest
@@ -52,13 +53,36 @@ class GetCategoriesRequest extends Request
      */
     public function get(): Response
     {
-        try {
-            $data = $this->authenticatedGet();
-        } catch (ApiException|GuzzleException $e) {
-            throw new ApiHttpException($e->getMessage());
+        $collectedRows = [];
+        $hasNextPage   = true;
+        $loopCount     = 0;
+        $page          = 1;
+        Log::debug(sprintf('Start of %s', __METHOD__));
+
+        while ($hasNextPage && $loopCount < 30) {
+            $parameters         = $this->getParameters();
+            $parameters['page'] = $page;
+            $this->setParameters($parameters);
+
+            try {
+                $data = $this->authenticatedGet();
+            } catch (ApiException|GuzzleException $e) {
+                throw new ApiHttpException($e->getMessage());
+            }
+            $collectedRows[] = $data['data'];
+            $totalPages      = $data['meta']['pagination']['total_pages'] ?? 1;
+
+            if ($page < $totalPages) {
+                $page++;
+                continue;
+            }
+            if ($page >= $totalPages) {
+                $hasNextPage = false;
+                continue;
+            }
         }
 
-        return new GetCategoriesResponse($data['data']);
+        return new GetCategoriesResponse(array_merge(...$collectedRows));
     }
 
     /**
