@@ -25,6 +25,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ApiHttpException;
 use App\Services\FireflyIIIApi\Request\SystemInformationRequest;
+use App\Services\FireflyIIIApi\Response\SystemInformationResponse;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -42,12 +43,20 @@ class TokenController extends Controller
         $response = ['result' => 'OK', 'message' => null];
         $request  = new SystemInformationRequest();
         try {
-            $request->get();
+            $result = $request->get();
         } catch (ApiHttpException $e) {
             $response = ['result' => 'NOK', 'message' => $e->getMessage()];
         }
+        // -1 = OK (minimum is smaller)
+        // 0 = OK (same version)
+        // 1 = NOK (too low a version)
 
-        // TODO verify version of Firefly III
+        $minimum = config('csv_importer.minimum_version');
+        $compare = version_compare($minimum, $result->version);
+        if (1 === $compare) {
+            $errorMessage = sprintf('Your Firefly III version %s is below the minimum required version %s', $result->version, $minimum);
+            $response = ['result' => 'NOK', 'message' => $errorMessage];
+        }
 
         return response()->json($response);
     }
@@ -63,11 +72,23 @@ class TokenController extends Controller
         $errorMessage = 'No error message.';
         $isError      = false;
         try {
-            $request->get();
+            /** @var SystemInformationResponse $result */
+            $result = $request->get();
         } catch (ApiHttpException $e) {
             $errorMessage = $e->getMessage();
             $isError      = true;
         }
+        // -1 = OK (minimum is smaller)
+        // 0 = OK (same version)
+        // 1 = NOK (too low a version)
+
+        $minimum = config('csv_importer.minimum_version');
+        $compare = version_compare($minimum, $result->version);
+        if (1 === $compare) {
+            $errorMessage = sprintf('Your Firefly III version %s is below the minimum required version %s', $result->version, $minimum);
+            $isError      = true;
+        }
+
         if (!$isError) {
             return redirect(route('index'));
         }

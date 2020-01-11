@@ -38,12 +38,13 @@ use App\Services\Import\Task\PositiveAmount;
 use App\Services\Import\Task\Tags;
 
 return [
-    'version'           => '0.1',
-    'access_token'      => env('FIREFLY_III_ACCESS_TOKEN'),
-    'uri'               => env('FIREFLY_III_URI'),
-    'upload_path'       => storage_path('uploads'),
-    'cache_api_calls'   => false,
-    'delimiters'        => [
+    'version'         => '0.1',
+    'access_token'    => env('FIREFLY_III_ACCESS_TOKEN'),
+    'uri'             => env('FIREFLY_III_URI'),
+    'upload_path'     => storage_path('uploads'),
+    'minimum_version' => '5.0.0-beta.1',
+    'cache_api_calls' => false,
+    'delimiters'      => [
         'comma'     => ',',
         'semicolon' => ';',
         'tab'       => "\t",
@@ -51,7 +52,7 @@ return [
         ';'         => ';',
         "\t"        => "\t",
     ],
-    'classic_roles'     => [
+    'classic_roles'   => [
         'original-source'    => 'original_source',
         'sepa-cc'            => 'sepa_cc',
         'sepa-ct-op'         => 'sepa_ct_op',
