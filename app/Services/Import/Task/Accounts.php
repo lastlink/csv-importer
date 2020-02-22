@@ -23,7 +23,6 @@
 namespace App\Services\Import\Task;
 
 
-use App\Services\CSV\Converter\Amount;
 use App\Services\FireflyIIIApi\Model\Account;
 use App\Services\FireflyIIIApi\Request\GetSearchAccountRequest;
 use App\Services\FireflyIIIApi\Response\GetAccountsResponse;
@@ -163,6 +162,28 @@ class Accounts extends AbstractTask
 
             return $account;
         }
+        // if response is multiple:
+        if (count($response) > 1) {
+            Log::debug(sprintf('Found %d results searching for "%s" "%s"', count($response), $field, $value));
+
+            Log::debug('First loop and find exact:');
+            /** @var Account $row */
+            foreach ($response as $index => $row) {
+                if ($row->name === $value) {
+                    Log::debug(sprintf('Result #%d has exact name "%s", return it.', $index, $value));
+
+                    return $row;
+                }
+            }
+            Log::debug('No exact match found, return the first one.');
+
+            /** @var Account $account */
+            $account = $response->current();
+            Log::debug(sprintf('Found %s account #%d based on "%s" "%s"', $account->type, $account->id, $field, $value));
+
+            return $account;
+        }
+        Log::debug('Found NOTHING.');
 
         return null;
     }
