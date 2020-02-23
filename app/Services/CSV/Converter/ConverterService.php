@@ -23,6 +23,7 @@
 namespace App\Services\CSV\Converter;
 
 use RuntimeException;
+use Log;
 
 /**
  * Class ConverterService
@@ -44,6 +45,7 @@ class ConverterService
         if (self::exists($class)) {
             /** @var ConverterInterface $object */
             $object = app(self::fullName($class));
+            Log::debug(sprintf('Created converter class %s', $class));
             if (null !== $configuration) {
                 $object->setConfiguration($configuration);
             }

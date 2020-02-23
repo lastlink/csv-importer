@@ -172,7 +172,7 @@ class CSVFileProcessor
         foreach ($array as $index => $line) {
             $hash = hash('sha256', json_encode($line, JSON_THROW_ON_ERROR));
             if (in_array($hash, $hashes, true)) {
-                $message = sprintf('Going to skip line #%d because it\'s in the file twice. This may reset the count below.', $index + 1);
+                $message = sprintf('Going to skip line #%d because it\'s in the file twice. This may reset the count below.', $index);
                 Log::warning($message);
                 $this->addWarning($index, $message);
             }

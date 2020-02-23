@@ -44,6 +44,9 @@
                 $('#start').hide();
                 window.location = tokenPageUri;
             }
-        })
+        }).fail(function() {
+            $('#start').hide();
+            window.location = tokenPageUri;
+        });
     </script>
 {% endblock %}

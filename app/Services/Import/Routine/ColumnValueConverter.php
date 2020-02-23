@@ -64,7 +64,6 @@ class ColumnValueConverter
         Log::info(sprintf('Now parsing and combining %d lines.', $count));
         foreach ($lines as $index => $line) {
             $processed[] = $this->processValueArray($index, $line);
-            //sleep(1); // DEBUG
         }
         Log::info(sprintf('Done parsing and combining %d lines.', $count));
 
@@ -186,8 +185,6 @@ class ColumnValueConverter
             if (false === $value->isAppendValue()) {
                 $transaction['transactions'][0][$transactionField] = $parsedValue;
             }
-
-
         }
         Log::debug('Almost final transaction', $transaction);
 

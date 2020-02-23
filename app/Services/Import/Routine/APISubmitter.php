@@ -72,7 +72,7 @@ class APISubmitter
                     $lineIndex,
                     sprintf(
                         'Line #%d may have had its currency changed (from ID #%d to ID #%d). This happens because the associated asset account overrules the currency of the transaction.',
-                        $lineIndex + 1, $line['transactions'][$index]['currency_id'], (int)$transaction->currencyId
+                        $lineIndex, $line['transactions'][$index]['currency_id'], (int)$transaction->currencyId
                     )
                 );
             }
@@ -83,8 +83,8 @@ class APISubmitter
                 $this->addWarning(
                     $lineIndex,
                     sprintf(
-                        'Line #%d may have had its currency changed (from %s to %s). This happens because the associated asset account overrules the currency of the transaction.',
-                        $lineIndex + 1, $line['transactions'][$index]['currency_code'], $transaction->currencyCode
+                        'Line #%d may have had its currency changed (from "%s" to "%s"). This happens because the associated asset account overrules the currency of the transaction.',
+                        $lineIndex, $line['transactions'][$index]['currency_code'], $transaction->currencyCode
                     )
                 );
             }
@@ -106,7 +106,7 @@ class APISubmitter
                 foreach ($errors as $error) {
                     $msg = sprintf('%s: %s (original value: "%s")', $key, $error, $this->getOriginalValue($key, $line));
                     // plus 1 to keep the count.
-                    $this->addError($index+1, $msg);
+                    $this->addError($index, $msg);
                     Log::error($msg);
                 }
             }
@@ -127,7 +127,7 @@ class APISubmitter
                 round($transaction->amount, $transaction->currencyDecimalPlaces)
             );
             // plus 1 to keep the count.
-            $this->addMessage($index+1, $message);
+            $this->addMessage($index, $message);
             $this->compareArrays($index, $line, $group);
             Log::info($message);
         }

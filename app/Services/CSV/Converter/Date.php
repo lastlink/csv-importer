@@ -24,7 +24,9 @@ namespace App\Services\CSV\Converter;
 
 use App\Exceptions\ImportException;
 use Carbon\Carbon;
+use Exception;
 use InvalidArgumentException;
+use Log;
 
 /**
  * Class Date
@@ -99,13 +101,16 @@ class Date implements ConverterInterface
         /** @var Carbon $carbon */
 
         if ('' === $string) {
+            Log::warning('Empty date string, so date is set to today.');
             $carbon = Carbon::today();
         }
         if ('' !== $string) {
+            Log::debug(sprintf('Date converter is going to work on "%s" using format "%s"', $string, $this->dateFormat));
             try {
                 $carbon = Carbon::createFromFormat($this->dateFormat, $string);
-            } catch (InvalidArgumentException $e) {
-                throw new ImportException(sprintf('Could not convert date "%s" using format "%s".', $string, $this->dateFormat));
+            } catch (InvalidArgumentException|Exception $e) {
+                Log::error(sprintf('%s converting the date: %s', get_class($e), $e->getMessage()));
+                return Carbon::today()->format('Y-m-d');
             }
         }
 

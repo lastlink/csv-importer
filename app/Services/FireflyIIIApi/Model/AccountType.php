@@ -53,4 +53,6 @@ class AccountType
 
     /** @var string */
     public const REVENUE = 'revenue';
+
+    public const LIABILITIES = 'liabilities';
 }

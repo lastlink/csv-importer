@@ -64,13 +64,15 @@ class TokenController extends Controller
     /**
      * Same thing but not over JSON.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
      */
     public function index()
     {
         $request      = new SystemInformationRequest();
         $errorMessage = 'No error message.';
         $isError      = false;
+        $result       = null;
+        $compare      = 1;
         try {
             /** @var SystemInformationResponse $result */
             $result = $request->get();
@@ -81,15 +83,16 @@ class TokenController extends Controller
         // -1 = OK (minimum is smaller)
         // 0 = OK (same version)
         // 1 = NOK (too low a version)
-
-        $minimum = config('csv_importer.minimum_version');
-        $compare = version_compare($minimum, $result->version);
-        if (1 === $compare) {
+        if (false === $isError) {
+            $minimum = config('csv_importer.minimum_version');
+            $compare = version_compare($minimum, $result->version);
+        }
+        if (false === $isError && 1 === $compare) {
             $errorMessage = sprintf('Your Firefly III version %s is below the minimum required version %s', $result->version, $minimum);
             $isError      = true;
         }
 
-        if (!$isError) {
+        if (false === $isError) {
             return redirect(route('index'));
         }
         $pageTitle = 'Token error';
