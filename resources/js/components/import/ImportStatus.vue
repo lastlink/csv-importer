@@ -123,7 +123,7 @@
                         return;
                     }
                     if (true === this.triedToStart && 'waiting_to_start' === this.status) {
-                        console.log('Job hasnt started yet.');
+                        console.log('Job hasn\'t started yet.');
                     }
                     if ('job_done' === this.status) {
                         console.log('Job is done!');
