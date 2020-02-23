@@ -57,9 +57,12 @@ class AutoImport extends Command
 
         $this->directory = $this->argument('directory') ?? './';
         $this->line(sprintf('Going to automatically import everything found in %s', $this->directory));
+
         $files = $this->getFiles();
         if (0 === count($files)) {
-            $this->error(sprintf('Found no CSV files in %s', $this->directory));
+            $this->info('There are no files in directory %s');
+            $this->info('To learn more about this process, read the docs:');
+            $this->info('https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/docker');
 
             return 1;
         }
