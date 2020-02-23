@@ -60,7 +60,7 @@ class AutoImport extends Command
 
         $files = $this->getFiles();
         if (0 === count($files)) {
-            $this->info('There are no files in directory %s');
+            $this->info(sprintf('There are no files in directory %s', $this->directory));
             $this->info('To learn more about this process, read the docs:');
             $this->info('https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/docker');
 
@@ -118,8 +118,9 @@ class AutoImport extends Command
     {
         $short    = substr($file, 0, -4);
         $jsonFile = sprintf('%s.json', $short);
-        if (!file_exists(sprintf('%s%s', $this->directory, $jsonFile))) {
-            $this->warn(sprintf('Can\'t find JSON file "%s" expected to go with CSV file "%s". CSV file will be ignored.', $jsonFile, $file));
+        $fullJson = sprintf('%s/%s', $this->directory, $jsonFile);
+        if (!file_exists($fullJson)) {
+            $this->warn(sprintf('Can\'t find JSON file "%s" expected to go with CSV file "%s". CSV file will be ignored.', $fullJson, $file));
 
             return false;
         }
@@ -132,8 +133,8 @@ class AutoImport extends Command
      */
     private function importFile(string $file): void
     {
-        $csvFile  = sprintf('%s%s', $this->directory, $file);
-        $jsonFile = sprintf('%s%s.json', $this->directory, substr($file, 0, -4));
+        $csvFile  = sprintf('%s/%s', $this->directory, $file);
+        $jsonFile = sprintf('%s/%s.json', $this->directory, substr($file, 0, -4));
 
         // do JSON check
         $jsonResult = $this->verifyJSON($jsonFile);
