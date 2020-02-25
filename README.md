@@ -9,6 +9,8 @@
 - [Installation](#installation)
 	- [Upgrade](#upgrade)
 - [Usage](#usage)
+	- [Using the web interface](#using-the-web-interface)
+	- [Using the auto-import](#using-the-auto-import)
 - [Known issues and problems](#known-issues-and-problems)
 - [Other stuff](#other-stuff)
 	- [Contribute](#contribute)
@@ -53,14 +55,22 @@ There are [upgrade instructions](https://firefly-iii.gitbook.io/firefly-iii-csv-
 
 ## Usage
 
-The [full usage instructions](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/) can be found in the documentation. Basically, this is the workflow.
+The [full usage instructions](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/) can be found in the documentation. Basically, this is the workflow:
+
+### Using the web interface
 
 1. [Set up and configure your Personal Access Token and Firefly III URL](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/configure).
 2. [Upload your CSV file](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/upload).
-3. [Tell the importer what your CSV file looks like. Date format, data types, etc](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/configure).
+3. [Tell the importer what your CSV file looks like.](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/configure).
 4. [Set each column's role and data type](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/roles).
 5. [Map values in the CSV file to existing values in your database](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/map).
 6. [Enjoy the result in Firefly III](https://github.com/firefly-iii/firefly-iii).
+
+### Using the auto-import
+
+1. Import at least once so you'll have a configuration file.
+2. Or, get a configuration file from [the repository](https://github.com/firefly-iii/import-configurations).
+3. [Run the Docker inline import command](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/command_line)
 
 ## Known issues and problems
 
