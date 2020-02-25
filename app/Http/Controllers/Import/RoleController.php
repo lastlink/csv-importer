@@ -67,6 +67,7 @@ class RoleController extends Controller
 
         // roles
         $roles = config('csv_importer.import_roles');
+        ksort($roles);
 
         // configuration (if it is set)
         $configuredRoles     = $configuration->getRoles();
