@@ -1,7 +1,7 @@
 <?php
 /**
  * GetAccountsResponse.php
- * Copyright (c) 2019 thegrumpydictator@gmail.com
+ * Copyright (c) 2019 james@firefly-iii.org
  *
  * This file is part of Firefly III CSV Importer.
  *
