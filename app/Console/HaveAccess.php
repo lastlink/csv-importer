@@ -1,7 +1,7 @@
 <?php
 /**
  * HaveAccess.php
- * Copyright (c) 2019 - 2020 thegrumpydictator@gmail.com
+ * Copyright (c) 2019 - 2020 james@firefly-iii.org
  *
  * This file is part of the Firefly III CSV importer
  * (https://github.com/firefly-iii-csv-importer).
