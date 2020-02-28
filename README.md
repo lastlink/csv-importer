@@ -27,23 +27,31 @@
 
 <!-- MarkdownTOC autolink="true" -->
 
-(TOC update TODO)
+- [About the Firefly III CSV importer](#about-the-firefly-iii-csv-importer)
+	- [Purpose](#purpose)
+	- [Features](#features)
+	- [Who's it for?](#whos-it-for)
+- [Getting Started](#getting-started)
+	- [Using the web interface](#using-the-web-interface)
+	- [Using the auto-import](#using-the-auto-import)
+- [Known import challenges](#known-import-challenges)
+- [Other stuff](#other-stuff)
+	- [Contribute](#contribute)
+	- [Support the development of Firefly III](#support-the-development-of-firefly-iii)
+- [License](#license)
+- [Contact](#contact)
 
 <!-- /MarkdownTOC -->
 
 ## About the Firefly III CSV importer
 
 <p align="center">
-	(screenshot todo)
+	<img src="https://www.firefly-iii.org/static/screenshots/csv/imac-complete.png" />
 </p>
 
 This is a tool to import CSV files into [Firefly III](https://github.com/firefly-iii/firefly-iii). It works by using a personal access token to access your Firefly III installation's API. It will then create transactions based upon the CSV files you upload.
 
 ### Purpose
-
-<p align="center">
-  (screenshot todo)
-</p>
 
 Use this tool to (automatically) import your bank's CSV files into Firefly III. If you're a bit of a developer, feel free to use this code to generate your own import tool.
 
