@@ -36,8 +36,6 @@ class Controller extends BaseController
 
     /**
      * Controller constructor.
-     *
-     * @throws ConfigMissingException
      */
     public function __construct()
     {

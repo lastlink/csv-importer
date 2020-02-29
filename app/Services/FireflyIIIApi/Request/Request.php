@@ -143,7 +143,6 @@ abstract class Request
                 'Authorization' => sprintf('Bearer %s', $this->getToken()),
             ],
             'exceptions' => false,
-            'verify'     => resource_path('certs/ca.cert.pem'),
             'body'       => json_encode($this->getBody()),
         ];
 
@@ -206,7 +205,6 @@ abstract class Request
                          'Accept'        => 'application/json',
                          'Authorization' => sprintf('Bearer %s', $this->getToken()),
                      ],
-                     'verify'  => resource_path('certs/ca.cert.pem'),
                  ]
         );
 
