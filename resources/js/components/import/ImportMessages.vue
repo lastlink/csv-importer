@@ -62,19 +62,19 @@
         name: "ImportMessages",
         props: {
             messages: {
-                type: Object,
+                type: [Array, Object],
                 default: function () {
                     return {};
                 }
             },
             warnings: {
-                type: Object,
+                type: [Array, Object],
                 default: function () {
                     return {};
                 }
             },
             errors: {
-                type: Object,
+                type: [Array, Object],
                 default: function () {
                     return {};
                 }
@@ -82,10 +82,7 @@
         },
         methods: {
             isEmpty(obj) {
-                for (let x in obj) {
-                    return false;
-                }
-                return true;
+                return _.isEmpty(obj);
             }
         }
     }
