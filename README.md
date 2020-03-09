@@ -38,8 +38,7 @@
 - [Other stuff](#other-stuff)
 	- [Contribute](#contribute)
 	- [Support the development of Firefly III](#support-the-development-of-firefly-iii)
-- [License](#license)
-- [Contact](#contact)
+	- [Contact](#contact)
 
 <!-- /MarkdownTOC -->
 
@@ -109,16 +108,19 @@ If you like this tool and if it helps you save lots of money, why not send me a 
 
 OK that was a joke. You can donate using [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=44UKUT455HUFA), [Patreon](https://www.patreon.com/jc5) or the [GitHub Sponsors Program](https://github.com/sponsors/JC5).
 
-Thank you for considering donating to Firefly III, and the CSV Importer.
-
-## License
-
 This work [is licensed](https://github.com/firefly-iii/csv-importer/blob/master/LICENSE) under the [GNU Affero General Public License v3](https://www.gnu.org/licenses/agpl-3.0.html).
 
-## Contact
+### Contact
 
 You can contact me at [james@firefly-iii.org](mailto:james@firefly-iii.org), you may open an issue or contact me through the various social media pages there are: [reddit](https://www.reddit.com/r/FireflyIII/) and [Twitter](https://twitter.com/Firefly_III).
 
+[![Scrutinizer][scrutinizer-shield]][scrutinizer-url]
+[![Requires PHP7.3][php-shield]][php-uri]
+
+[scrutinizer-shield]: https://img.shields.io/scrutinizer/g/firefly-iii/csv-importer.svg?style=flat-square
+[scrutinizer-uri]: https://scrutinizer-ci.com/g/firefly-iii/csv-importer/
+[php-shield]: https://img.shields.io/badge/php-7.3-red.svg?style=flat-square
+[php-uri]: https://secure.php.net/downloads.php
 [packagist-shield]: https://img.shields.io/packagist/v/firefly-iii/csv-importer.svg?style=flat-square
 [packagist-uri]: https://packagist.org/packages/firefly-iii/csv-importer
 [license-shield]: https://img.shields.io/github/license/firefly-iii/csv-importer.svg?style=flat-square
@@ -126,4 +128,4 @@ You can contact me at [james@firefly-iii.org](mailto:james@firefly-iii.org), you
 [stars-shield]: https://img.shields.io/github/stars/firefly-iii/csv-importer.svg?style=flat-square
 [stars-url]: https://github.com/firefly-iii/csv-importer/stargazers
 [donate-shield]: https://img.shields.io/badge/donate-%24%20%E2%82%AC-brightgreen?style=flat-square
-[donate-uri]: #support-the-development-of-firefly-iii
+[donate-uri]: #support
