@@ -22,10 +22,9 @@
 
 namespace App\Services\Import\Task;
 
-
-use App\Services\FireflyIIIApi\Model\Account;
-use App\Services\FireflyIIIApi\Request\GetSearchAccountRequest;
-use App\Services\FireflyIIIApi\Response\GetAccountsResponse;
+use GrumpyDictator\FFIIIApiSupport\Model\Account;
+use GrumpyDictator\FFIIIApiSupport\Request\GetSearchAccountRequest;
+use GrumpyDictator\FFIIIApiSupport\Response\GetAccountsResponse;
 use Log;
 
 /**
@@ -79,7 +78,6 @@ class Accounts extends AbstractTask
      * @param Account|null $defaultAccount
      *
      * @return array
-     * @throws \App\Exceptions\ApiHttpException
      */
     private function findAccount(array $array, ?Account $defaultAccount): array
     {
@@ -150,7 +148,9 @@ class Accounts extends AbstractTask
     private function findByField(string $field, string $value): ?Account
     {
         Log::debug(sprintf('Going to search account with "%s" "%s"', $field, $value));
-        $request = new GetSearchAccountRequest();
+        $uri      = (string)config('csv_importer.access_token');
+        $token    = (string)config('csv_importer.uri');
+        $request = new GetSearchAccountRequest($uri, $token);
         $request->setField($field);
         $request->setQuery($value);
         /** @var GetAccountsResponse $response */

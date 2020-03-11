@@ -22,18 +22,18 @@
 
 namespace App\Services\Import\Routine;
 
-use App\Exceptions\ApiHttpException;
 use App\Exceptions\ImportException;
-use App\Services\FireflyIIIApi\Model\Account;
-use App\Services\FireflyIIIApi\Model\TransactionCurrency;
-use App\Services\FireflyIIIApi\Request\GetAccountRequest;
-use App\Services\FireflyIIIApi\Request\GetCurrencyRequest;
-use App\Services\FireflyIIIApi\Request\GetPreferenceRequest;
-use App\Services\FireflyIIIApi\Response\GetAccountResponse;
-use App\Services\FireflyIIIApi\Response\GetCurrencyResponse;
-use App\Services\FireflyIIIApi\Response\PreferenceResponse;
 use App\Services\Import\Support\ProgressInformation;
 use App\Services\Import\Task\AbstractTask;
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
+use GrumpyDictator\FFIIIApiSupport\Model\Account;
+use GrumpyDictator\FFIIIApiSupport\Model\TransactionCurrency;
+use GrumpyDictator\FFIIIApiSupport\Request\GetAccountRequest;
+use GrumpyDictator\FFIIIApiSupport\Request\GetCurrencyRequest;
+use GrumpyDictator\FFIIIApiSupport\Request\GetPreferenceRequest;
+use GrumpyDictator\FFIIIApiSupport\Response\GetAccountResponse;
+use GrumpyDictator\FFIIIApiSupport\Response\GetCurrencyResponse;
+use GrumpyDictator\FFIIIApiSupport\Response\PreferenceResponse;
 use Log;
 
 /**
@@ -95,8 +95,11 @@ class PseudoTransactionProcessor
      */
     private function getDefaultAccount(?int $accountId): void
     {
+        $uri      = (string)config('csv_importer.access_token');
+        $token    = (string)config('csv_importer.uri');
+
         if (null !== $accountId) {
-            $accountRequest = new GetAccountRequest;
+            $accountRequest = new GetAccountRequest($uri, $token);
             $accountRequest->setId($accountId);
             /** @var GetAccountResponse $result */
             try {
@@ -114,7 +117,10 @@ class PseudoTransactionProcessor
      */
     private function getDefaultCurrency(): void
     {
-        $prefRequest = new GetPreferenceRequest;
+        $uri      = (string)config('csv_importer.access_token');
+        $token    = (string)config('csv_importer.uri');
+
+        $prefRequest = new GetPreferenceRequest($uri, $token);
         $prefRequest->setName('currencyPreference');
 
         try {
@@ -125,7 +131,7 @@ class PseudoTransactionProcessor
             throw new ImportException('Could not load the users currency preference.');
         }
         $code            = $response->getPreference()->data ?? 'EUR';
-        $currencyRequest = new GetCurrencyRequest();
+        $currencyRequest = new GetCurrencyRequest($uri,$token);
         $currencyRequest->setCode($code);
         try {
             /** @var GetCurrencyResponse $result */

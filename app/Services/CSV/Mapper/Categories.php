@@ -22,8 +22,8 @@
 
 namespace App\Services\CSV\Mapper;
 
-use App\Services\FireflyIIIApi\Model\Category;
-use App\Services\FireflyIIIApi\Request\GetCategoriesRequest;
+use GrumpyDictator\FFIIIApiSupport\Model\Category;
+use GrumpyDictator\FFIIIApiSupport\Request\GetCategoriesRequest;
 
 /**
  * Class Categories
@@ -35,12 +35,14 @@ class Categories implements MapperInterface
      * Get map of objects.
      *
      * @return array
-     * @throws \App\Exceptions\ApiHttpException
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      */
     public function getMap(): array
     {
         $result   = [];
-        $request  = new GetCategoriesRequest;
+        $uri      = (string)config('csv_importer.access_token');
+        $token    = (string)config('csv_importer.uri');
+        $request  = new GetCategoriesRequest($uri, $token);
         $response = $request->get();
         /** @var Category $category */
         foreach ($response as $category) {

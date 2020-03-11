@@ -28,11 +28,11 @@ use App\Http\Middleware\ConfigComplete;
 use App\Http\Request\ConfigurationPostRequest;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Specifics\SpecificService;
-use App\Services\FireflyIIIApi\Model\Account;
-use App\Services\FireflyIIIApi\Request\GetAccountsRequest;
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
 use Carbon\Carbon;
+use GrumpyDictator\FFIIIApiSupport\Model\Account;
+use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Log;
@@ -74,7 +74,9 @@ class ConfigurationController extends Controller
         }
 
         // get list of asset accounts:
-        $request = new GetAccountsRequest;
+        $uri     = (string)config('csv_importer.access_token');
+        $token   = (string)config('csv_importer.uri');
+        $request = new GetAccountsRequest($uri, $token);
         $request->setType(GetAccountsRequest::ASSET);
         $response = $request->get();
 
@@ -92,9 +94,9 @@ class ConfigurationController extends Controller
         $doMapping = '{}';
         $mapping   = '{}';
         if (null !== $configuration) {
-            $roles     = base64_encode(json_encode($configuration->getRoles()));
-            $doMapping = base64_encode(json_encode($configuration->getDoMapping()));
-            $mapping   = base64_encode(json_encode($configuration->getMapping()));
+            $roles     = base64_encode(json_encode($configuration->getRoles(), JSON_THROW_ON_ERROR, 512));
+            $doMapping = base64_encode(json_encode($configuration->getDoMapping(), JSON_THROW_ON_ERROR, 512));
+            $mapping   = base64_encode(json_encode($configuration->getMapping(), JSON_THROW_ON_ERROR, 512));
         }
 
         // update configuration with old values if present? TODO

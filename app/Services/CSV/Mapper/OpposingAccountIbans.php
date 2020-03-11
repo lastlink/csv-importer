@@ -22,8 +22,6 @@
 
 namespace App\Services\CSV\Mapper;
 
-use App\Services\FireflyIIIApi\Model\Account;
-use App\Services\FireflyIIIApi\Request\GetAccountsRequest;
 use Log;
 
 /**
@@ -44,6 +42,8 @@ class OpposingAccountIbans implements MapperInterface
     {
         Log::debug('Now in OpposingAccountIbans');
         $result = [];
+        $uri      = (string)config('csv_importer.access_token');
+        $token    = (string)config('csv_importer.uri');
         // get list of asset accounts:
         $request = new GetAccountsRequest;
         $request->setType(GetAccountsRequest::ALL);

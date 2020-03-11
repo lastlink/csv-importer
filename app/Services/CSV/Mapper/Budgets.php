@@ -22,8 +22,8 @@
 
 namespace App\Services\CSV\Mapper;
 
-use App\Services\FireflyIIIApi\Model\Budget;
-use App\Services\FireflyIIIApi\Request\GetBudgetsRequest;
+use GrumpyDictator\FFIIIApiSupport\Model\Budget;
+use GrumpyDictator\FFIIIApiSupport\Request\GetBudgetsRequest;
 
 /**
  * Class Budgets
@@ -35,12 +35,14 @@ class Budgets implements MapperInterface
      * Get map of objects.
      *
      * @return array
-     * @throws \App\Exceptions\ApiHttpException
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      */
     public function getMap(): array
     {
         $result   = [];
-        $request  = new GetBudgetsRequest;
+        $uri      = (string)config('csv_importer.access_token');
+        $token    = (string)config('csv_importer.uri');
+        $request  = new GetBudgetsRequest($uri, $token);
         $response = $request->get();
         /** @var Budget $budget */
         foreach ($response as $budget) {

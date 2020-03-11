@@ -22,9 +22,8 @@
 
 namespace App\Console;
 
-
-use App\Exceptions\ApiHttpException;
-use App\Services\FireflyIIIApi\Request\SystemInformationRequest;
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
+use GrumpyDictator\FFIIIApiSupport\Request\SystemInformationRequest;
 
 /**
  * Trait HaveAccess
@@ -36,7 +35,9 @@ trait HaveAccess
      */
     private function haveAccess(): bool
     {
-        $request = new SystemInformationRequest();
+        $uri     = (string)config('csv_importer.access_token');
+        $token   = (string)config('csv_importer.uri');
+        $request = new SystemInformationRequest($uri, $token);
         try {
             $request->get();
         } catch (ApiHttpException $e) {

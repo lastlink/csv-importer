@@ -22,8 +22,8 @@
 
 namespace App\Services\Import\Task;
 
-use App\Services\FireflyIIIApi\Model\Account;
-use App\Services\FireflyIIIApi\Model\TransactionCurrency;
+use GrumpyDictator\FFIIIApiSupport\Model\Account;
+use GrumpyDictator\FFIIIApiSupport\Model\TransactionCurrency;
 
 /**
  * Interface TaskInterface

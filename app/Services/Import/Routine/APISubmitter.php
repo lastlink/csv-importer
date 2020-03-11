@@ -22,12 +22,12 @@
 
 namespace App\Services\Import\Routine;
 
-use App\Services\FireflyIIIApi\Model\Transaction;
-use App\Services\FireflyIIIApi\Model\TransactionGroup;
-use App\Services\FireflyIIIApi\Request\PostTransactionRequest;
-use App\Services\FireflyIIIApi\Response\PostTransactionResponse;
-use App\Services\FireflyIIIApi\Response\ValidationErrorResponse;
 use App\Services\Import\Support\ProgressInformation;
+use GrumpyDictator\FFIIIApiSupport\Model\Transaction;
+use GrumpyDictator\FFIIIApiSupport\Model\TransactionGroup;
+use GrumpyDictator\FFIIIApiSupport\Request\PostTransactionRequest;
+use GrumpyDictator\FFIIIApiSupport\Response\PostTransactionResponse;
+use GrumpyDictator\FFIIIApiSupport\Response\ValidationErrorResponse;
 use Log;
 
 /**
@@ -36,6 +36,7 @@ use Log;
 class APISubmitter
 {
     use ProgressInformation;
+
     /**
      * @param array $lines
      */
@@ -98,7 +99,9 @@ class APISubmitter
      */
     private function processTransaction(int $index, array $line): void
     {
-        $request = new PostTransactionRequest();
+        $uri     = (string)config('csv_importer.access_token');
+        $token   = (string)config('csv_importer.uri');
+        $request = new PostTransactionRequest($uri, $token);
         $request->setBody($line);
         $response = $request->post();
         if ($response instanceof ValidationErrorResponse) {

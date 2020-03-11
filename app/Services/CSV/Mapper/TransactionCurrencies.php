@@ -22,8 +22,8 @@
 
 namespace App\Services\CSV\Mapper;
 
-use App\Services\FireflyIIIApi\Model\TransactionCurrency;
-use App\Services\FireflyIIIApi\Request\GetCurrenciesRequest;
+use GrumpyDictator\FFIIIApiSupport\Model\TransactionCurrency;
+use GrumpyDictator\FFIIIApiSupport\Request\GetCurrenciesRequest;
 
 /**
  * Class TransactionCurrencies
@@ -35,12 +35,14 @@ class TransactionCurrencies implements MapperInterface
      * Get map of objects.
      *
      * @return array
-     * @throws \App\Exceptions\ApiHttpException
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      */
     public function getMap(): array
     {
         $result   = [];
-        $request  = new GetCurrenciesRequest;
+        $uri      = (string)config('csv_importer.access_token');
+        $token    = (string)config('csv_importer.uri');
+        $request  = new GetCurrenciesRequest($uri, $token);
         $response = $request->get();
         /** @var TransactionCurrency $currency */
         foreach ($response as $currency) {

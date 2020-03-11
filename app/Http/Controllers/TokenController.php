@@ -22,10 +22,9 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Exceptions\ApiHttpException;
-use App\Services\FireflyIIIApi\Request\SystemInformationRequest;
-use App\Services\FireflyIIIApi\Response\SystemInformationResponse;
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
+use GrumpyDictator\FFIIIApiSupport\Request\SystemInformationRequest;
+use GrumpyDictator\FFIIIApiSupport\Response\SystemInformationResponse;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -41,7 +40,9 @@ class TokenController extends Controller
     public function doValidate(): JsonResponse
     {
         $response = ['result' => 'OK', 'message' => null];
-        $request  = new SystemInformationRequest();
+        $uri     = (string)config('csv_importer.access_token');
+        $token   = (string)config('csv_importer.uri');
+        $request  = new SystemInformationRequest($uri, $token);
         try {
             $result = $request->get();
         } catch (ApiHttpException $e) {

@@ -22,8 +22,8 @@
 
 namespace App\Services\CSV\Mapper;
 
-use App\Services\FireflyIIIApi\Model\Bill;
-use App\Services\FireflyIIIApi\Request\GetBillsRequest;
+use GrumpyDictator\FFIIIApiSupport\Model\Bill;
+use GrumpyDictator\FFIIIApiSupport\Request\GetBillsRequest;
 
 /**
  * Class Bills
@@ -35,12 +35,14 @@ class Bills implements MapperInterface
      * Get map of objects.
      *
      * @return array
-     * @throws \App\Exceptions\ApiHttpException
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      */
     public function getMap(): array
     {
         $result   = [];
-        $request  = new GetBillsRequest;
+        $uri      = (string)config('csv_importer.access_token');
+        $token    = (string)config('csv_importer.uri');
+        $request  = new GetBillsRequest($uri, $token);
         $response = $request->get();
         /** @var Bill $bill */
         foreach ($response as $bill) {
