@@ -148,8 +148,8 @@ class Accounts extends AbstractTask
     private function findByField(string $field, string $value): ?Account
     {
         Log::debug(sprintf('Going to search account with "%s" "%s"', $field, $value));
-        $uri      = (string)config('csv_importer.access_token');
-        $token    = (string)config('csv_importer.uri');
+        $uri     = (string)config('csv_importer.uri');
+        $token   = (string)config('csv_importer.access_token');
         $request = new GetSearchAccountRequest($uri, $token);
         $request->setField($field);
         $request->setQuery($value);

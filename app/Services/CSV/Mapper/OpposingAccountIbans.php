@@ -22,6 +22,8 @@
 
 namespace App\Services\CSV\Mapper;
 
+use GrumpyDictator\FFIIIApiSupport\Model\Account;
+use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
 use Log;
 
 /**
@@ -42,10 +44,10 @@ class OpposingAccountIbans implements MapperInterface
     {
         Log::debug('Now in OpposingAccountIbans');
         $result = [];
-        $uri      = (string)config('csv_importer.access_token');
-        $token    = (string)config('csv_importer.uri');
+        $uri     = (string)config('csv_importer.uri');
+        $token   = (string)config('csv_importer.access_token');
         // get list of asset accounts:
-        $request = new GetAccountsRequest;
+        $request = new GetAccountsRequest($uri, $token);
         $request->setType(GetAccountsRequest::ALL);
         $response = $request->get();
         /** @var Account $account */

@@ -74,8 +74,8 @@ class ConfigurationController extends Controller
         }
 
         // get list of asset accounts:
-        $uri     = (string)config('csv_importer.access_token');
-        $token   = (string)config('csv_importer.uri');
+        $uri   = (string)config('csv_importer.uri');
+        $token = (string)config('csv_importer.access_token');
         $request = new GetAccountsRequest($uri, $token);
         $request->setType(GetAccountsRequest::ASSET);
         $response = $request->get();

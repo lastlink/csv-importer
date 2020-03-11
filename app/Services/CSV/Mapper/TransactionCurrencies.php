@@ -40,8 +40,8 @@ class TransactionCurrencies implements MapperInterface
     public function getMap(): array
     {
         $result   = [];
-        $uri      = (string)config('csv_importer.access_token');
-        $token    = (string)config('csv_importer.uri');
+        $uri     = (string)config('csv_importer.uri');
+        $token   = (string)config('csv_importer.access_token');
         $request  = new GetCurrenciesRequest($uri, $token);
         $response = $request->get();
         /** @var TransactionCurrency $currency */

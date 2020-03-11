@@ -95,8 +95,8 @@ class PseudoTransactionProcessor
      */
     private function getDefaultAccount(?int $accountId): void
     {
-        $uri      = (string)config('csv_importer.access_token');
-        $token    = (string)config('csv_importer.uri');
+        $uri     = (string)config('csv_importer.uri');
+        $token   = (string)config('csv_importer.access_token');
 
         if (null !== $accountId) {
             $accountRequest = new GetAccountRequest($uri, $token);
@@ -117,8 +117,8 @@ class PseudoTransactionProcessor
      */
     private function getDefaultCurrency(): void
     {
-        $uri      = (string)config('csv_importer.access_token');
-        $token    = (string)config('csv_importer.uri');
+        $uri     = (string)config('csv_importer.uri');
+        $token   = (string)config('csv_importer.access_token');
 
         $prefRequest = new GetPreferenceRequest($uri, $token);
         $prefRequest->setName('currencyPreference');

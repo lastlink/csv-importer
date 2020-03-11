@@ -40,8 +40,8 @@ class TokenController extends Controller
     public function doValidate(): JsonResponse
     {
         $response = ['result' => 'OK', 'message' => null];
-        $uri     = (string)config('csv_importer.access_token');
-        $token   = (string)config('csv_importer.uri');
+        $uri   = (string)config('csv_importer.uri');
+        $token   = (string)config('csv_importer.access_token');
         $request  = new SystemInformationRequest($uri, $token);
         try {
             $result = $request->get();
@@ -69,7 +69,9 @@ class TokenController extends Controller
      */
     public function index()
     {
-        $request      = new SystemInformationRequest();
+        $uri          = (string)config('csv_importer.uri');
+        $token        = (string)config('csv_importer.access_token');
+        $request      = new SystemInformationRequest($uri, $token);
         $errorMessage = 'No error message.';
         $isError      = false;
         $result       = null;
