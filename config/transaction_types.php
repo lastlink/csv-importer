@@ -22,8 +22,8 @@
 
 declare(strict_types=1);
 
-use App\Services\FireflyIIIApi\Model\AccountType;
-use App\Services\FireflyIIIApi\Model\TransactionType;
+use GrumpyDictator\FFIIIApiSupport\Model\AccountType;
+use GrumpyDictator\FFIIIApiSupport\Model\TransactionType;
 
 return [
     // having the source + dest will tell you the transaction type.

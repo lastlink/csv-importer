@@ -38,11 +38,11 @@ use App\Services\Import\Task\PositiveAmount;
 use App\Services\Import\Task\Tags;
 
 return [
-    'version'         => '1.0.0-beta.1',
+    'version'         => '1.0.0-beta.2',
     'access_token'    => env('FIREFLY_III_ACCESS_TOKEN'),
     'uri'             => env('FIREFLY_III_URI'),
     'upload_path'     => storage_path('uploads'),
-    'minimum_version' => '5.0.0-beta.1',
+    'minimum_version' => '5.1.1',
     'cache_api_calls' => false,
     'delimiters'      => [
         'comma'     => ',',
@@ -353,7 +353,7 @@ return [
             'pre-process-map' => false,
             'field'           => 'asset-account-iban',
             'converter'       => 'Iban',
-            'mapper'          => 'AssetAccountIbans',
+            'mapper'          => 'AssetAccounts',
             'append_value'    => false,
 
         ],
@@ -400,7 +400,7 @@ return [
             'pre-process-map' => false,
             'field'           => 'opposing-account-iban',
             'converter'       => 'Iban',
-            'mapper'          => 'OpposingAccountIbans',
+            'mapper'          => 'OpposingAccounts',
             'append_value'    => false,
         ],
         'opposing-number'      => [

@@ -3,33 +3,47 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Donate][donate-shield]][donate-uri]
 
+<!-- PROJECT LOGO -->
+<br />
+<p align="center">
+  <a href="https://firefly-iii.org/">
+    <img src="https://www.firefly-iii.org/static/img/logo-small-new.png" alt="Logo" width="96" height="96">
+  </a>
+</p>
+  <h1 align="center">Firefly III CSV importer</h1>
 
-# Firefly III CSV Importer
+  <p align="center">
+    A tool to import CSV files into Firefly III
+    <br />
+    <a href="https://firefly-iii.gitbook.io/firefly-iii-csv-importer/"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://demo.firefly-iii.org/">View Firefly III demo</a>
+    ·
+    <a href="https://github.com/firefly-iii/firefly-iii/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/firefly-iii/firefly-iii/issues">Request Feature</a>
+  </p>
 
 <!-- MarkdownTOC autolink="true" -->
 
-- [Introduction](#introduction)
+- [About the Firefly III CSV importer](#about-the-firefly-iii-csv-importer)
 	- [Purpose](#purpose)
 	- [Features](#features)
 	- [Who's it for?](#whos-it-for)
-- [Installation](#installation)
-	- [Upgrade](#upgrade)
-- [Usage](#usage)
-- [Known issues and problems](#known-issues-and-problems)
+- [Getting Started](#getting-started)
+	- [Using the web interface](#using-the-web-interface)
+	- [Using the auto-import](#using-the-auto-import)
+- [Known import challenges](#known-import-challenges)
 - [Other stuff](#other-stuff)
 	- [Contribute](#contribute)
-	- [Versioning](#versioning)
-	- [License](#license)
+	- [Support the development of Firefly III](#support-the-development-of-firefly-iii)
 	- [Contact](#contact)
-	- [Support](#support)
 
 <!-- /MarkdownTOC -->
 
-## Introduction
-
+## About the Firefly III CSV importer
 This is a tool to import CSV files into [Firefly III](https://github.com/firefly-iii/firefly-iii). It works by using a personal access token to access your Firefly III installation's API. It will then create transactions based upon the CSV files you upload.
-
-At this moment, the tool is in beta, which means that it may not work as expected. Please bear with me and open all the issues and PR's you like. I greatly appreciate your input!
 
 ### Purpose
 
@@ -43,31 +57,33 @@ Use this tool to (automatically) import your bank's CSV files into Firefly III. 
 
 Anybody who uses Firefly III and wants to automatically import files.
 
-## Installation
+## Getting Started
 
 You can use this tool in several ways.
 
 1. [Install it on your server using composer](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/self_hosted).
 2. [Use the Docker-image](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/docker).
 
-Generally speaking, it's easiest to use and install this tool the same way as you use Firefly III. And although it features an excellent web-interface, you can also use the command line to import your data.
+Generally speaking, it's easiest to use and install this tool the same way as you use Firefly III. And although it features an excellent web-interface, you can also use the command line to import your data. There are [upgrade instructions](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/upgrading/upgrade) for both methods of installation.
 
-### Upgrade
+The [full usage instructions](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/) can be found in the documentation. Basically, this is the workflow:
 
-There are [upgrade instructions](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/upgrading/upgrade) for boths methods of installation.
-
-## Usage
-
-The [full usage instructions](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/) can be found in the documentation. Basically, this is the workflow.
+### Using the web interface
 
 1. [Set up and configure your Personal Access Token and Firefly III URL](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/configure).
 2. [Upload your CSV file](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/upload).
-3. [Tell the importer what your CSV file looks like. Date format, data types, etc](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/configure).
+3. [Tell the importer what your CSV file looks like.](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/configure).
 4. [Set each column's role and data type](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/roles).
 5. [Map values in the CSV file to existing values in your database](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/map).
 6. [Enjoy the result in Firefly III](https://github.com/firefly-iii/firefly-iii).
 
-## Known issues and problems
+### Using the auto-import
+
+1. Import at least once so you'll have a configuration file.
+2. Or, get a configuration file from [the repository](https://github.com/firefly-iii/import-configurations).
+3. [Run the Docker inline import command](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/command_line)
+
+## Known import challenges
 
 Most people run into the same problems when importing data into Firefly III. Read more about those on the following pages:
 
@@ -86,11 +102,11 @@ Of course, there are some [contributing guidelines](https://github.com/firefly-i
 
 For all other contributions, see below.
 
-### Versioning
+### Support the development of Firefly III
 
-The Firefly III CSV Importer uses [SemVer](https://semver.org/) for versioning. For the versions available, see [the tags](https://github.com/firefly-iii/csv-importer/tags) on this repository.
+If you like this tool and if it helps you save lots of money, why not send me a dime for every dollar saved!
 
-### License
+OK that was a joke. You can donate using [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=44UKUT455HUFA), [Patreon](https://www.patreon.com/jc5) or the [GitHub Sponsors Program](https://github.com/sponsors/JC5).
 
 This work [is licensed](https://github.com/firefly-iii/csv-importer/blob/master/LICENSE) under the [GNU Affero General Public License v3](https://www.gnu.org/licenses/agpl-3.0.html).
 
@@ -98,17 +114,7 @@ This work [is licensed](https://github.com/firefly-iii/csv-importer/blob/master/
 
 You can contact me at [james@firefly-iii.org](mailto:james@firefly-iii.org), you may open an issue or contact me through the various social media pages there are: [reddit](https://www.reddit.com/r/FireflyIII/) and [Twitter](https://twitter.com/Firefly_III).
 
-### Support
-
-If you like this tool and if it helps you save lots of money, why not send me a dime for every dollar saved!
-
-OK that was a joke. You can donate using [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=44UKUT455HUFA) or [Patreon](https://www.patreon.com/jc5).
-
-I am very proud to be a part of the **[GitHub Sponsors Program](https://github.com/sponsors/JC5)**. Use their program if you can; they'll double your donation!
-
-Thank you for considering donating to Firefly III, and the CSV Importer.
-
-[![Scrutinizer][scrutinizer-shield]][scrutinizer-url]
+[![Scrutinizer][scrutinizer-shield]][scrutinizer-uri]
 [![Requires PHP7.3][php-shield]][php-uri]
 
 [scrutinizer-shield]: https://img.shields.io/scrutinizer/g/firefly-iii/csv-importer.svg?style=flat-square

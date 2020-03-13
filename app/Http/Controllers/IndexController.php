@@ -50,6 +50,9 @@ class IndexController extends Controller
         return view('index');
     }
 
+    /**
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function flush()
     {
         Log::debug(sprintf('Now at %s', __METHOD__));

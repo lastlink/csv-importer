@@ -22,8 +22,8 @@
 
 namespace App\Services\CSV\Mapper;
 
-use App\Services\FireflyIIIApi\Model\Account;
-use App\Services\FireflyIIIApi\Request\GetAccountsRequest;
+use GrumpyDictator\FFIIIApiSupport\Model\Account;
+use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
 
 /**
  * Class OpposingAccounts
@@ -40,8 +40,10 @@ class OpposingAccounts implements MapperInterface
     public function getMap(): array
     {
         $result = [];
+        $uri     = (string)config('csv_importer.uri');
+        $token   = (string)config('csv_importer.access_token');
         // get list of asset accounts:
-        $request = new GetAccountsRequest;
+        $request = new GetAccountsRequest($uri, $token);
         $request->setType(GetAccountsRequest::ALL);
         $response = $request->get();
         /** @var Account $account */

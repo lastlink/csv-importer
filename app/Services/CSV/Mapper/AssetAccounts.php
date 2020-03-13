@@ -22,8 +22,8 @@
 
 namespace App\Services\CSV\Mapper;
 
-use App\Services\FireflyIIIApi\Model\Account;
-use App\Services\FireflyIIIApi\Request\GetAccountsRequest;
+use GrumpyDictator\FFIIIApiSupport\Model\Account;
+use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
 
 /**
  * Class AssetAccounts
@@ -36,13 +36,15 @@ class AssetAccounts implements MapperInterface
      * Get map of objects.
      *
      * @return array
-     * @throws \App\Exceptions\ApiHttpException
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      */
     public function getMap(): array
     {
         $result = [];
+        $uri     = (string)config('csv_importer.uri');
+        $token   = (string)config('csv_importer.access_token');
         // get list of asset accounts:
-        $request = new GetAccountsRequest;
+        $request = new GetAccountsRequest($uri, $token);
         $request->setType(GetAccountsRequest::ASSET);
         $response = $request->get();
         /** @var Account $account */
@@ -58,7 +60,7 @@ class AssetAccounts implements MapperInterface
         }
 
         // get list of liabilities.
-        $request = new GetAccountsRequest;
+        $request = new GetAccountsRequest($uri, $token);
         $request->setType(GetAccountsRequest::LIABILITIES);
         $response = $request->get();
         /** @var Account $account */

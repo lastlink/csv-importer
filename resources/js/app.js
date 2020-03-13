@@ -25,6 +25,8 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+import ImportStatus from "./components/import/ImportStatus";
+
 require('./bootstrap');
 
 window.Vue = require('vue');
@@ -41,7 +43,7 @@ window.Vue = require('vue');
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-Vue.component('import-status', require('./components/import/ImportStatus.vue').default);
+Vue.component('import-status', ImportStatus);
 Vue.component('import-messages', require('./components/import/ImportMessages.vue').default);
 
 /**
@@ -49,7 +51,10 @@ Vue.component('import-messages', require('./components/import/ImportMessages.vue
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
-
-const app = new Vue({
-    el: '#app',
-});
+let props = {};
+new Vue({
+            el: "#app",
+            render: (createElement) => {
+                return createElement(ImportStatus, { props: props })
+            },
+        });
