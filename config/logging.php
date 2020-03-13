@@ -58,7 +58,7 @@ return [
     'channels' => [
         'stack' => [
             'driver'            => 'stack',
-            'channels'          => ['daily'],
+            'channels'          => ['daily', 'stdout'],
             'ignore_exceptions' => false,
         ],
 
@@ -99,6 +99,14 @@ return [
             'formatter' => env('LOG_STDERR_FORMATTER'),
             'with'      => [
                 'stream' => 'php://stderr',
+            ],
+        ],
+        'stdout' => [
+            'driver'    => 'monolog',
+            'handler'   => StreamHandler::class,
+            'formatter' => env('LOG_STDERR_FORMATTER'),
+            'with'      => [
+                'stream' => 'php://stdout',
             ],
         ],
 
