@@ -353,7 +353,7 @@ return [
             'pre-process-map' => false,
             'field'           => 'asset-account-iban',
             'converter'       => 'Iban',
-            'mapper'          => 'AssetAccountIbans',
+            'mapper'          => 'AssetAccounts',
             'append_value'    => false,
 
         ],
@@ -400,7 +400,7 @@ return [
             'pre-process-map' => false,
             'field'           => 'opposing-account-iban',
             'converter'       => 'Iban',
-            'mapper'          => 'OpposingAccountIbans',
+            'mapper'          => 'OpposingAccounts',
             'append_value'    => false,
         ],
         'opposing-number'      => [
