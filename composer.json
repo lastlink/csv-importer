@@ -61,6 +61,20 @@
         "source": "https://github.com/firefly-iii/csv-importer",
         "docs": "https://firefly-iii.gitbook.io/firefly-iii-csv-importer/"
     },
+    "funding": [
+      {
+        "type": "patreon",
+        "url": "https://www.patreon.com/JC5"
+      },
+      {
+        "type": "github",
+        "url": "https://github.com/sponsors/JC5"
+      },
+      {
+        "type": "paypal",
+        "url": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=44UKUT455HUFA"
+      }
+    ],
     "require": {
         "php": "^7.3",
         "ext-json": "*",
