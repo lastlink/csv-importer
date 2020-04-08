@@ -101,9 +101,7 @@ return [
         /*
          * Package Service Providers...
          */
-        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         TwigBridge\ServiceProvider::class,
-        Barryvdh\Debugbar\ServiceProvider::class,
 
         /*
          * Application Service Providers...

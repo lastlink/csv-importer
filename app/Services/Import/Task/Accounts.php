@@ -177,6 +177,7 @@ class Accounts extends AbstractTask
             }
             Log::debug('No exact match found, return the first one.');
 
+            $response->rewind();
             /** @var Account $account */
             $account = $response->current();
             Log::debug(sprintf('Found %s account #%d based on "%s" "%s"', $account->type, $account->id, $field, $value));

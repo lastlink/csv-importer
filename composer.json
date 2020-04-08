@@ -61,10 +61,24 @@
         "source": "https://github.com/firefly-iii/csv-importer",
         "docs": "https://firefly-iii.gitbook.io/firefly-iii-csv-importer/"
     },
+    "funding": [
+      {
+        "type": "patreon",
+        "url": "https://www.patreon.com/JC5"
+      },
+      {
+        "type": "github",
+        "url": "https://github.com/sponsors/JC5"
+      },
+      {
+        "type": "paypal",
+        "url": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=44UKUT455HUFA"
+      }
+    ],
     "require": {
         "php": "^7.3",
         "ext-json": "*",
-        "barryvdh/laravel-ide-helper": "^2.6",
+        "ext-bcmath": "*",
         "firefly-iii/api-support-classes": "dev-master",
         "doctrine/dbal": "^2.9",
         "fideloper/proxy": "^4.0",
@@ -72,13 +86,13 @@
         "laravel/framework": "6.*",
         "laravel/tinker": "^1.0",
         "league/csv": "9.*",
-        "rcrowe/twigbridge": "^0.11.0",
-        "ext-bcmath": "*"
+        "rcrowe/twigbridge": "^0.11.0"
     },
     "require-dev": {
         "filp/whoops": "^2.0",
         "fzaninotto/faker": "^1.4",
         "barryvdh/laravel-debugbar": "^3.2",
+        "barryvdh/laravel-ide-helper": "^2.6",
         "laravel/ui": "^1.0",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^3.0",
