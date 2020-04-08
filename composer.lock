@@ -590,12 +590,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/JC5/api-support-classes.git",
-                "reference": "6616c1e8d2323b76bc6e71296a422a2027890b84"
+                "reference": "e4f050b93559ccc94c77ddd27ae71e2ca270801b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JC5/api-support-classes/zipball/6616c1e8d2323b76bc6e71296a422a2027890b84",
-                "reference": "6616c1e8d2323b76bc6e71296a422a2027890b84",
+                "url": "https://api.github.com/repos/JC5/api-support-classes/zipball/e4f050b93559ccc94c77ddd27ae71e2ca270801b",
+                "reference": "e4f050b93559ccc94c77ddd27ae71e2ca270801b",
                 "shasum": ""
             },
             "require": {
@@ -634,10 +634,58 @@
             "description": "API support classes",
             "homepage": "https://github.com/firefly-iii/api-support-classes",
             "keywords": [
-                "api-support-classes",
-                "firefly-iii"
+                "administration",
+                "api",
+                "api support",
+                "assistant",
+                "bills",
+                "budgeting",
+                "budgeting application",
+                "budgeting tool",
+                "budgets",
+                "currency",
+                "dollar",
+                "euro",
+                "finance",
+                "finances",
+                "financial",
+                "financials",
+                "firefly",
+                "firefly iii",
+                "firefly-iii",
+                "help",
+                "helper",
+                "import",
+                "importing",
+                "laravel",
+                "management",
+                "manager",
+                "money",
+                "organizing",
+                "personal finance",
+                "planning",
+                "self hosted",
+                "self-hosted",
+                "tool",
+                "tooling",
+                "transactions",
+                "transfers"
             ],
-            "time": "2020-04-03T14:54:40+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/JC5",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/JC5",
+                    "type": "patreon"
+                },
+                {
+                    "url": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=44UKUT455HUFA",
+                    "type": "paypal"
+                }
+            ],
+            "time": "2020-04-05T08:50:04+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -920,16 +968,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v6.18.3",
+            "version": "v6.18.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "4e48acfaba87f08320a2764d36c3b6a4a4112ccf"
+                "reference": "5b7f541a3c075b394793f4d7884a24ad6f00288a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/4e48acfaba87f08320a2764d36c3b6a4a4112ccf",
-                "reference": "4e48acfaba87f08320a2764d36c3b6a4a4112ccf",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/5b7f541a3c075b394793f4d7884a24ad6f00288a",
+                "reference": "5b7f541a3c075b394793f4d7884a24ad6f00288a",
                 "shasum": ""
             },
             "require": {
@@ -1062,7 +1110,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2020-03-24T16:37:50+00:00"
+            "time": "2020-04-07T18:54:55+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -1129,16 +1177,16 @@
         },
         {
             "name": "league/commonmark",
-            "version": "1.3.2",
+            "version": "1.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/commonmark.git",
-                "reference": "75542a366ccbe1896ed79fcf3e8e68206d6c4257"
+                "reference": "5a67afc2572ec6d430526cdc9c637ef124812389"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/75542a366ccbe1896ed79fcf3e8e68206d6c4257",
-                "reference": "75542a366ccbe1896ed79fcf3e8e68206d6c4257",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/5a67afc2572ec6d430526cdc9c637ef124812389",
+                "reference": "5a67afc2572ec6d430526cdc9c637ef124812389",
                 "shasum": ""
             },
             "require": {
@@ -1213,7 +1261,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-03-25T19:55:28+00:00"
+            "time": "2020-04-05T16:01:48+00:00"
         },
         {
             "name": "league/csv",
