@@ -40,7 +40,7 @@ use App\Services\Import\Task\Tags;
 // TODO update to Laravel 7.
 
 return [
-    'version'         => '1.0.0-beta.3',
+    'version'         => '1.0.0',
     'access_token'    => env('FIREFLY_III_ACCESS_TOKEN'),
     'uri'             => env('FIREFLY_III_URI'),
     'upload_path'     => storage_path('uploads'),
