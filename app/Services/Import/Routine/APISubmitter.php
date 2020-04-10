@@ -51,7 +51,7 @@ class APISubmitter
          */
         foreach ($lines as $index => $line) {
             $this->processTransaction($index, $line);
-            sleep(1); // DEBUG
+            //sleep(1); // DEBUG
         }
         Log::info(sprintf('Done submitting %d transactions to your Firefly III instance.', $count));
     }
@@ -105,10 +105,12 @@ class APISubmitter
         $uri     = (string)config('csv_importer.uri');
         $token   = (string)config('csv_importer.access_token');
         $request = new PostTransactionRequest($uri, $token);
+        Log::debug('Submitting to Firefly III:', $line);
         $request->setBody($line);
         $response = $request->post();
         if ($response instanceof ValidationErrorResponse) {
             foreach ($response->errors->messages() as $key => $errors) {
+                Log::error(sprintf('Submission error: %d', $key), $errors);
                 foreach ($errors as $error) {
                     $msg = sprintf('%s: %s (original value: "%s")', $key, $error, $this->getOriginalValue($key, $line));
                     // plus 1 to keep the count.
@@ -156,7 +158,7 @@ class APISubmitter
         }
         $index = (int)$parts[1];
 
-        return $transaction['transactions'][$index][$parts[2]] ?? '(not found)';
+        return (string)($transaction['transactions'][$index][$parts[2]] ?? '(not found)');
     }
 
 }
