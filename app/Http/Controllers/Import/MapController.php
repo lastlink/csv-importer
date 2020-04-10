@@ -32,6 +32,7 @@ use App\Services\CSV\Mapper\MapperService;
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
 use Illuminate\Http\Request;
+use Log;
 use RuntimeException;
 
 /**
@@ -56,7 +57,9 @@ class MapController extends Controller
     public function index()
     {
         $mainTitle = 'Map data';
-        $subTitle  = 'Map values in CSV bla bla.';
+        $subTitle  = 'Map values in CSV file to actual data in Firefly III';
+
+        Log::debug('Now im mapController index');
 
         // get configuration object.
         $configuration   = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
@@ -65,7 +68,7 @@ class MapController extends Controller
         $data            = [];
 
         foreach ($roles as $index => $role) {
-            $info = config('csv_importer.import_roles')[$role] ?? null;
+            $info     = config('csv_importer.import_roles')[$role] ?? null;
             $mappable = $info['mappable'] ?? false;
             if (null === $info) {
                 continue;
@@ -73,6 +76,8 @@ class MapController extends Controller
             if (false === $mappable) {
                 continue;
             }
+            Log::debug(sprintf('Mappable role is "%s"', $role));
+
             $info['role']   = $role;
             $info['values'] = [];
 
@@ -83,26 +88,24 @@ class MapController extends Controller
             if (!class_exists($class)) {
                 throw new RuntimeException(sprintf('Class %s does not exist.', $class));
             }
+            Log::debug(sprintf('Associated class is %s', $class));
+
+
             /** @var MapperInterface $object */
             $object               = app($class);
             $info['mapping_data'] = $object->getMap();
+            $info['mapped']       = $existingMapping[$index] ?? [];
 
-            $info['mapped'] = $existingMapping[$index] ?? [];
+            Log::debug(sprintf('Mapping data length is %d', count($info['mapping_data'])), $info['mapping_data']);
 
             $data[$index] = $info;
         }
 
         // TODO here we collect all the values from the CSV file.
         // get columns from file
-        $content = StorageService::getContent(session()->get(Constants::UPLOAD_CSV_FILE));
-        $data    = MapperService::getMapData($content, $configuration->isHeaders(), $configuration->getSpecifics(), $data);
-
-        //        var_dump($data);
-        //        exit;
-
-
-        //        var_dump($configuration);
-        //        exit;
+        $content   = StorageService::getContent(session()->get(Constants::UPLOAD_CSV_FILE));
+        $delimiter = (string) config(sprintf('csv_importer.delimiters.%s', $configuration->getDelimiter()));
+        $data      = MapperService::getMapData($content, $delimiter, $configuration->isHeaders(), $configuration->getSpecifics(), $data);
 
         return view('import.map.index', compact('mainTitle', 'subTitle', 'roles', 'data'));
     }

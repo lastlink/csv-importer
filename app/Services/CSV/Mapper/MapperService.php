@@ -47,10 +47,14 @@ class MapperService
      *
      * @return array
      */
-    public static function getMapData(string $content, bool $hasHeaders, array $specifics, array $data): array
+    public static function getMapData(string $content, string $delimiter, bool $hasHeaders, array $specifics, array $data): array
     {
         // make file reader first.
         $reader = Reader::createFromString($content);
+
+        // reader not configured to use correct delimiter.
+        $reader->setDelimiter($delimiter);
+
         $offset = 0;
         if (true === $hasHeaders) {
             $offset = 1;
@@ -62,11 +66,9 @@ class MapperService
             Log::error($e->getMessage());
             throw new RuntimeException($e->getMessage());
         }
-
         // loop each row, apply specific:
         foreach ($records as $rowIndex => $row) {
             $row = SpecificService::runSpecifics($row, $specifics);
-
             // loop each column, put in $data
             foreach ($row as $columnIndex => $column) {
                 if(!isset($data[$columnIndex])) {

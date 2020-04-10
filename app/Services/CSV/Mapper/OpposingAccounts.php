@@ -25,6 +25,8 @@ namespace App\Services\CSV\Mapper;
 
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
 use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
+use GrumpyDictator\FFIIIApiSupport\Response\GetAccountsResponse;
+use Log;
 
 /**
  * Class OpposingAccounts
@@ -40,24 +42,32 @@ class OpposingAccounts implements MapperInterface
      */
     public function getMap(): array
     {
+        Log::debug('Now in OpposingAccounts::getMap()');
         $result = [];
-        $uri     = (string)config('csv_importer.uri');
-        $token   = (string)config('csv_importer.access_token');
+        $uri    = (string) config('csv_importer.uri');
+        $token  = (string) config('csv_importer.access_token');
         // get list of asset accounts:
         $request = new GetAccountsRequest($uri, $token);
         $request->setType(GetAccountsRequest::ALL);
         $response = $request->get();
-        /** @var Account $account */
-        foreach ($response as $account) {
-            $name = $account->name;
-            if (null !== $account->iban) {
-                $name = sprintf('%s (%s)', $account->name, $account->iban);
+
+        Log::debug(sprintf('Response class is %s', get_class($response)));
+        if ($response instanceof GetAccountsResponse) {
+            Log::debug(sprintf('Count of response is %d', $response->count()));
+            /** @var Account $account */
+            foreach ($response as $account) {
+                $name = $account->name;
+                if (null !== $account->iban) {
+                    $name = sprintf('%s (%s)', $account->name, $account->iban);
+                }
+                Log::debug(sprintf('Found name %s', $name));
+                // add optgroup to result:
+                $group                        = trans(sprintf('import.account_types_%s', $account->type));
+                $result[$group]               = $result[$group] ?? [];
+                $result[$group][$account->id] = $name;
             }
-            // add optgroup to result:
-            $group                        = trans(sprintf('import.account_types_%s', $account->type));
-            $result[$group]               = $result[$group] ?? [];
-            $result[$group][$account->id] = $name;
         }
+        Log::debug('Final result is ', $result);
 
         return $result;
     }
