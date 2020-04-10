@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * Controller.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -20,16 +23,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace App\Http\Controllers;
 
+use Artisan;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\Artisan;
 
+/**
+ * Class Controller
+ */
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;

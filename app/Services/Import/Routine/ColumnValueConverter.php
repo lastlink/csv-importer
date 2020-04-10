@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * ColumnValueConverter.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -44,6 +45,11 @@ class ColumnValueConverter
     /** @var array */
     private $roleToTransaction;
 
+    /**
+     * ColumnValueConverter constructor.
+     *
+     * @param Configuration $configuration
+     */
     public function __construct(Configuration $configuration)
     {
         $this->roleToTransaction = config('csv_importer.role_to_transaction');

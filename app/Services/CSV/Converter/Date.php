@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Date.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -42,7 +43,6 @@ class Date implements ConverterInterface
      *
      * @return mixed
      *
-     * @throws ImportException
      */
     public function convert($value)
     {

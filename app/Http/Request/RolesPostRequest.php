@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * RolesPostRequest.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -39,6 +40,9 @@ class RolesPostRequest extends Request
         return true;
     }
 
+    /**
+     * @return array
+     */
     public function getAll(): array
     {
         $data = [
@@ -47,7 +51,7 @@ class RolesPostRequest extends Request
         ];
         foreach (array_keys($data['roles']) as $index) {
 
-            $data['do_mapping'][$index] = $this->convertBoolean($data['do_mapping'][$index] ?? false);
+            $data['do_mapping'][$index] = $this->convertBoolean($data['do_mapping'][$index] ?? 'false');
         }
 
         return $data;

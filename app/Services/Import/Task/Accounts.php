@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Accounts.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -36,6 +37,7 @@ class Accounts extends AbstractTask
     /**
      * @param array $group
      *
+     * @throws \App\Exceptions\ApiHttpException
      * @return array
      */
     public function process(array $group): array
@@ -77,6 +79,8 @@ class Accounts extends AbstractTask
      *
      * @param Account|null $defaultAccount
      *
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      * @return array
      */
     private function findAccount(array $array, ?Account $defaultAccount): array
@@ -142,8 +146,9 @@ class Accounts extends AbstractTask
      * @param string $field
      * @param string $value
      *
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      * @return Account|null
-     * @throws \App\Exceptions\ApiHttpException
      */
     private function findByField(string $field, string $value): ?Account
     {
@@ -278,7 +283,6 @@ class Accounts extends AbstractTask
      * @param array $transaction
      *
      * @return array
-     * @throws \App\Exceptions\ApiHttpException
      */
     private function processTransaction(array $transaction): array
     {
@@ -309,9 +313,32 @@ class Accounts extends AbstractTask
         if (1 === bccomp($transaction['amount'], '0')) {
             // amount is positive
             Log::debug(sprintf('%s is positive.', $transaction['amount']));
-            $transaction           = $this->setSource($transaction, $destination);
-            $transaction           = $this->setDestination($transaction, $source);
-            $transaction['type']   = $this->determineType($destination['type'], $source['type']);
+            $transaction         = $this->setSource($transaction, $destination);
+            $transaction         = $this->setDestination($transaction, $source);
+            $transaction['type'] = $this->determineType($destination['type'], $source['type']);
+        }
+
+        /*
+         * Final check. If the type is "withdrawal" but the destination account found is "revenue"
+         * we found the wrong one. Just submit the name and hope for the best.
+         */
+        if ('revenue' === $destination['type'] && 'withdrawal' === $transaction['type']) {
+            Log::warning('The found destination account is of type revenue but this is a withdrawal. Out of cheese error.');
+            $transaction['destination_id']   = null;
+            $transaction['destination_name'] = $destination['name'];
+            $transaction['destination_iban'] = $destination['iban'];
+        }
+
+        /*
+         * Same but for the other way around.
+         * If type is "deposit" but the source account is an expense account.
+         * Submit just the name.
+         */
+        if ('expense' === $source['type'] && 'deposit' === $transaction['type']) {
+            Log::warning('The found source account is of type expense but this is a deposit. Out of cheese error.');
+            $transaction['source_id']   = null;
+            $transaction['source_name'] = $source['name'];
+            $transaction['source_iban'] = $source['iban'];
         }
 
         /*

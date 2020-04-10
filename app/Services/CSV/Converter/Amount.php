@@ -37,7 +37,7 @@ class Amount implements ConverterInterface
      */
     public static function positive(string $amount): string
     {
-        if (bccomp($amount, '0') === -1) {
+        if (-1 === bccomp($amount, '0')) {
             $amount = bcmul($amount, '-1');
         }
 
@@ -51,7 +51,7 @@ class Amount implements ConverterInterface
      */
     public static function negative(string $amount): string
     {
-        if (bccomp($amount, '0') === 1) {
+        if (1 === bccomp($amount, '0')) {
             $amount = bcmul($amount, '-1');
         }
 
@@ -111,7 +111,7 @@ class Amount implements ConverterInterface
             $value  = str_replace($search, '', $value);
             Log::debug(sprintf('No decimal character found. Converted amount from "%s" to "%s".', $original, $value));
         }
-        if (strpos($value, '.') === 0) {
+        if (0 === strpos($value, '.')) {
             $value = '0' . $value;
         }
 
@@ -252,7 +252,7 @@ class Amount implements ConverterInterface
         $value = trim((string)str_replace(['€'], '', $value));
         $str   = preg_replace('/[^\-\(\)\.\,0-9 ]/', '', $value);
         $len   = strlen($str);
-        if (strpos($str, '(') === 0 && ')' === $str[$len - 1]) {
+        if (0 === strpos($str, '(') && ')' === $str[$len - 1]) {
             $str = '-' . substr($str, 1, $len - 2);
         }
 

@@ -33,7 +33,7 @@ use Log;
 class AppendHash implements SpecificInterface
 {
     /** @var array Counter for each line. */
-    public $lines_counter = array();
+    public $lines_counter = [];
 
     /**
      * Description of the current specific.

@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * TrimStrings.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -20,12 +23,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\TrimStrings as Middleware;
 
+/**
+ * Class TrimStrings
+ */
 class TrimStrings extends Middleware
 {
     /**
@@ -33,9 +37,8 @@ class TrimStrings extends Middleware
      *
      * @var array
      */
-    protected $except
-        = [
-            'password',
-            'password_confirmation',
-        ];
+    protected $except = [
+        'password',
+        'password_confirmation',
+    ];
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * RoleService.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -40,9 +41,10 @@ class RoleService
     public const EXAMPLE_COUNT  = 7;
 
     /**
-     * @param string $content
+     * @param string        $content
      * @param Configuration $configuration
      *
+     * @throws Exception
      * @return array
      */
     public static function getColumns(string $content, Configuration $configuration): array
@@ -108,9 +110,10 @@ class RoleService
     }
 
     /**
-     * @param string $content
+     * @param string        $content
      * @param Configuration $configuration
      *
+     * @throws Exception
      * @return array
      */
     public static function getExampleData(string $content, Configuration $configuration): array

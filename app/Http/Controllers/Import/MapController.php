@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * MapController.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -80,7 +81,7 @@ class MapController extends Controller
             // TODO make a service
             $class = sprintf('App\\Services\\CSV\\Mapper\\%s', $info['mapper']);
             if (!class_exists($class)) {
-                throw new RunTimeException(sprintf('Class %s does not exist.', $class));
+                throw new RuntimeException(sprintf('Class %s does not exist.', $class));
             }
             /** @var MapperInterface $object */
             $object               = app($class);
@@ -106,6 +107,11 @@ class MapController extends Controller
         return view('import.map.index', compact('mainTitle', 'subTitle', 'roles', 'data'));
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function postIndex(Request $request)
     {
         $values  = $request->get('values') ?? [];

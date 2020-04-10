@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * ConfigurationController.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -53,8 +54,8 @@ class ConfigurationController extends Controller
     }
 
     /**
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
-     * @throws \App\Exceptions\ApiHttpException
      */
     public function index()
     {

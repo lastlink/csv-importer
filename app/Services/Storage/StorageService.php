@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * StorageService.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -45,6 +46,11 @@ class StorageService
         return $fileName;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
     public static function getContent(string $name): string
     {
         $disk = Storage::disk('uploads');

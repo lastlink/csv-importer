@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * ImportJobStatus.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -56,6 +57,11 @@ class ImportJobStatus
         $this->messages = [];
     }
 
+    /**
+     * @param array $array
+     *
+     * @return static
+     */
     public static function fromArray(array $array): self
     {
         $config           = new self;

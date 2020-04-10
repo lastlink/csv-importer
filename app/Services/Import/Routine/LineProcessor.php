@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * LineProcessor.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -51,6 +52,11 @@ class LineProcessor
     /** @var string */
     private $dateFormat;
 
+    /**
+     * LineProcessor constructor.
+     *
+     * @param Configuration $configuration
+     */
     public function __construct(Configuration $configuration)
     {
         //array $roles, array $mapping, array $doMapping
@@ -203,7 +209,7 @@ class LineProcessor
             'opposing-number'       => 'opposing-id',
         ];
         if (!isset($roleMapping[$role])) {
-            throw new RunTimeException(sprintf('Cannot indicate new role for mapped role "%s"', $role)); // @codeCoverageIgnore
+            throw new RuntimeException(sprintf('Cannot indicate new role for mapped role "%s"', $role)); // @codeCoverageIgnore
         }
         $newRole = $roleMapping[$role];
         if ($newRole !== $role) {

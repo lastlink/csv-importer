@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * auth.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -19,8 +22,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-declare(strict_types=1);
 
 return [
 
@@ -119,7 +120,21 @@ return [
             'provider' => 'users',
             'table'    => 'password_resets',
             'expire'   => 60,
+            'throttle' => 60,
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password Confirmation Timeout
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define the amount of seconds before a password confirmation
+    | times out and the user is prompted to re-enter their password via the
+    | confirmation screen. By default, the timeout lasts for three hours.
+    |
+    */
+
+    'password_timeout' => 10800,
 
 ];

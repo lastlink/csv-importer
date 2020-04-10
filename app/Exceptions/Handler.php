@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * Handler.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -20,60 +23,59 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace App\Exceptions;
 
-use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Throwable;
 
+/**
+ * Class Handler
+ */
 class Handler extends ExceptionHandler
 {
-    /**
-     * A list of the inputs that are never flashed for validation exceptions.
-     *
-     * @var array
-     */
-    protected $dontFlash
-        = [
-            'password',
-            'password_confirmation',
-        ];
     /**
      * A list of the exception types that are not reported.
      *
      * @var array
      */
-    protected $dontReport
-        = [
-            //
-        ];
+    protected $dontReport = [
+        //
+    ];
 
     /**
-     * Render an exception into an HTTP response.
+     * A list of the inputs that are never flashed for validation exceptions.
      *
-     * @param Request   $request
-     * @param Exception $exception
-     *
-     * @return Response
+     * @var array
      */
-    public function render($request, Exception $exception)
-    {
-        return parent::render($request, $exception);
-    }
+    protected $dontFlash = [
+        'password',
+        'password_confirmation',
+    ];
 
     /**
      * Report or log an exception.
      *
-     * @param Exception $exception
-     *
+     * @param  \Throwable  $exception
      * @return void
-     * @throws Exception
+     *
+     * @throws \Exception
      */
-    public function report(Exception $exception)
+    public function report(Throwable $exception)
     {
         parent::report($exception);
+    }
+
+    /**
+     * Render an exception into an HTTP response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $exception
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Throwable
+     */
+    public function render($request, Throwable $exception)
+    {
+        return parent::render($request, $exception);
     }
 }

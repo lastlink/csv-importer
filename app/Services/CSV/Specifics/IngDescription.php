@@ -165,7 +165,7 @@ class IngDescription implements SpecificInterface
 
         // if Saving account number exists
         if (('' !== (string) $this->row[3]) && !preg_match('/[A-Za-z]/', $this->row[3])) { // if Saving account number has no characters
-            $this->row[3] = sprintf("%010d", $this->row[3]); // Make the number 10 digits
+            $this->row[3] = sprintf('%010d', $this->row[3]); // Make the number 10 digits
         }
     }
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * RunController.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -83,6 +84,8 @@ class RunController extends Controller
     }
 
     /**
+     * @param Request $request
+     *
      * @return JsonResponse
      */
     public function start(Request $request): JsonResponse

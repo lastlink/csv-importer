@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * AuthServiceProvider.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -20,12 +23,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
+/**
+ * Class AuthServiceProvider
+ */
 class AuthServiceProvider extends ServiceProvider
 {
     /**
@@ -33,17 +38,16 @@ class AuthServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $policies
-        = [
-            // 'App\Model' => 'App\Policies\ModelPolicy',
-        ];
+    protected $policies = [
+        // 'App\Model' => 'App\Policies\ModelPolicy',
+    ];
 
     /**
      * Register any authentication / authorization services.
      *
      * @return void
      */
-    public function boot(): void
+    public function boot()
     {
         $this->registerPolicies();
 

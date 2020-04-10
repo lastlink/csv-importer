@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * queue.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -19,8 +22,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-declare(strict_types=1);
 
 return [
 
@@ -77,6 +78,7 @@ return [
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
             'prefix' => env('SQS_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),
             'queue'  => env('SQS_QUEUE', 'your-queue-name'),
+            'suffix' => env('SQS_SUFFIX'),
             'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
         ],
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * MapperService.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -30,6 +31,9 @@ use League\Csv\Statement;
 use Log;
 use RuntimeException;
 
+/**
+ * Class MapperService
+ */
 class MapperService
 {
 

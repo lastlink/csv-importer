@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * ImportException.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -24,6 +25,9 @@ namespace App\Exceptions;
 
 use Exception;
 
+/**
+ * Class ImportException
+ */
 class ImportException extends Exception
 {
 

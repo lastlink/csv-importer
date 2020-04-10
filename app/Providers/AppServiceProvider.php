@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * AppServiceProvider.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -20,30 +23,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Class AppServiceProvider
+ */
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot(): void
-    {
-        //
-    }
-
     /**
      * Register any application services.
      *
      * @return void
      */
     public function register()
+    {
+        //
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
     {
         //
     }
