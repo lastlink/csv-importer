@@ -1,4 +1,11 @@
-## [1.0.0] - 2020-xx-xx
+## [1.0.1] - 2020-04-10
+
+### Fixed
+- Call to `convertBoolean` with bad parameters.
+- Catch exception where Firefly III returns the wrong account.
+- Update minimum version for Firefly III to 5.2.0.
+
+## [1.0.0] - 2020-04-10
 
 This release was preceded by several alpha and beta versions:
 
