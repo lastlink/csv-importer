@@ -44,6 +44,7 @@ return [
     'upload_path'     => storage_path('uploads'),
     'minimum_version' => '5.2.0',
     'cache_api_calls' => false,
+    'trusted_proxies' => env('TRUSTED_PROXIES', ''),
     'delimiters'      => [
         'comma'     => ',',
         'semicolon' => ';',
