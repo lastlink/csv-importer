@@ -67,7 +67,7 @@
                             :errors="this.errors"
                     ></import-messages>
                     <p>
-                        Thank you for using this tool. <a href="https://github.com/firefly-iii/firefly-iii-csv-importer" target="_blank">Please share any feedback you may have</a>.
+                        Thank you for using this tool. <a rel="noopener noreferrer" href="https://github.com/firefly-iii/firefly-iii-csv-importer" target="_blank">Please share any feedback you may have</a>.
                     </p>
                 </div>
                 <div class="card-body" v-if="'error' === this.status && true === this.triedToStart">

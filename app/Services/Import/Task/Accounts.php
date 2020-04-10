@@ -158,7 +158,16 @@ class Accounts extends AbstractTask
         if (1 === count($response)) {
             /** @var Account $account */
             $account = $response->current();
-            Log::debug(sprintf('Found %s account #%d based on "%s" "%s"', $account->type, $account->id, $field, $value));
+
+            // fall out when field search is for 'name' but name is not exact.
+            if (in_array($field, ['name', 'iban'], true) && $value !== $account->$field) {
+                Log::debug(sprintf('Found %s account #%d based on "%s" "%s" but no exact match so return NULL.', $account->type, $account->id, $field, $value));
+
+                return null;
+            }
+
+
+            Log::debug(sprintf('[a] Found %s account #%d based on "%s" "%s"', $account->type, $account->id, $field, $value));
 
             return $account;
         }
@@ -180,7 +189,7 @@ class Accounts extends AbstractTask
             $response->rewind();
             /** @var Account $account */
             $account = $response->current();
-            Log::debug(sprintf('Found %s account #%d based on "%s" "%s"', $account->type, $account->id, $field, $value));
+            Log::debug(sprintf('[b] Found %s account #%d based on "%s" "%s"', $account->type, $account->id, $field, $value));
 
             return $account;
         }
