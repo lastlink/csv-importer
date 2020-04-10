@@ -51,7 +51,7 @@ class RolesPostRequest extends Request
         ];
         foreach (array_keys($data['roles']) as $index) {
 
-            $data['do_mapping'][$index] = $this->convertBoolean($data['do_mapping'][$index] ?? false);
+            $data['do_mapping'][$index] = $this->convertBoolean($data['do_mapping'][$index] ?? 'false');
         }
 
         return $data;
