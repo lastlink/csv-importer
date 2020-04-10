@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * ConverterService.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -55,6 +56,11 @@ class ConverterService
         throw new RuntimeException(sprintf('No such converter: "%s"', $class));
     }
 
+    /**
+     * @param string $class
+     *
+     * @return bool
+     */
     public static function exists(string $class): bool
     {
         $name = self::fullName($class);
@@ -62,6 +68,11 @@ class ConverterService
         return class_exists($name);
     }
 
+    /**
+     * @param string $class
+     *
+     * @return string
+     */
     public static function fullName(string $class): string
     {
         return sprintf('App\\Services\\CSV\\Converter\\%s', $class);

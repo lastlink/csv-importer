@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * ConfigFileProcessor.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -26,6 +27,9 @@ namespace App\Services\CSV\Configuration;
 use App\Services\Storage\StorageService;
 use Log;
 
+/**
+ * Class ConfigFileProcessor
+ */
 class ConfigFileProcessor
 {
     /**

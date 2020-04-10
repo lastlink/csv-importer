@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * ListTests.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -24,6 +25,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
+/**
+ * Class ListTests
+ */
 class ListTests extends Command
 {
     /**

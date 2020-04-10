@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * logging.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -20,8 +23,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
+use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 
@@ -110,6 +112,7 @@ return [
             ],
         ],
 
+
         'syslog' => [
             'driver' => 'syslog',
             'level'  => 'debug',
@@ -118,6 +121,15 @@ return [
         'errorlog' => [
             'driver' => 'errorlog',
             'level'  => 'debug',
+        ],
+
+        'null' => [
+            'driver'  => 'monolog',
+            'handler' => NullHandler::class,
+        ],
+
+        'emergency' => [
+            'path' => storage_path('logs/laravel.log'),
         ],
     ],
 

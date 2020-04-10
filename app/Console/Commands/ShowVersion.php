@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * ShowVersion.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -24,6 +25,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
+/**
+ * Class ShowVersion
+ */
 class ShowVersion extends Command
 {
     /**

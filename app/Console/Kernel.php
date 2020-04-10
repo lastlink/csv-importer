@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * Kernel.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -20,13 +23,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
+/**
+ * Class Kernel
+ */
 class Kernel extends ConsoleKernel
 {
     /**
@@ -34,10 +38,20 @@ class Kernel extends ConsoleKernel
      *
      * @var array
      */
-    protected $commands
-        = [
-            //
-        ];
+    protected $commands = [
+        //
+    ];
+
+    /**
+     * Define the application's command schedule.
+     *
+     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @return void
+     */
+    protected function schedule(Schedule $schedule)
+    {
+        // $schedule->command('inspire')->hourly();
+    }
 
     /**
      * Register the commands for the application.
@@ -46,21 +60,8 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__ . '/Commands');
+        $this->load(__DIR__.'/Commands');
 
         require base_path('routes/console.php');
-    }
-
-    /**
-     * Define the application's command schedule.
-     *
-     * @param Schedule $schedule
-     *
-     * @return void
-     */
-    protected function schedule(Schedule $schedule)
-    {
-        // $schedule->command('inspire')
-        //          ->hourly();
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * RolesComplete.php
  * Copyright (c) 2020 james@firefly-iii.org

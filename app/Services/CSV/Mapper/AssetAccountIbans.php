@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * AssetAccountIbans.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -35,8 +36,8 @@ class AssetAccountIbans implements MapperInterface
      * TODO very duplicate with AssetAccounts
      * Get map of objects.
      *
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      * @return array
-     * @throws \App\Exceptions\ApiHttpException
      */
     public function getMap(): array
     {

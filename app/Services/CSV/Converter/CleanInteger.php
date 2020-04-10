@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * CleanInteger.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -23,6 +24,9 @@
 namespace App\Services\CSV\Converter;
 
 
+/**
+ * Class CleanInteger
+ */
 class CleanInteger implements ConverterInterface
 {
 

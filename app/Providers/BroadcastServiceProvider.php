@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * BroadcastServiceProvider.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -20,13 +23,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Class BroadcastServiceProvider
+ */
 class BroadcastServiceProvider extends ServiceProvider
 {
     /**
@@ -34,7 +38,7 @@ class BroadcastServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot(): void
+    public function boot()
     {
         Broadcast::routes();
 

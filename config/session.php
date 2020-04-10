@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * session.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -19,8 +22,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-declare(strict_types=1);
 
 use Illuminate\Support\Str;
 
@@ -188,7 +189,7 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE', false),
+    'secure' => env('SESSION_SECURE_COOKIE'),
 
     /*
     |--------------------------------------------------------------------------
@@ -210,12 +211,12 @@ return [
     |
     | This option determines how your cookies behave when cross-site requests
     | take place, and can be used to mitigate CSRF attacks. By default, we
-    | do not enable this as other CSRF protection services are in place.
+    | will set this value to "lax" since this is a secure default value.
     |
-    | Supported: "lax", "strict"
+    | Supported: "lax", "strict", "none", null
     |
     */
 
-    'same_site' => null,
+    'same_site' => 'lax',
 
 ];

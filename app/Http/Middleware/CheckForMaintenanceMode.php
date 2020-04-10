@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * CheckForMaintenanceMode.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -20,12 +23,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode as Middleware;
 
+/**
+ * Class CheckForMaintenanceMode
+ */
 class CheckForMaintenanceMode extends Middleware
 {
     /**
@@ -33,8 +37,7 @@ class CheckForMaintenanceMode extends Middleware
      *
      * @var array
      */
-    protected $except
-        = [
-            //
-        ];
+    protected $except = [
+        //
+    ];
 }

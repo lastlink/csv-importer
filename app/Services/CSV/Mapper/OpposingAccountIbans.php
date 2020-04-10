@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * OpposingAccountIbans.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -37,8 +38,8 @@ class OpposingAccountIbans implements MapperInterface
      *
      * Get map of objects.
      *
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      * @return array
-     * @throws \App\Exceptions\ApiHttpException
      */
     public function getMap(): array
     {

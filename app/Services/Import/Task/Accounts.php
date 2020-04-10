@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Accounts.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -36,6 +37,7 @@ class Accounts extends AbstractTask
     /**
      * @param array $group
      *
+     * @throws \App\Exceptions\ApiHttpException
      * @return array
      */
     public function process(array $group): array
@@ -77,6 +79,8 @@ class Accounts extends AbstractTask
      *
      * @param Account|null $defaultAccount
      *
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      * @return array
      */
     private function findAccount(array $array, ?Account $defaultAccount): array
@@ -142,8 +146,9 @@ class Accounts extends AbstractTask
      * @param string $field
      * @param string $value
      *
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      * @return Account|null
-     * @throws \App\Exceptions\ApiHttpException
      */
     private function findByField(string $field, string $value): ?Account
     {
@@ -278,7 +283,6 @@ class Accounts extends AbstractTask
      * @param array $transaction
      *
      * @return array
-     * @throws \App\Exceptions\ApiHttpException
      */
     private function processTransaction(array $transaction): array
     {

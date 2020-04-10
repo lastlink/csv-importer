@@ -83,9 +83,10 @@
         "doctrine/dbal": "^2.9",
         "fideloper/proxy": "^4.0",
         "guzzlehttp/guzzle": "^6.3",
-        "laravel/framework": "6.*",
-        "laravel/tinker": "^1.0",
+        "laravel/framework": "7.*",
+        "laravel/tinker": "^2.0",
         "league/csv": "9.*",
+        "fruitcake/laravel-cors": "^1.0",
         "rcrowe/twigbridge": "^0.11.0"
     },
     "require-dev": {
@@ -93,10 +94,10 @@
         "fzaninotto/faker": "^1.4",
         "barryvdh/laravel-debugbar": "^3.2",
         "barryvdh/laravel-ide-helper": "^2.6",
-        "laravel/ui": "^1.0",
+        "laravel/ui": "^2.0",
         "mockery/mockery": "^1.0",
-        "nunomaduro/collision": "^3.0",
-        "phpunit/phpunit": "^8.0",
+        "nunomaduro/collision": "^4.0",
+        "phpunit/phpunit": "^8.5",
         "roave/security-advisories": "dev-master"
     },
     "config": {

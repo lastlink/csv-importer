@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * ApiException.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -25,6 +26,9 @@ namespace App\Exceptions;
 
 use Exception;
 
+/**
+ * Class ApiException
+ */
 class ApiException extends Exception
 {
 

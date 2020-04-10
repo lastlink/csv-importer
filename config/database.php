@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * database.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -19,8 +22,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-declare(strict_types=1);
 
 use Illuminate\Support\Str;
 
@@ -154,16 +155,16 @@ return [
             'url'      => env('REDIS_URL'),
             'host'     => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
-            'port'     => env('REDIS_PORT', 6379),
-            'database' => env('REDIS_DB', 0),
+            'port'     => env('REDIS_PORT', '6379'),
+            'database' => env('REDIS_DB', '0'),
         ],
 
         'cache' => [
             'url'      => env('REDIS_URL'),
             'host'     => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
-            'port'     => env('REDIS_PORT', 6379),
-            'database' => env('REDIS_CACHE_DB', 1),
+            'port'     => env('REDIS_PORT', '6379'),
+            'database' => env('REDIS_CACHE_DB', '1'),
         ],
 
     ],

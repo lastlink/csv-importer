@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * AbstractTask.php
  * Copyright (c) 2020 james@firefly-iii.org

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * APISubmitter.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -96,6 +97,8 @@ class APISubmitter
     /**
      * @param int   $index
      * @param array $line
+     *
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      */
     private function processTransaction(int $index, array $line): void
     {
