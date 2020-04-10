@@ -23,7 +23,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-header">Import status</div>
+                <div class="card-header">Import <status></status></div>
                 <div class="card-body" v-if="'waiting_to_start' === this.status && false === this.triedToStart">
                     <p>
                         The tool is ready to import your data. Press "start job" to start.
@@ -70,7 +70,7 @@
                         Thank you for using this tool. <a rel="noopener noreferrer" href="https://github.com/firefly-iii/firefly-iii-csv-importer" target="_blank">Please share any feedback you may have</a>.
                     </p>
                 </div>
-                <div class="card-body" v-if="'error' === this.status && true === this.triedToStart">
+                <div class="card-body" v-if="'job_errored' === this.status">
                     <p class="text-danger">
                         The job could not be started or failed due to an error. Please check the log files. Sorry about this :(.
                     </p>
@@ -129,6 +129,10 @@
                         console.log('Job is done!');
                         return;
                     }
+                    if('job_errored' === this.status) {
+                        console.error('Job is kill.');
+                        return;
+                    }
 
                     setTimeout(function () {
                         console.log('Fired on setTimeout');
@@ -141,7 +145,8 @@
                 axios.post(jobStartUri).then((response) => {
                     this.getJobStatus();
                 }).catch((error) => {
-                    this.status = 'error';
+                    this.triedToStart = true;
+                    this.status = 'job_errored';
                 });
                 this.getJobStatus();
                 this.triedToStart = true;
