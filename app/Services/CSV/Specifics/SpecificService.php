@@ -77,6 +77,7 @@ class SpecificService
      */
     public static function runSpecifics(array $row, array $specifics): array
     {
+        // Fix as suggested by @FelikZ in https://github.com/firefly-iii/csv-importer/pull/4
         /** @var string $name */
         foreach ($specifics as $name) {
             if(self::exists($name)) {

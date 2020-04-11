@@ -210,6 +210,7 @@ class Configuration
         $object->mapping   = [];
 
         // loop specifics from classic file:
+        // Fix as suggested by @FelikZ in https://github.com/firefly-iii/csv-importer/pull/4
         $specifics = array_keys($data['specifics'] ?? []);
 
         foreach ($specifics as $name) {
