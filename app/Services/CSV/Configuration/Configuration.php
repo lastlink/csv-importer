@@ -173,10 +173,16 @@ class Configuration
         $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
         $object->rules                       = $array['rules'];
         $object->skipForm                    = $array['skip_form'];
-        $object->specifics                   = $array['specifics'];
-        $object->roles                       = $array['roles'];
-        $object->mapping                     = $array['mapping'];
-        $object->doMapping                   = $array['do_mapping'];
+        //$object->specifics                   = $array['specifics'];
+        $object->roles     = $array['roles'];
+        $object->mapping   = $array['mapping'];
+        $object->doMapping = $array['do_mapping'];
+        $object->specifics = [];
+        foreach ($array['specifics'] as $key => $enabled) {
+            if (true === $enabled) {
+                $object->specifics[] = $key;
+            }
+        }
 
         return $object;
     }
@@ -205,6 +211,7 @@ class Configuration
 
         // loop specifics from classic file:
         $specifics = array_keys($data['specifics'] ?? []);
+
         foreach ($specifics as $name) {
             $class = SpecificService::fullClass($name);
             if (class_exists($class)) {
@@ -305,7 +312,7 @@ class Configuration
             'roles'                         => $this->roles,
             'do_mapping'                    => $this->doMapping,
             'mapping'                       => $this->mapping,
-            'version' => $this->version,
+            'version'                       => $this->version,
         ];
     }
 

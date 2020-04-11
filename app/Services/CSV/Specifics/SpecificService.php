@@ -78,8 +78,8 @@ class SpecificService
     public static function runSpecifics(array $row, array $specifics): array
     {
         /** @var string $name */
-        foreach ($specifics as $name => $enabled) {
-            if($enabled && self::exists($name)) {
+        foreach ($specifics as $name) {
+            if(self::exists($name)) {
                 /** @var SpecificInterface $object */
                 $object = app(self::fullClass($name));
                 $row    = $object->run($row);
