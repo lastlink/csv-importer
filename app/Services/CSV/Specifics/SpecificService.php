@@ -77,14 +77,33 @@ class SpecificService
      */
     public static function runSpecifics(array $row, array $specifics): array
     {
+        // if the array keys are strings, pluck those.
+        if (0 === count($specifics)) {
+            return $row;
+        }
+
+        // little hack.
+        $newSpecifics = $specifics;
+        $keys         = array_keys($specifics);
+        if (is_string($keys[0]) || !is_numeric($keys[0])) {
+            $newSpecifics = [];
+            foreach ($specifics as $name => $enabled) {
+                if ($enabled) {
+                    $newSpecifics[] = $name;
+                }
+            }
+        }
+
+        // Fix as suggested by @FelikZ in https://github.com/firefly-iii/csv-importer/pull/4
         /** @var string $name */
-        foreach ($specifics as $name => $enabled) {
-            if($enabled && self::exists($name)) {
+        foreach ($newSpecifics as $name) {
+            if (self::exists($name)) {
                 /** @var SpecificInterface $object */
                 $object = app(self::fullClass($name));
                 $row    = $object->run($row);
             }
         }
+
         return $row;
     }
 

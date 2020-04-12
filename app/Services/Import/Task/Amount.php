@@ -52,7 +52,24 @@ class Amount extends AbstractTask
      */
     private function processAmount(array $transaction): array
     {
-        Log::debug(sprintf('Now at the start of processAmount(%s)', $transaction['amount']));
+        Log::debug(sprintf('Now at the start of processAmount("%s")', $transaction['amount']));
+        if (array_key_exists('amount', $transaction)) {
+            $transaction['amount'] = (string) $transaction['amount'];
+        }
+        if (array_key_exists('amount_modifier', $transaction)) {
+            $transaction['amount_modifier'] = (string) $transaction['amount_modifier'];
+        }
+        if (array_key_exists('foreign_amount', $transaction)) {
+            $transaction['foreign_amount'] = (string) $transaction['foreign_amount'];
+        }
+
+        if ('' === $transaction['amount']) {
+            $transaction['amount'] = '0';
+
+            Log::error('Amount is EMPTY. This will give problems further ahead.', $transaction);
+
+            return $transaction;
+        }
         // modify amount:
         $transaction['amount'] = bcmul($transaction['amount'], $transaction['amount_modifier']);
 

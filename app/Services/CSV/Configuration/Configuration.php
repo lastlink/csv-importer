@@ -173,10 +173,16 @@ class Configuration
         $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
         $object->rules                       = $array['rules'];
         $object->skipForm                    = $array['skip_form'];
-        $object->specifics                   = $array['specifics'];
-        $object->roles                       = $array['roles'];
-        $object->mapping                     = $array['mapping'];
-        $object->doMapping                   = $array['do_mapping'];
+        //$object->specifics                   = $array['specifics'];
+        $object->roles     = $array['roles'];
+        $object->mapping   = $array['mapping'];
+        $object->doMapping = $array['do_mapping'];
+        $object->specifics = [];
+        foreach ($array['specifics'] as $key => $enabled) {
+            if (true === $enabled) {
+                $object->specifics[] = $key;
+            }
+        }
 
         return $object;
     }
@@ -204,7 +210,9 @@ class Configuration
         $object->mapping   = [];
 
         // loop specifics from classic file:
+        // Fix as suggested by @FelikZ in https://github.com/firefly-iii/csv-importer/pull/4
         $specifics = array_keys($data['specifics'] ?? []);
+
         foreach ($specifics as $name) {
             $class = SpecificService::fullClass($name);
             if (class_exists($class)) {
@@ -250,12 +258,14 @@ class Configuration
      */
     public static function fromFile(array $data): self
     {
-        Log::debug('Now in Configuration::fromClassic', $data);
+        Log::debug('Now in Configuration::fromFile', $data);
         $version = $data['version'] ?? 1;
         if (1 === $version) {
+            Log::debug('v1, going for classic.');
             return self::fromClassicFile($data);
         }
         if (2 === $version) {
+            Log::debug('v2.');
             return self::fromVersionTwo($data);
         }
         throw new RuntimeException(sprintf('Configuration file version "%s" cannot be parsed.', $version));
@@ -305,7 +315,7 @@ class Configuration
             'roles'                         => $this->roles,
             'do_mapping'                    => $this->doMapping,
             'mapping'                       => $this->mapping,
-            'version' => $this->version,
+            'version'                       => $this->version,
         ];
     }
 

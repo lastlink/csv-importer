@@ -27,7 +27,6 @@ namespace App\Http\Controllers\Import;
 use App\Exceptions\ImportException;
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\ReadyForImport;
-use App\Http\Middleware\UploadedFiles;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\File\FileReader;
 use App\Services\Import\ImportJobStatus\ImportJobStatus;
@@ -37,6 +36,7 @@ use App\Services\Session\Constants;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Log;
+use ErrorException;
 
 /**
  * Class RunController
@@ -102,7 +102,12 @@ class RunController extends Controller
             $routine->setConfiguration(Configuration::fromArray(session()->get(Constants::CONFIGURATION)));
             $routine->setReader(FileReader::getReaderFromSession());
             $routine->start();
-        } catch (ImportException $e) {
+        } catch (ImportException|ErrorException $e) {
+            // update job to error state.
+            ImportJobStatusManager::setJobStatus(ImportJobStatus::JOB_ERRORED);
+            $importJobStatus->errors[] = $e->getMessage();
+
+            return response()->json($importJobStatus->toArray());
         }
 
         // set done:

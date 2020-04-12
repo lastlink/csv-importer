@@ -97,9 +97,10 @@ class RoleService
 
         // specific processors may add or remove headers.
         // so those must be processed as well.
+        // Fix as suggested by @FelikZ in https://github.com/firefly-iii/csv-importer/pull/4
         /** @var string $name */
-        foreach ($configuration->getSpecifics() as $name => $enabled) {
-            if ($enabled && SpecificService::exists($name)) {
+        foreach ($configuration->getSpecifics() as $name) {
+            if (SpecificService::exists($name)) {
                 /** @var SpecificInterface $object */
                 $object  = app(SpecificService::fullClass($name));
                 $headers = $object->runOnHeaders($headers);

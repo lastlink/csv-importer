@@ -1,3 +1,15 @@
+## [1.0.2] - 2020-04-12
+
+### Added
+- Add ability to handle `TRUSTED_PROXIES` environment variable.
+
+### Fixed
+- [Issue 3253](https://github.com/firefly-iii/firefly-iii/issues/3253) Could not map values if the delimiter wasn't a comma.
+- [Issue 3254](https://github.com/firefly-iii/firefly-iii/issues/3254) Better handling of strings.
+- [Issue 3258](https://github.com/firefly-iii/firefly-iii/issues/3258) Better handling of existing accounts.
+- Better error handling (500 errors will not make the importer loop).
+- Fixed handling of specifics, thanks to @FelikZ
+
 ## [1.0.1] - 2020-04-10
 
 ### Fixed
@@ -33,6 +45,3 @@ This release was preceded by several alpha and beta versions:
 
 ### Security
 - Initial release.
-
-### API
-- Initial release
