@@ -258,12 +258,14 @@ class Configuration
      */
     public static function fromFile(array $data): self
     {
-        Log::debug('Now in Configuration::fromClassic', $data);
+        Log::debug('Now in Configuration::fromFile', $data);
         $version = $data['version'] ?? 1;
         if (1 === $version) {
+            Log::debug('v1, going for classic.');
             return self::fromClassicFile($data);
         }
         if (2 === $version) {
+            Log::debug('v2.');
             return self::fromVersionTwo($data);
         }
         throw new RuntimeException(sprintf('Configuration file version "%s" cannot be parsed.', $version));
