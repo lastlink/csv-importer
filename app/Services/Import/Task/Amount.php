@@ -23,7 +23,9 @@ declare(strict_types=1);
 
 namespace App\Services\Import\Task;
 
-use App\Services\CSV\Converter\Amount as AmountConverter;
+use FireflyIII\Import\Converter\AmountCredit;
+use FireflyIII\Import\Converter\AmountDebit;
+use FireflyIII\Import\Converter\AmountNegated;
 use Log;
 
 /**
@@ -53,27 +55,43 @@ class Amount extends AbstractTask
     private function processAmount(array $transaction): array
     {
         Log::debug(sprintf('Now at the start of processAmount("%s")', $transaction['amount']));
-        if (array_key_exists('amount', $transaction)) {
-            $transaction['amount'] = (string) $transaction['amount'];
+        $amount = null;
+        if (null === $amount && array_key_exists('amount', $transaction) && null !== $transaction['amount']) {
+            Log::debug('Transaction["amount"] value is not NULL, assume this is the correct value.');
+            $amount = $transaction['amount'];
         }
+
+        if (null === $amount && array_key_exists('amount_debit', $transaction) && null !== $transaction['amount_debit']) {
+            Log::debug('Transaction["amount_debit"] value is not NULL, assume this is the correct value.');
+            $amount = $transaction['amount_debit'];
+        }
+
+        if (null === $amount && array_key_exists('amount_credit', $transaction) && null !== $transaction['amount_credit']) {
+            Log::debug('Transaction["amount_credit"] value is not NULL, assume this is the correct value.');
+            $amount = $transaction['amount_credit'];
+        }
+
+        if (null === $amount && array_key_exists('amount_negated', $transaction) && null !== $transaction['amount_negated']) {
+            Log::debug('Transaction["amount_negated"] value is not NULL, assume this is the correct value.');
+            $amount = $transaction['amount_negated'];
+        }
+
         if (array_key_exists('amount_modifier', $transaction)) {
             $transaction['amount_modifier'] = (string) $transaction['amount_modifier'];
         }
         if (array_key_exists('foreign_amount', $transaction)) {
             $transaction['foreign_amount'] = (string) $transaction['foreign_amount'];
         }
-
-        if ('' === $transaction['amount']) {
-            $transaction['amount'] = '0';
-
+        $amount = (string) $amount;
+        if ('' === $amount) {
             Log::error('Amount is EMPTY. This will give problems further ahead.', $transaction);
 
             return $transaction;
         }
         // modify amount:
-        $transaction['amount'] = bcmul($transaction['amount'], $transaction['amount_modifier']);
+        $amount = bcmul($amount, $transaction['amount_modifier']);
 
-        Log::debug(sprintf('Amount is now %s.', $transaction['amount']));
+        Log::debug(sprintf('Amount is now %s.', $amount));
 
         // modify foreign amount
         if (isset($transaction['foreign_amount']) && null !== $transaction['foreign_amount']) {
@@ -81,28 +99,9 @@ class Amount extends AbstractTask
             Log::debug(sprintf('FOREIGN amount is now %s.', $transaction['foreign_amount']));
         }
 
-        // amount is overruled by amount_debit:
-        if (null !== $transaction['amount_debit'] && 0 !== bccomp('0', $transaction['amount_debit'])) {
-            Log::debug(sprintf('Debit amount is "%s" which trumps the normal amount.', $transaction['amount_debit']));
-            $transaction['amount'] = AmountConverter::negative($transaction['amount_debit']);
-        }
-        Log::debug(sprintf('Amount (after amount_debit) is now %s.', $transaction['amount']));
-
-        // then credit
-        if (null !== $transaction['amount_credit'] && 0 !== bccomp('0', $transaction['amount_credit'])) {
-            Log::debug(sprintf('Credit amount is "%s" which trumps the normal amount.', $transaction['amount_credit']));
-            $transaction['amount'] = AmountConverter::positive($transaction['amount_credit']);
-        }
-        Log::debug(sprintf('Amount (after amount_credit) is now %s.', $transaction['amount']));
-
-        // then negated
-        if (null !== $transaction['amount_negated'] && 0 !== bccomp('0', $transaction['amount_negated'])) {
-            Log::debug(sprintf('Negated amount is "%s" which trumps the normal amount.', $transaction['amount_negated']));
-            $transaction['amount'] = AmountConverter::negative($transaction['amount_negated']);
-        }
-        Log::debug(sprintf('Amount (after amount_negated) is now %s.', $transaction['amount']));
         // unset those fields:
         unset($transaction['amount_credit'], $transaction['amount_debit'], $transaction['amount_negated']);
+        $transaction['amount'] = $amount;
 
         return $transaction;
     }

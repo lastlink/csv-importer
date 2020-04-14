@@ -24,8 +24,6 @@ declare(strict_types=1);
 namespace App\Services\Import\Task;
 
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
-use GrumpyDictator\FFIIIApiSupport\Request\GetSearchAccountRequest;
-use GrumpyDictator\FFIIIApiSupport\Response\GetAccountsResponse;
 use Log;
 
 /**
@@ -42,7 +40,7 @@ class Accounts extends AbstractTask
      */
     public function process(array $group): array
     {
-        Log::debug('Now in process()');
+        Log::debug('Now in Accounts::process()');
         $total = count($group['transactions']);
         foreach ($group['transactions'] as $index => $transaction) {
             Log::debug(sprintf('Now processing transaction %d of %d', $index + 1, $total));
@@ -73,14 +71,10 @@ class Accounts extends AbstractTask
     }
 
     /**
-     * TODO move to own class.
-     *
      * @param array        $array
      *
      * @param Account|null $defaultAccount
      *
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      * @return array
      */
     private function findAccount(array $array, ?Account $defaultAccount): array
@@ -93,42 +87,18 @@ class Accounts extends AbstractTask
             Log::debug(sprintf('Default account is #%d ("%s")', $defaultAccount->id, $defaultAccount->name));
         }
 
-        $result = null;
-        // search ID
-        if (is_int($array['id']) && $array['id'] > 0) {
-            Log::debug('Find by ID field.');
-            $result = $this->findByField('id', (string)$array['id']);
-        }
-
-        // search name
-        if (null === $result && is_string($array['name']) && '' !== $array['name']) {
-            Log::debug('Find by name field.');
-            $result = $this->findByField('name', $array['name']);
-        }
-
-        // search IBAN
-        if (null === $result && is_string($array['iban']) && '' !== $array['iban']) {
-            Log::debug('Find by IBAN field.');
-            $result = $this->findByField('iban', $array['iban']);
-        }
-
-        // search number
-        if (null === $result && is_string($array['number']) && '' !== $array['number']) {
-            Log::debug('Find by account number field.');
-            $result = $this->findByField('number', $array['number']);
-        }
-        if (null !== $result) {
-            $return = $result->toArray();
-            Log::debug('Result of findByX is not null, returning:', $return);
-
-            return $return;
-        }
-
         Log::debug('Found no account or haven\'t searched for one.');
 
         // append an empty type to the array for consistency's sake.
         $array['type'] = $array['type'] ?? null;
         $array['bic']  = $array['bic'] ?? null;
+
+        // Return ID or name if not null
+        if (null !== $array['id'] || null !== $array['name']) {
+            Log::debug('Array with account has some info, return that.', $array);
+
+            return $array;
+        }
 
         // if the default account is not NULL, return that one instead:
         if (null !== $defaultAccount) {
@@ -140,67 +110,6 @@ class Accounts extends AbstractTask
         Log::debug('Default account is NULL, so will return: ', $array);
 
         return $array;
-    }
-
-    /**
-     * @param string $field
-     * @param string $value
-     *
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
-     * @return Account|null
-     */
-    private function findByField(string $field, string $value): ?Account
-    {
-        Log::debug(sprintf('Going to search account with "%s" "%s"', $field, $value));
-        $uri     = (string)config('csv_importer.uri');
-        $token   = (string)config('csv_importer.access_token');
-        $request = new GetSearchAccountRequest($uri, $token);
-        $request->setField($field);
-        $request->setQuery($value);
-        /** @var GetAccountsResponse $response */
-        $response = $request->get();
-        if (1 === count($response)) {
-            /** @var Account $account */
-            $account = $response->current();
-
-            // fall out when field search is for 'name' but name is not exact.
-            if (in_array($field, ['name', 'iban'], true) && $value !== $account->$field) {
-                Log::debug(sprintf('Found %s account #%d based on "%s" "%s" but no exact match so return NULL.', $account->type, $account->id, $field, $value));
-
-                return null;
-            }
-
-
-            Log::debug(sprintf('[a] Found %s account #%d based on "%s" "%s"', $account->type, $account->id, $field, $value));
-
-            return $account;
-        }
-        // if response is multiple:
-        if (count($response) > 1) {
-            Log::debug(sprintf('Found %d results searching for "%s" "%s"', count($response), $field, $value));
-
-            Log::debug('First loop and find exact:');
-            /** @var Account $row */
-            foreach ($response as $index => $row) {
-                if ($row->name === $value) {
-                    Log::debug(sprintf('Result #%d has exact name "%s", return it.', $index, $value));
-
-                    return $row;
-                }
-            }
-            Log::debug('No exact match found, return the first one.');
-
-            $response->rewind();
-            /** @var Account $account */
-            $account = $response->current();
-            Log::debug(sprintf('[b] Found %s account #%d based on "%s" "%s"', $account->type, $account->id, $field, $value));
-
-            return $account;
-        }
-        Log::debug('Found NOTHING.');
-
-        return null;
     }
 
     /**
@@ -286,7 +195,7 @@ class Accounts extends AbstractTask
      */
     private function processTransaction(array $transaction): array
     {
-        Log::debug('Now in processTransaction()');
+        Log::debug('Now in Accounts::processTransaction()');
 
         /*
          * Try to find the source and destination accounts in the transaction.
