@@ -81,7 +81,6 @@ class PseudoTransactionProcessor
         /** @var array $line */
         foreach ($lines as $index => $line) {
             $processed[] = $this->processPseudoLine($index, $line);
-            //sleep(1); // DEBUG
         }
         Log::info(sprintf('Done converting %d lines into transactions.', $count));
 
