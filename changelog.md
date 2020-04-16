@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.4] - 2020-04-16
+
+- [Issue 3266](https://github.com/firefly-iii/firefly-iii/issues/3266) Import loop due to bad bccomp call.
+- Some code cleanup.
+
 ## [1.0.3] - 2020-04-13
 
 - Fix issue with account selection.

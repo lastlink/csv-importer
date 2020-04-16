@@ -33,10 +33,12 @@ use App\Services\Import\ImportJobStatus\ImportJobStatus;
 use App\Services\Import\ImportJobStatus\ImportJobStatusManager;
 use App\Services\Import\ImportRoutineManager;
 use App\Services\Session\Constants;
+use ErrorException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Log;
-use ErrorException;
+use TypeError;
+
 
 /**
  * Class RunController
@@ -64,15 +66,8 @@ class RunController extends Controller
 
         // job ID may be in session:
         $identifier = session()->get(Constants::JOB_IDENTIFIER);
-        if(null !== $identifier) {
-            // create a new import job:
-            $routine    = new ImportRoutineManager($identifier);
-        }
-        if(null === $identifier) {
-            // create a new import job:
-            $routine    = new ImportRoutineManager();
-            $identifier = $routine->getIdentifier();
-        }
+        $routine    = new ImportRoutineManager($identifier);
+        $identifier = $routine->getIdentifier();
 
         Log::debug(sprintf('Import routine manager identifier is "%s"', $identifier));
 
@@ -80,7 +75,7 @@ class RunController extends Controller
         session()->put(Constants::JOB_IDENTIFIER, $identifier);
         Log::debug(sprintf('Stored "%s" under "%s"', $identifier, Constants::JOB_IDENTIFIER));
 
-        return view('import.run.index', compact('mainTitle', 'subTitle','identifier'));
+        return view('import.run.index', compact('mainTitle', 'subTitle', 'identifier'));
     }
 
     /**
@@ -102,10 +97,13 @@ class RunController extends Controller
             $routine->setConfiguration(Configuration::fromArray(session()->get(Constants::CONFIGURATION)));
             $routine->setReader(FileReader::getReaderFromSession());
             $routine->start();
-        } catch (ImportException|ErrorException $e) {
+        } catch (ImportException|ErrorException|TypeError $e) {
             // update job to error state.
             ImportJobStatusManager::setJobStatus(ImportJobStatus::JOB_ERRORED);
-            $importJobStatus->errors[] = $e->getMessage();
+            $error = sprintf('Internal error: %s in file %s:%d', $e->getMessage(), $e->getFile(), $e->getLine());
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            ImportJobStatusManager::addError($identifier, 0, $error);
 
             return response()->json($importJobStatus->toArray());
         }
