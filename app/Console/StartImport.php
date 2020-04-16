@@ -33,6 +33,7 @@ use Log;
  */
 trait StartImport
 {
+    use ManageMessages;
     /**
      * @param string $csv
      * @param array  $configuration
@@ -65,29 +66,9 @@ trait StartImport
         $warnings = $manager->getAllWarnings();
         $errors   = $manager->getAllErrors();
 
-        if (count($errors) > 0) {
-            foreach ($errors as $index => $error) {
-                foreach ($error as $line) {
-                    $this->error(sprintf('ERROR in line     #%d: %s', $index + 1, $line));
-                }
-            }
-        }
-
-        if (count($warnings) > 0) {
-            foreach ($warnings as $index => $warning) {
-                foreach ($warning as $line) {
-                    $this->warn(sprintf('Warning from line #%d: %s', $index + 1, $line));
-                }
-            }
-        }
-
-        if (count($messages) > 0) {
-            foreach ($messages as $index => $message) {
-                foreach ($message as $line) {
-                    $this->info(sprintf('Message from line #%d: %s', $index + 1, strip_tags($line)));
-                }
-            }
-        }
+        $this->listMessages('ERROR', $errors);
+        $this->listMessages('Warning', $warnings);
+        $this->listMessages('Message', $messages);
 
         return 0;
     }

@@ -100,8 +100,6 @@ class ConfigurationController extends Controller
             $mapping   = base64_encode(json_encode($configuration->getMapping(), JSON_THROW_ON_ERROR, 512));
         }
 
-        // update configuration with old values if present? TODO
-
         return view(
             'import.configuration.index',
             compact('mainTitle', 'subTitle', 'accounts', 'specifics', 'configuration', 'roles', 'mapping', 'doMapping')
@@ -133,7 +131,7 @@ class ConfigurationController extends Controller
         // store config on drive.
         $fromRequest   = $request->getAll();
         $configuration = Configuration::fromRequest($fromRequest);
-        $config = StorageService::storeContent(json_encode($configuration));
+        StorageService::storeContent(json_encode($configuration));
 
         session()->put(Constants::CONFIGURATION, $configuration->toArray());
 

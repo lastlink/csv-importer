@@ -32,6 +32,7 @@ use App\Services\CSV\Mapper\MapperService;
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
 use Illuminate\Http\Request;
+use InvalidArgumentException;
 use Log;
 use RuntimeException;
 
@@ -83,10 +84,9 @@ class MapController extends Controller
 
 
             // create the "mapper" class which will get data from Firefly III.
-            // TODO make a service
             $class = sprintf('App\\Services\\CSV\\Mapper\\%s', $info['mapper']);
             if (!class_exists($class)) {
-                throw new RuntimeException(sprintf('Class %s does not exist.', $class));
+                throw new InvalidArgumentException(sprintf('Class %s does not exist.', $class));
             }
             Log::debug(sprintf('Associated class is %s', $class));
 
@@ -101,7 +101,6 @@ class MapController extends Controller
             $data[$index] = $info;
         }
 
-        // TODO here we collect all the values from the CSV file.
         // get columns from file
         $content   = StorageService::getContent(session()->get(Constants::UPLOAD_CSV_FILE));
         $delimiter = (string) config(sprintf('csv_importer.delimiters.%s', $configuration->getDelimiter()));
