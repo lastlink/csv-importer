@@ -24,6 +24,8 @@ declare(strict_types=1);
 namespace App\Http\Request;
 
 
+use Illuminate\Validation\Validator;
+
 /**
  * Class RolesPostRequest
  */
@@ -69,6 +71,41 @@ class RolesPostRequest extends Request
             'roles.*'      => sprintf('required|in:%s', $keys),
             'do_mapping.*' => 'numeric|between:0,1',
         ];
+    }
+
+    /**
+     * Configure the validator instance with special rules for after the basic validation rules.
+     *
+     * @param Validator $validator
+     *
+     * @return void
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(
+            function (Validator $validator) {
+                // validate all account info
+                $this->validateAmountRole($validator);
+            }
+        );
+    }
+
+    /**
+     * @param Validator $validator
+     */
+    protected function validateAmountRole(Validator $validator): void
+    {
+        $data  = $validator->getData();
+        $roles = $data['roles'] ?? [];
+        $count = 0;
+        foreach ($roles as $role) {
+            if (in_array($role, ['amount', 'amount_negated', 'amount_debit', 'amount_credit'], true)) {
+                $count++;
+            }
+        }
+        if (0 === $count) {
+            $validator->errors()->add('roles.0', 'The import will fail if no column is assigned an "Amount"-role.');
+        }
     }
 
 }
