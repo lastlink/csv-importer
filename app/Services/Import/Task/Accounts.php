@@ -211,17 +211,24 @@ class Accounts extends AbstractTask
         /*
          * First, set source and destination in the transaction array:
          */
-        $transaction           = $this->setSource($transaction, $source);
-        $transaction           = $this->setDestination($transaction, $destination);
-        $transaction['type']   = $this->determineType($source['type'], $destination['type']);
+        $transaction         = $this->setSource($transaction, $source);
+        $transaction         = $this->setDestination($transaction, $destination);
+        $transaction['type'] = $this->determineType($source['type'], $destination['type']);
+
+        $amount = (string) $transaction['amount'];
+        $amount = '' === $amount ? '0' : $amount;
+
+        if('0'===$amount) {
+            Log::error('Amount is ZERO. This will give trouble further down the line.');
+        }
 
         /*
          * If the amount is positive, the transaction is a deposit. We switch Source
          * and Destination and see if we can still handle the transaction:
          */
-        if (1 === bccomp($transaction['amount'], '0')) {
+        if (1 === bccomp($amount, '0')) {
             // amount is positive
-            Log::debug(sprintf('%s is positive.', $transaction['amount']));
+            Log::debug(sprintf('%s is positive.', $amount));
             $transaction         = $this->setSource($transaction, $destination);
             $transaction         = $this->setDestination($transaction, $source);
             $transaction['type'] = $this->determineType($destination['type'], $source['type']);

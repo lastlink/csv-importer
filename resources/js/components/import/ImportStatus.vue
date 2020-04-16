@@ -72,7 +72,7 @@
                 </div>
                 <div class="card-body" v-if="'job_errored' === this.status">
                     <p class="text-danger">
-                        The job could not be started or failed due to an error. Please check the log files. Sorry about this :(.
+                        The job could not be started, or failed due to an error. Please check the log files. Sorry about this :(.
                     </p>
                     <import-messages
                             :messages="this.messages"
@@ -131,6 +131,7 @@
                     }
                     if('job_errored' === this.status) {
                         console.error('Job is kill.');
+                        console.error(response.data);
                         return;
                     }
 
