@@ -231,9 +231,7 @@ class Amount implements ConverterInterface
         $value = str_replace($search, '', $value);
 
         /** @noinspection CascadeStringReplacementInspection */
-        $value = str_replace(',', '.', $value);
-
-        return $value;
+        return str_replace(',', '.', $value);
     }
 
     /**

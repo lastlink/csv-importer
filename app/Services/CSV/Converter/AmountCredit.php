@@ -40,9 +40,7 @@ class AmountCredit implements ConverterInterface
         /** @var ConverterInterface $converter */
         $converter = app(Amount::class);
         $result    = $converter->convert($value);
-        $result    = Amount::positive($result);
-
-        return $result;
+        return Amount::positive($result);
     }
     /**
      * Add extra configuration parameters.

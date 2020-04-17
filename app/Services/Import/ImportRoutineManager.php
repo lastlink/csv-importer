@@ -184,12 +184,12 @@ class ImportRoutineManager
         $disk  = Storage::disk('jobs');
         $count = 0;
         do {
-            $identifier = Str::random(16);
+            $generatedId = Str::random(16);
             $count++;
-            Log::debug(sprintf('Attempt #%d results in "%s"', $count, $identifier));
-        } while ($count < 30 && $disk->exists($identifier));
-        $this->identifier = $identifier;
-        Log::info(sprintf('Job identifier is "%s"', $identifier));
+            Log::debug(sprintf('Attempt #%d results in "%s"', $count, $generatedId));
+        } while ($count < 30 && $disk->exists($generatedId));
+        $this->identifier = $generatedId;
+        Log::info(sprintf('Job identifier is "%s"', $generatedId));
     }
 
     /**

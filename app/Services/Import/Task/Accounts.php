@@ -187,8 +187,6 @@ class Accounts extends AbstractTask
     }
 
     /**
-     * // TODO add warning when falling back on the default account.
-     *
      * @param array $transaction
      *
      * @return array

@@ -27,12 +27,12 @@ use App\Exceptions\ImportException;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Specifics\SpecificService;
 use App\Services\Import\Support\ProgressInformation;
+use InvalidArgumentException;
 use League\Csv\Exception;
 use League\Csv\Reader;
 use League\Csv\ResultSet;
 use League\Csv\Statement;
 use Log;
-use RuntimeException;
 
 /**
  * Class CSVFileProcessor
@@ -99,7 +99,7 @@ class CSVFileProcessor
             $records = $stmt->process($this->reader);
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            throw new RuntimeException($e->getMessage());
+            throw new InvalidArgumentException($e->getMessage());
         }
 
         return $this->processCSVLines($records);
@@ -142,7 +142,7 @@ class CSVFileProcessor
         $count          = $records->count();
         Log::info(sprintf('Now in %s with %d records', __METHOD__, $count));
         $currentIndex = 1;
-        foreach ($records as $index => $line) {
+        foreach ($records as $line) {
             $line = $this->sanitize($line);
             Log::debug(sprintf('Parsing line %d/%d', $currentIndex, $count));
             $line             = SpecificService::runSpecifics($line, $this->specifics);
@@ -200,9 +200,7 @@ class CSVFileProcessor
         $lineValues = array_values($line);
         array_walk(
             $lineValues, static function ($element) {
-            $element = trim(str_replace('&nbsp;', ' ', (string)$element));
-
-            return $element;
+            return trim(str_replace('&nbsp;', ' ', (string) $element));
         }
         );
 

@@ -26,11 +26,11 @@ namespace App\Services\CSV\Roles;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Specifics\SpecificInterface;
 use App\Services\CSV\Specifics\SpecificService;
+use InvalidArgumentException;
 use League\Csv\Exception;
 use League\Csv\Reader;
 use League\Csv\Statement;
 use Log;
-use RuntimeException;
 
 /**
  * Class RoleService
@@ -54,11 +54,12 @@ class RoleService
         // configure reader:
         $delimiter = $configuration->getDelimiter();
         switch($delimiter) {
-            case 'semicolon':
-                $reader->setDelimiter(';');
-                break;
+            default:
             case 'comma':
                 $reader->setDelimiter(',');
+                break;
+            case 'semicolon':
+                $reader->setDelimiter(';');
                 break;
             case 'tab':
                 $reader->setDelimiter("\t");
@@ -74,7 +75,7 @@ class RoleService
                 // @codeCoverageIgnoreStart
             } catch (Exception $e) {
                 Log::error($e->getMessage());
-                throw new RuntimeException($e->getMessage());
+                throw new InvalidArgumentException($e->getMessage());
             }
             // @codeCoverageIgnoreEnd
             Log::debug('Detected file headers:', $headers);
@@ -91,7 +92,7 @@ class RoleService
                 // @codeCoverageIgnoreStart
             } catch (Exception $e) {
                 Log::error($e->getMessage());
-                throw new RuntimeException($e->getMessage());
+                throw new InvalidArgumentException($e->getMessage());
             }
         }
 
@@ -123,12 +124,13 @@ class RoleService
 
         // configure reader:
         $delimiter = $configuration->getDelimiter();
-        switch($delimiter) {
-            case 'semicolon':
-                $reader->setDelimiter(';');
-                break;
+        switch ($delimiter) {
+            default:
             case 'comma':
                 $reader->setDelimiter(',');
+                break;
+            case 'semicolon':
+                $reader->setDelimiter(';');
                 break;
             case 'tab':
                 $reader->setDelimiter("\t");
@@ -143,7 +145,7 @@ class RoleService
             // @codeCoverageIgnoreStart
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            throw new RuntimeException($e->getMessage());
+            throw new InvalidArgumentException($e->getMessage());
         }
         // @codeCoverageIgnoreEnd
 

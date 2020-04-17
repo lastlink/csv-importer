@@ -516,12 +516,12 @@ return [
         'account-iban'          => 'source_iban',
         'account-name'          => 'source_name',
         'account-number'        => 'source_number',
-        'account-bic'           => 'source_bic', // TODO not present in API.
+        'account-bic'           => 'source_bic',
         'opposing-id'           => 'destination_id',
         'opposing-iban'         => 'destination_iban',
         'opposing-name'         => 'destination_name',
         'opposing-number'       => 'destination_number',
-        'opposing-bic'          => 'destination_bic', // TODO not present in API.
+        'opposing-bic'          => 'destination_bic',
         'sepa_cc'               => 'sepa_cc',
         'sepa_ct_op'            => 'sepa_ct_op',
         'sepa_ct_id'            => 'sepa_ct_id',
@@ -554,8 +554,8 @@ return [
         'external-id'           => 'external_id',
         'internal_reference'    => 'internal_reference',
         'original-source'       => 'original_source',
-        'tags-comma'            => 'tags_comma', // TODO needs extra conversion
-        'tags-space'            => 'tags_space', // TODO needs extra conversion
+        'tags-comma'            => 'tags_comma',
+        'tags-space'            => 'tags_space',
         'date_transaction'      => 'date',
         'date_interest'         => 'interest_date',
         'date_book'             => 'book_date',

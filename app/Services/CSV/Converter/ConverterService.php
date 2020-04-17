@@ -25,6 +25,7 @@ namespace App\Services\CSV\Converter;
 
 use RuntimeException;
 use Log;
+use UnexpectedValueException;
 
 /**
  * Class ConverterService
@@ -53,7 +54,7 @@ class ConverterService
 
             return $object->convert($value);
         }
-        throw new RuntimeException(sprintf('No such converter: "%s"', $class));
+        throw new UnexpectedValueException(sprintf('No such converter: "%s"', $class));
     }
 
     /**

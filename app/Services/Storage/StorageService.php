@@ -26,6 +26,7 @@ namespace App\Services\Storage;
 use RuntimeException;
 use Storage;
 use Str;
+use UnexpectedValueException;
 
 /**
  * Class StorageService
@@ -57,7 +58,7 @@ class StorageService
         if ($disk->exists($name)) {
             return $disk->get($name);
         }
-        throw new RuntimeException(sprintf('No such file %s', $name));
+        throw new UnexpectedValueException(sprintf('No such file %s', $name));
     }
 
 }
