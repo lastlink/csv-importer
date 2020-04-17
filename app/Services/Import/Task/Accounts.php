@@ -24,6 +24,8 @@ declare(strict_types=1);
 namespace App\Services\Import\Task;
 
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
+use GrumpyDictator\FFIIIApiSupport\Request\GetSearchAccountRequest;
+use GrumpyDictator\FFIIIApiSupport\Response\GetAccountsResponse;
 use Log;
 
 /**
@@ -87,6 +89,19 @@ class Accounts extends AbstractTask
             Log::debug(sprintf('Default account is #%d ("%s")', $defaultAccount->id, $defaultAccount->name));
         }
 
+        $result = null;
+        // if the ID is set, at least search for the ID.
+        if (is_int($array['id']) && $array['id'] > 0) {
+            Log::debug('Find by ID field.');
+            $result = $this->findById((string) $array['id']);
+        }
+        if (null !== $result) {
+            $return = $result->toArray();
+            Log::debug('Result of findById is not null, returning:', $return);
+
+            return $return;
+        }
+
         Log::debug('Found no account or haven\'t searched for one.');
 
         // append an empty type to the array for consistency's sake.
@@ -145,6 +160,36 @@ class Accounts extends AbstractTask
             'bic'              => $transaction['source_bic'] ?? null,
         ];
     }
+
+    /**
+     * @param string $value
+     *
+     * @return Account|null
+     */
+    private function findById(string $value): ?Account
+    {
+        Log::debug(sprintf('Going to search account with ID "%s"', $value));
+        $uri     = (string) config('csv_importer.uri');
+        $token   = (string) config('csv_importer.access_token');
+        $request = new GetSearchAccountRequest($uri, $token);
+        $request->setField('id');
+        $request->setQuery($value);
+        /** @var GetAccountsResponse $response */
+        $response = $request->get();
+        if (1 === count($response)) {
+            /** @var Account $account */
+            $account = $response->current();
+
+            Log::debug(sprintf('[a] Found %s account #%d based on ID "%s"', $account->type, $account->id, $value));
+
+            return $account;
+        }
+
+        Log::debug('Found NOTHING.');
+
+        return null;
+    }
+
 
     /**
      * @param array $transaction

@@ -37,6 +37,10 @@ class AmountDebit implements ConverterInterface
      */
     public function convert($value): string
     {
+        if (null === $value || '' === $value) {
+            return '';
+        }
+        
         /** @var ConverterInterface $converter */
         $converter = app(Amount::class);
         $result    = $converter->convert($value);

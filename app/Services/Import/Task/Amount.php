@@ -56,22 +56,22 @@ class Amount extends AbstractTask
     {
         Log::debug(sprintf('Now at the start of processAmount("%s")', $transaction['amount']));
         $amount = null;
-        if (null === $amount && array_key_exists('amount', $transaction) && null !== $transaction['amount']) {
+        if (null === $amount && array_key_exists('amount', $transaction) && '' !== (string)$transaction['amount']) {
             Log::debug('Transaction["amount"] value is not NULL, assume this is the correct value.');
             $amount = $transaction['amount'];
         }
 
-        if (null === $amount && array_key_exists('amount_debit', $transaction) && null !== $transaction['amount_debit']) {
+        if (null === $amount && array_key_exists('amount_debit', $transaction) && '' !== (string)$transaction['amount_debit']) {
             Log::debug('Transaction["amount_debit"] value is not NULL, assume this is the correct value.');
             $amount = $transaction['amount_debit'];
         }
 
-        if (null === $amount && array_key_exists('amount_credit', $transaction) && null !== $transaction['amount_credit']) {
+        if (null === $amount && array_key_exists('amount_credit', $transaction) && '' !== (string)$transaction['amount_credit']) {
             Log::debug('Transaction["amount_credit"] value is not NULL, assume this is the correct value.');
             $amount = $transaction['amount_credit'];
         }
 
-        if (null === $amount && array_key_exists('amount_negated', $transaction) && null !== $transaction['amount_negated']) {
+        if (null === $amount && array_key_exists('amount_negated', $transaction) && '' !== (string)$transaction['amount_negated']) {
             Log::debug('Transaction["amount_negated"] value is not NULL, assume this is the correct value.');
             $amount = $transaction['amount_negated'];
         }

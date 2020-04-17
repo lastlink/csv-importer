@@ -349,6 +349,14 @@ class Configuration
     }
 
     /**
+     * @return bool
+     */
+    public function isRules(): bool
+    {
+        return $this->rules;
+    }
+
+    /**
      * @return array
      */
     public function getDoMapping(): array
