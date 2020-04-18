@@ -39,26 +39,6 @@ use Log;
 class Request extends FormRequest
 {
     /**
-     * @param $array
-     *
-     * @return array|null
-     */
-    public function arrayFromValue($array): ?array
-    {
-        if (is_array($array)) {
-            return $array;
-        }
-        if (null === $array) {
-            return null;
-        }
-        if (is_string($array)) {
-            return explode(',', $array);
-        }
-
-        return null;
-    }
-
-    /**
      * @param string $value
      *
      * @return bool
@@ -68,47 +48,11 @@ class Request extends FormRequest
         if (null === $value) {
             return false;
         }
-        if ('true' === $value) {
-            return true;
-        }
-        if ('yes' === $value) {
-            return true;
-        }
-        if (1 === $value) {
-            return true;
-        }
-        if ('1' === $value) {
-            return true;
-        }
-        if (true === $value) {
+        if (in_array(trim($value), ['true', 'yes', '1'], true)) {
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * @param string|null $string
-     *
-     * @return Carbon|null
-     */
-    public function dateFromValue(?string $string): ?Carbon
-    {
-        if (null === $string) {
-            return null;
-        }
-        if ('' === $string) {
-            return null;
-        }
-        try {
-            $carbon = new Carbon($string);
-        } catch (Exception $e) {
-            Log::debug(sprintf('Invalid date: %s: %s', $string, $e->getMessage()));
-
-            return null;
-        }
-
-        return $carbon;
     }
 
     /**
@@ -244,42 +188,4 @@ class Request extends FormRequest
 
         return $result;
     }
-
-    /**
-     * Return date time or NULL.
-     *
-     * @param string $field
-     *
-     * @return Carbon|null
-     */
-    protected function dateTime(string $field): ?Carbon
-    {
-        if (null === $this->get($field)) {
-            return null;
-        }
-        $value = (string)$this->get($field);
-        if (10 === strlen($value)) {
-            // probably a date format.
-            try {
-                $result = Carbon::createFromFormat('Y-m-d', $value);
-            } catch (InvalidDateException $e) {
-                Log::error(sprintf('"%s" is not a valid date: %s', $value, $e->getMessage()));
-
-                return null;
-            }
-
-            return $result;
-        }
-        // is an atom string, I hope?
-        try {
-            $result = Carbon::parse($value);
-        } catch (InvalidDateException $e) {
-            Log::error(sprintf('"%s" is not a valid date or time: %s', $value, $e->getMessage()));
-
-            return null;
-        }
-
-        return $result;
-    }
-
 }

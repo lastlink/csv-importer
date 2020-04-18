@@ -329,17 +329,20 @@ class Accounts extends AbstractTask
         Log::debug(sprintf('Now in determineType("%s", "%s")', $sourceType, $destinationType));
         if (null === $sourceType && null === $destinationType) {
             Log::debug('Return withdrawal, both are NULL');
+
             return 'withdrawal';
         }
 
         // if source is a asset and dest is NULL, its a withdrawal
         if ('asset' === $sourceType && null === $destinationType) {
             Log::debug('Return withdrawal, source is asset');
+
             return 'withdrawal';
         }
         // if destination is asset and source is NULL, its a deposit
-        if(null === $sourceType && 'asset' === $destinationType){
+        if (null === $sourceType && 'asset' === $destinationType) {
             Log::debug('Return deposit, dest is asset');
+
             return 'deposit';
         }
 

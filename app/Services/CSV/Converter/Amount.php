@@ -68,12 +68,10 @@ class Amount implements ConverterInterface
      */
     public function convert($value): string
     {
-        if (null === $value) {
+        if (null === $value || '' === $value) {
             return '0';
         }
-        if('' === $value) {
-            return '0';
-        }
+
         Log::debug(sprintf('Start with amount "%s"', $value));
         $original = $value;
         $value    = $this->stripAmount((string)$value);

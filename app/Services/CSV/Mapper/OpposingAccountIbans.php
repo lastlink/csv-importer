@@ -23,46 +23,21 @@ declare(strict_types=1);
 
 namespace App\Services\CSV\Mapper;
 
-use GrumpyDictator\FFIIIApiSupport\Model\Account;
-use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
-use Log;
-
 /**
  * Class OpposingAccountIbans
  */
 class OpposingAccountIbans implements MapperInterface
 {
+    use GetAccounts;
 
     /**
-     * TODO very duplicate with AssetAccountIbans.
-     *
      * Get map of objects.
      *
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
+     * @throws \App\Exceptions\ImportException
      * @return array
      */
     public function getMap(): array
     {
-        Log::debug('Now in OpposingAccountIbans');
-        $result = [];
-        $uri     = (string)config('csv_importer.uri');
-        $token   = (string)config('csv_importer.access_token');
-        // get list of asset accounts:
-        $request = new GetAccountsRequest($uri, $token);
-        $request->setType(GetAccountsRequest::ALL);
-        $response = $request->get();
-        /** @var Account $account */
-        foreach ($response as $account) {
-            if (null !== $account->iban) {
-                $name = sprintf('%s (%s)', $account->iban, $account->name);
-                // add optgroup to result:
-                $group                        = trans(sprintf('import.account_types_%s', $account->type));
-                $result[$group]               = $result[$group] ?? [];
-                $result[$group][$account->id] = $name;
-            }
-
-        }
-
-        return $result;
+        return $this->mergeWithIBAN($this->getAllAccounts());
     }
 }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * import.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -78,6 +80,7 @@ return [
     'column_internal_reference'     => 'Internal reference',
     'account_types_asset'           => 'Asset accounts',
     'account_types_liabilities'     => 'Liabilities',
-    'account_types_revenue'     => 'Revenue accounts',
-    'account_types_expense'     => 'Expense accounts',
+    'account_types_revenue'         => 'Revenue accounts',
+    'account_types_expense'         => 'Expense accounts',
+    'account_types_cash'            => 'Cash accounts',
 ];

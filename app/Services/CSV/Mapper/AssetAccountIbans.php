@@ -24,57 +24,22 @@ declare(strict_types=1);
 namespace App\Services\CSV\Mapper;
 
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
-use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
 
 /**
  * Class AssetAccountIbans
  */
 class AssetAccountIbans implements MapperInterface
 {
+    use GetAccounts;
 
     /**
-     * TODO very duplicate with AssetAccounts
      * Get map of objects.
      *
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
+     * @throws \App\Exceptions\ImportException
      * @return array
      */
     public function getMap(): array
     {
-        $result = [];
-        // get list of asset accounts:
-        $uri     = (string)config('csv_importer.uri');
-        $token   = (string)config('csv_importer.access_token');
-        $request = new GetAccountsRequest($uri, $token);
-        $request->setType(GetAccountsRequest::ASSET);
-        $response = $request->get();
-        /** @var Account $account */
-        foreach ($response as $account) {
-            if (null !== $account->iban) {
-                $name = sprintf('%s (%s)', $account->iban, $account->name);
-                // add optgroup to result:
-                $group                        = trans(sprintf('import.account_types_%s', $account->type));
-                $result[$group]               = $result[$group] ?? [];
-                $result[$group][$account->id] = $name;
-            }
-
-        }
-
-        // get list of liabilities.
-        $request = new GetAccountsRequest($uri, $token);
-        $request->setType(GetAccountsRequest::LIABILITIES);
-        $response = $request->get();
-        /** @var Account $account */
-        foreach ($response as $account) {
-            if (null !== $account->iban) {
-                $name = sprintf('%s (%s)', $account->iban, $account->name);
-                // add optgroup to result:
-                $group                        = trans(sprintf('import.account_types_%s', $account->type));
-                $result[$group]               = $result[$group] ?? [];
-                $result[$group][$account->id] = $name;
-            }
-        }
-
-        return $result;
+        return $this->mergeWithIBAN($this->getAssetAccounts());
     }
 }
