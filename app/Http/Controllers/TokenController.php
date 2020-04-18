@@ -57,7 +57,7 @@ class TokenController extends Controller
         // 0 = OK (same version)
         // 1 = NOK (too low a version)
 
-        $minimum = config('csv_importer.minimum_version');
+        $minimum = (string) config('csv_importer.minimum_version');
         $compare = version_compare($minimum, $result->version);
         if (1 === $compare) {
             $errorMessage = sprintf(
@@ -84,6 +84,7 @@ class TokenController extends Controller
         $isError      = false;
         $result       = null;
         $compare      = 1;
+        $minimum      = '';
         try {
             /** @var SystemInformationResponse $result */
             $result = $request->get();

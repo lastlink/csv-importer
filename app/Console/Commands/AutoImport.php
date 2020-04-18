@@ -68,7 +68,7 @@ class AutoImport extends Command
             return 1;
         }
 
-        $this->directory = $this->argument('directory') ?? './';
+        $this->directory = (string) ($this->argument('directory') ?? './');
         $this->line(sprintf('Going to automatically import everything found in %s', $this->directory));
 
         $files = $this->getFiles();
@@ -111,7 +111,13 @@ class AutoImport extends Command
 
             return [];
         }
-        $files  = array_diff(scandir($this->directory), self::IGNORE);
+        $array = scandir($this->directory);
+        if (!is_array($array)) {
+            $this->error(sprintf('Directory "%s" is empty or invalid.', $this->directory));
+
+            return [];
+        }
+        $files  = array_diff($array, self::IGNORE);
         $return = [];
         foreach ($files as $file) {
             if ('csv' === $this->getExtension($file) && $this->hasJsonConfiguration($file)) {

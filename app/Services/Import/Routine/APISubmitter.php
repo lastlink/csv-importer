@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Services\Import\Routine;
 
+use App\Exceptions\ImportException;
 use App\Services\Import\Support\ProgressInformation;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Transaction;
@@ -41,8 +42,6 @@ class APISubmitter
 
     /**
      * @param array $lines
-     *
-     * @throws ApiHttpException
      */
     public function processTransactions(array $lines): void
     {
@@ -54,7 +53,6 @@ class APISubmitter
          */
         foreach ($lines as $index => $line) {
             $this->processTransaction($index, $line);
-            //sleep(1); // DEBUG
         }
         Log::info(sprintf('Done submitting %d transactions to your Firefly III instance.', $count));
     }
@@ -63,8 +61,6 @@ class APISubmitter
      * @param int              $lineIndex
      * @param array            $line
      * @param TransactionGroup $group
-     *
-     * @throws \JsonException
      */
     private function compareArrays(int $lineIndex, array $line, TransactionGroup $group): void
     {
@@ -102,18 +98,25 @@ class APISubmitter
     /**
      * @param int   $index
      * @param array $line
-     *
-     * @throws ApiHttpException
-     * @throws \JsonException
      */
     private function processTransaction(int $index, array $line): void
     {
-        $uri     = (string)config('csv_importer.uri');
-        $token   = (string)config('csv_importer.access_token');
+        $uri     = (string) config('csv_importer.uri');
+        $token   = (string) config('csv_importer.access_token');
         $request = new PostTransactionRequest($uri, $token);
         Log::debug('Submitting to Firefly III:', $line);
         $request->setBody($line);
-        $response = $request->post();
+
+        try {
+            $response = $request->post();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            $message = sprintf(sprintf('Submission HTTP error: %s', $e->getMessage()));
+            $this->addError($index, $message);
+            return;
+        }
+
         if ($response instanceof ValidationErrorResponse) {
             foreach ($response->errors->messages() as $key => $errors) {
                 Log::error(sprintf('Submission error: %d', $key), $errors);
@@ -124,6 +127,7 @@ class APISubmitter
                     Log::error($msg);
                 }
             }
+            return;
         }
 
         if ($response instanceof PostTransactionResponse) {

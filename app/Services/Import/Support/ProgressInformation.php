@@ -51,8 +51,6 @@ trait ProgressInformation
     /**
      * @param int    $index
      * @param string $error
-     *
-     * @throws JsonException
      */
     protected function addError(int $index, string $error): void
     {
@@ -67,8 +65,6 @@ trait ProgressInformation
     /**
      * @param int    $index
      * @param string $message
-     *
-     * @throws JsonException
      */
     protected function addMessage(int $index, string $message): void
     {
@@ -83,8 +79,6 @@ trait ProgressInformation
     /**
      * @param int    $index
      * @param string $warning
-     *
-     * @throws JsonException
      */
     protected function addWarning(int $index, string $warning): void
     {

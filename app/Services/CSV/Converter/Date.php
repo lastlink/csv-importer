@@ -46,11 +46,10 @@ class Date implements ConverterInterface
     public function convert($value)
     {
         $string = app('steam')->cleanStringAndNewlines($value);
-
-        /** @var Carbon $carbon */
-
+        $carbon = null;
         if ('' === $string) {
             Log::warning('Empty date string, so date is set to today.');
+            /** @var Carbon $carbon */
             $carbon = Carbon::today();
         }
         if ('' !== $string) {
