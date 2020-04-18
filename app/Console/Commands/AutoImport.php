@@ -27,6 +27,7 @@ use App\Console\HaveAccess;
 use App\Console\StartImport;
 use App\Console\VerifyJSON;
 use Illuminate\Console\Command;
+use JsonException;
 
 /**
  * Class AutoImport
@@ -55,6 +56,7 @@ class AutoImport extends Command
     /**
      * Execute the console command.
      *
+     * @throws JsonException
      * @return int
      */
     public function handle(): int
@@ -141,6 +143,8 @@ class AutoImport extends Command
 
     /**
      * @param string $file
+     *
+     * @throws JsonException
      */
     private function importFile(string $file): void
     {
@@ -172,6 +176,8 @@ class AutoImport extends Command
 
     /**
      * @param array $files
+     *
+     * @throws JsonException
      */
     private function importFiles(array $files): void
     {

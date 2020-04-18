@@ -25,6 +25,7 @@ namespace App\Services\Import\ImportJobStatus;
 
 use App\Services\Session\Constants;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use JsonException;
 use Log;
 use Storage;
 
@@ -36,6 +37,8 @@ class ImportJobStatusManager
     /**
      * @param string $identifier
      *
+     * @throws JsonException
+     * @throws JsonException
      * @return ImportJobStatus
      */
     public static function startOrFindJob(string $identifier): ImportJobStatus
@@ -66,6 +69,9 @@ class ImportJobStatusManager
      * @param string $identifier
      * @param int    $index
      * @param string $error
+     *
+     * @throws JsonException
+     * @throws JsonException
      */
     public static function addError(string $identifier, int $index, string $error): void
     {
@@ -86,6 +92,9 @@ class ImportJobStatusManager
      * @param string $identifier
      * @param int    $index
      * @param string $warning
+     *
+     * @throws JsonException
+     * @throws JsonException
      */
     public static function addWarning(string $identifier, int $index, string $warning): void
     {
@@ -106,6 +115,9 @@ class ImportJobStatusManager
      * @param string $identifier
      * @param int    $index
      * @param string $message
+     *
+     * @throws JsonException
+     * @throws JsonException
      */
     public static function addMessage(string $identifier, int $index, string $message): void
     {
@@ -126,6 +138,8 @@ class ImportJobStatusManager
     /**
      * @param string $status
      *
+     * @throws JsonException
+     * @throws JsonException
      * @return ImportJobStatus
      */
     public static function setJobStatus(string $status): ImportJobStatus
@@ -145,6 +159,8 @@ class ImportJobStatusManager
     /**
      * @param string          $identifier
      * @param ImportJobStatus $status
+     *
+     * @throws JsonException
      */
     private static function storeJobStatus(string $identifier, ImportJobStatus $status): void
     {

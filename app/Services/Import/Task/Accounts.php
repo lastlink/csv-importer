@@ -23,6 +23,10 @@ declare(strict_types=1);
 
 namespace App\Services\Import\Task;
 
+use App\Exceptions\ApiHttpException;
+use App\Exceptions\ImportException;
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException;
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException as GrumpyApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
 use GrumpyDictator\FFIIIApiSupport\Request\GetSearchAccountRequest;
 use GrumpyDictator\FFIIIApiSupport\Response\GetAccountsResponse;
@@ -37,7 +41,6 @@ class Accounts extends AbstractTask
     /**
      * @param array $group
      *
-     * @throws \App\Exceptions\ApiHttpException
      * @return array
      */
     public function process(array $group): array
@@ -77,6 +80,7 @@ class Accounts extends AbstractTask
      *
      * @param Account|null $defaultAccount
      *
+     * @throws ImportException
      * @return array
      */
     private function findAccount(array $array, ?Account $defaultAccount): array
@@ -164,6 +168,7 @@ class Accounts extends AbstractTask
     /**
      * @param string $value
      *
+     * @throws ImportException
      * @return Account|null
      */
     private function findById(string $value): ?Account
@@ -175,10 +180,18 @@ class Accounts extends AbstractTask
         $request->setField('id');
         $request->setQuery($value);
         /** @var GetAccountsResponse $response */
-        $response = $request->get();
+        try {
+            $response = $request->get();
+        } catch (GrumpyApiHttpException $e) {
+            throw new ImportException($e->getMessage());
+        }
         if (1 === count($response)) {
             /** @var Account $account */
-            $account = $response->current();
+            try {
+                $account = $response->current();
+            } catch (ApiException $e) {
+                throw new ImportException($e->getMessage());
+            }
 
             Log::debug(sprintf('[a] Found %s account #%d based on ID "%s"', $account->type, $account->id, $value));
 

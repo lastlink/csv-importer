@@ -29,8 +29,11 @@ use App\Http\Middleware\UploadedFiles;
 use App\Services\CSV\Configuration\ConfigFileProcessor;
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\MessageBag;
+use JsonException;
 use Log;
 
 /**
@@ -50,7 +53,8 @@ class UploadController extends Controller
     /**
      * @param Request $request
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @throws JsonException
+     * @return RedirectResponse|Redirector
      */
     public function upload(Request $request)
     {

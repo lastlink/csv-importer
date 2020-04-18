@@ -31,7 +31,10 @@ use App\Services\CSV\Mapper\MapperInterface;
 use App\Services\CSV\Mapper\MapperService;
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use InvalidArgumentException;
 use Log;
 use RuntimeException;
@@ -53,7 +56,9 @@ class MapController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws \League\Csv\Exception
+     * @return Factory|View
      */
     public function index()
     {
@@ -112,9 +117,9 @@ class MapController extends Controller
     /**
      * @param Request $request
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public function postIndex(Request $request)
+    public function postIndex(Request $request): RedirectResponse
     {
         $values  = $request->get('values') ?? [];
         $mapping = $request->get('mapping') ?? [];

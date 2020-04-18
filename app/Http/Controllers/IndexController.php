@@ -23,6 +23,10 @@
 declare(strict_types=1);
 
 namespace App\Http\Controllers;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
+use Illuminate\View\View;
 use Log;
 use Artisan;
 use Steam;
@@ -42,7 +46,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index()
     {
@@ -51,7 +55,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return RedirectResponse|Redirector
      */
     public function flush()
     {

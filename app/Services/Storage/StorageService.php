@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Services\Storage;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use RuntimeException;
 use Storage;
 use Str;
@@ -50,6 +51,7 @@ class StorageService
     /**
      * @param string $name
      *
+     * @throws FileNotFoundException
      * @return string
      */
     public static function getContent(string $name): string

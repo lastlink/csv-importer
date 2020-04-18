@@ -46,9 +46,9 @@ class ConfigurationPostRequest extends Request
      */
     public function getAll(): array
     {
-        $roles     = $this->get('roles') ? json_decode(base64_decode($this->get('roles')), true) : null;
-        $mapping   = $this->get('mapping') ? json_decode(base64_decode($this->get('mapping')), true) : null;
-        $doMapping = $this->get('do_mapping') ? json_decode(base64_decode($this->get('do_mapping')), true) : null;
+        $roles     = $this->get('roles') ? json_decode(base64_decode($this->get('roles')), true, 512, JSON_THROW_ON_ERROR) : null;
+        $mapping   = $this->get('mapping') ? json_decode(base64_decode($this->get('mapping')), true, 512, JSON_THROW_ON_ERROR) : null;
+        $doMapping = $this->get('do_mapping') ? json_decode(base64_decode($this->get('do_mapping')), true, 512, JSON_THROW_ON_ERROR) : null;
 
 
         $result = [

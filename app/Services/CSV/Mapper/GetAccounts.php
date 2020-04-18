@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace App\Services\CSV\Mapper;
 
 use App\Exceptions\ImportException;
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
 use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
 use GrumpyDictator\FFIIIApiSupport\Response\GetAccountsResponse;
@@ -38,6 +39,7 @@ trait GetAccounts
      * Returns a combined list of asset accounts and all liability accounts.
      *
      * @throws ImportException
+     * @throws ApiHttpException
      * @return array
      */
     protected function getAllAccounts(): array
@@ -67,6 +69,8 @@ trait GetAccounts
      * Returns a combined list of asset accounts and all liability accounts.
      *
      * @throws ImportException
+     * @throws ApiHttpException
+     * @throws ApiHttpException
      * @return array
      */
     protected function getAssetAccounts(): array

@@ -204,7 +204,7 @@ class ColumnValueConverter
     private function toString($value): string
     {
         if (is_array($value)) {
-            return json_encode($value);
+            return json_encode($value, JSON_THROW_ON_ERROR, 512);
         }
 
         return (string)$value;

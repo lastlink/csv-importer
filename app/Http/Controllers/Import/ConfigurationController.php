@@ -32,10 +32,15 @@ use App\Services\CSV\Specifics\SpecificService;
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
 use Carbon\Carbon;
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
 use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+use JsonException;
 use Log;
 
 /**
@@ -54,8 +59,11 @@ class ConfigurationController extends Controller
     }
 
     /**
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     * @throws ApiHttpException
+     * @throws JsonException
+     * @throws JsonException
+     * @throws JsonException
+     * @return Factory|RedirectResponse|View
      */
     public function index()
     {
@@ -117,21 +125,22 @@ class ConfigurationController extends Controller
         $format = $request->get('format');
         $date   = Carbon::make('1984-09-17');
 
+        /** @noinspection NullPointerExceptionInspection */
         return response()->json(['result' => $date->format($format)]);
     }
 
     /**
      * @param ConfigurationPostRequest $request
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public function postIndex(ConfigurationPostRequest $request)
+    public function postIndex(ConfigurationPostRequest $request): RedirectResponse
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
         // store config on drive.
         $fromRequest   = $request->getAll();
         $configuration = Configuration::fromRequest($fromRequest);
-        StorageService::storeContent(json_encode($configuration));
+        StorageService::storeContent(json_encode($configuration, JSON_THROW_ON_ERROR, 512));
 
         session()->put(Constants::CONFIGURATION, $configuration->toArray());
 

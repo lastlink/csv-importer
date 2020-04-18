@@ -31,6 +31,10 @@ use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Roles\RoleService;
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use League\Csv\Exception;
 
 /**
  * Class RoleController
@@ -47,9 +51,11 @@ class RoleController extends Controller
             $this->middleware(RolesComplete::class);
         }
 
-        /**
-         * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-         */
+    /**
+     * @throws Exception
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @return Factory|View
+     */
     public function index()
     {
         $mainTitle = 'Define roles';
@@ -64,7 +70,7 @@ class RoleController extends Controller
         $examples = RoleService::getExampleData($content, $configuration);
 
         // submit mapping from config.
-        $mapping = base64_encode(json_encode($configuration->getMapping()));
+        $mapping = base64_encode(json_encode($configuration->getMapping(), JSON_THROW_ON_ERROR, 512));
 
         // roles
         $roles = config('csv_importer.import_roles');
@@ -83,9 +89,9 @@ class RoleController extends Controller
     /**
      * @param RolesPostRequest $request
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public function postIndex(RolesPostRequest $request)
+    public function postIndex(RolesPostRequest $request): RedirectResponse
     {
         $data = $request->getAll();
 

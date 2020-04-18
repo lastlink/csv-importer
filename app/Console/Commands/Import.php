@@ -27,6 +27,7 @@ use App\Console\HaveAccess;
 use App\Console\StartImport;
 use App\Console\VerifyJSON;
 use Illuminate\Console\Command;
+use JsonException;
 use Log;
 
 /**
@@ -53,7 +54,7 @@ class Import extends Command
     /**
      * Execute the console command.
      *
-     * @throws \JsonException
+     * @throws JsonException
      * @return int
      */
     public function handle(): int

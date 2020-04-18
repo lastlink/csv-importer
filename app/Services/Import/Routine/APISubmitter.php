@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace App\Services\Import\Routine;
 
 use App\Services\Import\Support\ProgressInformation;
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Transaction;
 use GrumpyDictator\FFIIIApiSupport\Model\TransactionGroup;
 use GrumpyDictator\FFIIIApiSupport\Request\PostTransactionRequest;
@@ -40,6 +41,8 @@ class APISubmitter
 
     /**
      * @param array $lines
+     *
+     * @throws ApiHttpException
      */
     public function processTransactions(array $lines): void
     {
@@ -60,6 +63,8 @@ class APISubmitter
      * @param int              $lineIndex
      * @param array            $line
      * @param TransactionGroup $group
+     *
+     * @throws \JsonException
      */
     private function compareArrays(int $lineIndex, array $line, TransactionGroup $group): void
     {
@@ -98,7 +103,8 @@ class APISubmitter
      * @param int   $index
      * @param array $line
      *
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
+     * @throws ApiHttpException
+     * @throws \JsonException
      */
     private function processTransaction(int $index, array $line): void
     {

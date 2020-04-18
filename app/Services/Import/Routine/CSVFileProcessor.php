@@ -28,6 +28,7 @@ use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Specifics\SpecificService;
 use App\Services\Import\Support\ProgressInformation;
 use InvalidArgumentException;
+use JsonException;
 use League\Csv\Exception;
 use League\Csv\Reader;
 use League\Csv\ResultSet;
@@ -81,8 +82,9 @@ class CSVFileProcessor
     /**
      * Get a reader, and start looping over each line.
      *
-     * @return array
      * @throws ImportException
+     * @throws JsonException
+     * @return array
      */
     public function processCSVFile(): array
     {
@@ -134,6 +136,7 @@ class CSVFileProcessor
      *
      * @param ResultSet $records
      *
+     * @throws JsonException
      * @return array
      */
     private function processCSVLines(ResultSet $records): array
@@ -164,6 +167,7 @@ class CSVFileProcessor
     /**
      * @param array $array
      *
+     * @throws JsonException
      * @return array
      */
     private function removeDuplicateLines(array $array): array

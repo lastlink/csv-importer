@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace App\Services\CSV\Mapper;
 
+use App\Exceptions\ImportException;
+
 /**
  * Class OpposingAccountIbans
  */
@@ -33,7 +35,8 @@ class OpposingAccountIbans implements MapperInterface
     /**
      * Get map of objects.
      *
-     * @throws \App\Exceptions\ImportException
+     * @throws ImportException
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      * @return array
      */
     public function getMap(): array

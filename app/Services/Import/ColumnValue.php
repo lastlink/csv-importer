@@ -114,6 +114,7 @@ class ColumnValue
     public function getParsedValue()
     {
         if (0 !== $this->mappedValue) {
+            /** @noinspection UnnecessaryCastingInspection */
             return (int)$this->mappedValue;
         }
 

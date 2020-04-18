@@ -84,6 +84,7 @@ class Belfius implements SpecificInterface
         }
 
         $opposingAccountName = $row[5];
+        /** @noinspection MultiAssignmentUsageInspection */
         $description = $row[14];
 
         preg_match('/DOORLOPENDE OPDRACHT.*\s+' . preg_quote($opposingAccountName, '/') . '\s+(.+)\s+REF.\s*:/', $description, $matches);
