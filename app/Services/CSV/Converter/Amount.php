@@ -246,7 +246,7 @@ class Amount implements ConverterInterface
         }
         // have to strip the € because apparantly the Postbank (DE) thinks "1.000,00 €" is a normal way to format a number.
         $value = trim((string)str_replace(['€'], '', $value));
-        $str   = preg_replace('/[^\-\(\)\.\,0-9 ]/', '', $value);
+        $str   = preg_replace('/[^\-().,0-9 ]/', '', $value);
         $len   = strlen($str);
         if (0 === strpos($str, '(') && ')' === $str[$len - 1]) {
             $str = '-' . substr($str, 1, $len - 2);

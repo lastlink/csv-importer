@@ -51,7 +51,7 @@ class TokenController extends Controller
         try {
             $result = $request->get();
         } catch (ApiHttpException $e) {
-            $response = ['result' => 'NOK', 'message' => $e->getMessage()];
+            return ['result' => 'NOK', 'message' => $e->getMessage()];
         }
         // -1 = OK (minimum is smaller)
         // 0 = OK (same version)
@@ -60,8 +60,11 @@ class TokenController extends Controller
         $minimum = config('csv_importer.minimum_version');
         $compare = version_compare($minimum, $result->version);
         if (1 === $compare) {
-            $errorMessage = sprintf('Your Firefly III version %s is below the minimum required version %s', $result->version, $minimum);
-            $response = ['result' => 'NOK', 'message' => $errorMessage];
+            $errorMessage = sprintf(
+                'Your Firefly III version %s is below the minimum required version %s',
+                $result->version, $minimum
+            );
+            $response     = ['result' => 'NOK', 'message' => $errorMessage];
         }
 
         return response()->json($response);

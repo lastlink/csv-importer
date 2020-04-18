@@ -29,7 +29,7 @@ use Illuminate\Routing\Redirector;
 use Illuminate\View\View;
 use Log;
 use Artisan;
-use Steam;
+
 /**
  *
  * Class IndexController

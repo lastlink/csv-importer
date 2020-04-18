@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace App\Services\CSV\Converter;
 
-use RuntimeException;
 use Log;
 use UnexpectedValueException;
 

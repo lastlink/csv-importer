@@ -23,9 +23,6 @@ declare(strict_types=1);
 
 namespace App\Services\Import\Task;
 
-use FireflyIII\Import\Converter\AmountCredit;
-use FireflyIII\Import\Converter\AmountDebit;
-use FireflyIII\Import\Converter\AmountNegated;
 use Log;
 
 /**

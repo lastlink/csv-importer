@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace App\Services\CSV\Mapper;
 
 use App\Exceptions\ImportException;
-use GrumpyDictator\FFIIIApiSupport\Model\Account;
 
 /**
  * Class AssetAccountIbans

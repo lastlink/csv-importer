@@ -37,7 +37,6 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use InvalidArgumentException;
 use Log;
-use RuntimeException;
 
 /**
  * Class MapController
