@@ -16,6 +16,14 @@ trait ManageMessages
      */
     protected function listMessages(string $key, array $messages): void
     {
+        $functions = [
+            'ERROR'   => 'error',
+            'Warning' => 'warning',
+            'Message' => 'info',
+        ];
+
+        $func = $functions[$key] ?? 'line';
+
         if (count($messages) > 0) {
             /**
              * @var int   $index
@@ -24,7 +32,8 @@ trait ManageMessages
             foreach ($messages as $index => $list) {
                 /** @var string $line */
                 foreach ($list as $line) {
-                    $this->error(sprintf('%s in line #%d: %s', $key, $index + 1, $line));
+
+                    $this->$func(sprintf('%s in line #%d: %s', $key, $index + 1, $line));
                 }
             }
         }
