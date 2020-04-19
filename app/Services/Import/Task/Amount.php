@@ -45,6 +45,26 @@ class Amount extends AbstractTask
     }
 
     /**
+     * @param string $amount
+     *
+     * @return bool
+     */
+    private function validAmount(string $amount): bool
+    {
+        if ('' === $amount) {
+            return false;
+        }
+        if ('0' === $amount) {
+            return false;
+        }
+        if (0 === bccomp('0', $amount)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @param array $transaction
      *
      * @return array
@@ -53,23 +73,23 @@ class Amount extends AbstractTask
     {
         Log::debug(sprintf('Now at the start of processAmount("%s")', $transaction['amount']));
         $amount = null;
-        if (null === $amount && array_key_exists('amount', $transaction) && '' !== (string)$transaction['amount']) {
+        if (null === $amount && $this->validAmount((string) $transaction['amount'])) {
             Log::debug('Transaction["amount"] value is not NULL, assume this is the correct value.');
             $amount = $transaction['amount'];
         }
 
-        if (null === $amount && array_key_exists('amount_debit', $transaction) && '' !== (string)$transaction['amount_debit']) {
-            Log::debug('Transaction["amount_debit"] value is not NULL, assume this is the correct value.');
+        if (null === $amount && $this->validAmount((string) $transaction['amount_debit'])) {
+            Log::debug(sprintf('Transaction["amount_debit"] value is not NULL ("%s"), assume this is the correct value.', $transaction['amount_debit']));
             $amount = $transaction['amount_debit'];
         }
 
-        if (null === $amount && array_key_exists('amount_credit', $transaction) && '' !== (string)$transaction['amount_credit']) {
-            Log::debug('Transaction["amount_credit"] value is not NULL, assume this is the correct value.');
+        if (null === $amount && $this->validAmount((string) $transaction['amount_credit'])) {
+            Log::debug(sprintf('Transaction["amount_credit"] value is not NULL ("%s"), assume this is the correct value.', $transaction['amount_credit']));
             $amount = $transaction['amount_credit'];
         }
 
-        if (null === $amount && array_key_exists('amount_negated', $transaction) && '' !== (string)$transaction['amount_negated']) {
-            Log::debug('Transaction["amount_negated"] value is not NULL, assume this is the correct value.');
+        if (null === $amount && $this->validAmount((string) $transaction['amount_negated'])) {
+            Log::debug(sprintf('Transaction["amount_negated"] value is not NULL ("%s"), assume this is the correct value.', $transaction['amount_negated']));
             $amount = $transaction['amount_negated'];
         }
 

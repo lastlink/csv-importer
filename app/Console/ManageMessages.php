@@ -18,7 +18,7 @@ trait ManageMessages
     {
         $functions = [
             'ERROR'   => 'error',
-            'Warning' => 'warning',
+            'Warning' => 'warn',
             'Message' => 'info',
         ];
 
