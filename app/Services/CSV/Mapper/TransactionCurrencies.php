@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Services\CSV\Mapper;
 
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\TransactionCurrency;
 use GrumpyDictator\FFIIIApiSupport\Request\GetCurrenciesRequest;
 
@@ -36,7 +37,7 @@ class TransactionCurrencies implements MapperInterface
      * Get map of objects.
      *
      * @return array
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
+     * @throws ApiHttpException
      */
     public function getMap(): array
     {

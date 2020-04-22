@@ -28,6 +28,7 @@ use App\Services\Import\ColumnValue;
 use App\Services\Import\Support\ProgressInformation;
 use Log;
 use RuntimeException;
+use UnexpectedValueException;
 
 /**
  * Class LineProcessor
@@ -83,7 +84,7 @@ class LineProcessor
 
         foreach ($lines as $index => $line) {
             Log::debug(sprintf('Now processing CSV line #%d/#%d', $index + 1, $count));
-            $processed[] = $this->process($index, $line);
+            $processed[] = $this->process($line);
             //sleep(1); // DEBUG
         }
 
@@ -96,12 +97,11 @@ class LineProcessor
      * Convert each raw CSV to a set of ColumnValue objects, which hold as much info
      * as we can cram into it. These new lines can be imported later on.
      *
-     * @param int   $index
      * @param array $line
      *
      * @return array
      */
-    private function process(int $index, array $line): array
+    private function process(array $line): array
     {
         Log::debug(sprintf('Now in %s', __METHOD__));
         $count  = count($line);
@@ -150,8 +150,6 @@ class LineProcessor
         $columnValue->setRole('original-source');
         $return[] = $columnValue;
         Log::debug(sprintf('Added column #%d to denote the original source.', count($return)));
-
-        //$this->addError($index, 'Error from line processor.');
 
         return $return;
     }
@@ -209,7 +207,7 @@ class LineProcessor
             'opposing-number'       => 'opposing-id',
         ];
         if (!isset($roleMapping[$role])) {
-            throw new RuntimeException(sprintf('Cannot indicate new role for mapped role "%s"', $role)); // @codeCoverageIgnore
+            throw new UnexpectedValueException(sprintf('Cannot indicate new role for mapped role "%s"', $role)); // @codeCoverageIgnore
         }
         $newRole = $roleMapping[$role];
         if ($newRole !== $role) {
@@ -218,7 +216,6 @@ class LineProcessor
 
         // also store the $mapped values in a "mappedValues" array.
         // used to validate whatever has been set as mapping
-        // TODO this validation is not implemented yet.
         $this->mappedValues[$newRole][] = $mapped;
         $this->mappedValues[$newRole]   = array_unique($this->mappedValues[$newRole]);
         Log::debug(sprintf('Values mapped to role "%s" are: ', $newRole), $this->mappedValues[$newRole]);

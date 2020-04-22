@@ -25,6 +25,7 @@ namespace App\Services\Import\ImportJobStatus;
 
 use App\Services\Session\Constants;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use JsonException;
 use Log;
 use Storage;
 
@@ -72,13 +73,17 @@ class ImportJobStatusManager
         $disk = Storage::disk('jobs');
         try {
             if ($disk->exists($identifier)) {
-                $status                   = ImportJobStatus::fromArray(json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR));
+                try {
+                    $status = ImportJobStatus::fromArray(json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR));
+                } catch (JsonException $e) {
+                    $status = new ImportJobStatus;
+                }
                 $status->errors[$index]   = $status->errors[$index] ?? [];
                 $status->errors[$index][] = $error;
                 self::storeJobStatus($identifier, $status);
             }
         } catch (FileNotFoundException $e) {
-            Log::error($e);
+            Log::error($e->getMessage());
         }
     }
 
@@ -86,19 +91,24 @@ class ImportJobStatusManager
      * @param string $identifier
      * @param int    $index
      * @param string $warning
+     *
      */
     public static function addWarning(string $identifier, int $index, string $warning): void
     {
         $disk = Storage::disk('jobs');
         try {
             if ($disk->exists($identifier)) {
-                $status                     = ImportJobStatus::fromArray(json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR));
+                try {
+                    $status = ImportJobStatus::fromArray(json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR));
+                } catch (JsonException $e) {
+                    $status = new ImportJobStatus;
+                }
                 $status->warnings[$index]   = $status->warnings[$index] ?? [];
                 $status->warnings[$index][] = $warning;
                 self::storeJobStatus($identifier, $status);
             }
         } catch (FileNotFoundException $e) {
-            Log::error($e);
+            Log::error($e->getMessage());
         }
     }
 
@@ -106,19 +116,24 @@ class ImportJobStatusManager
      * @param string $identifier
      * @param int    $index
      * @param string $message
+     *
      */
     public static function addMessage(string $identifier, int $index, string $message): void
     {
         $disk = Storage::disk('jobs');
         try {
             if ($disk->exists($identifier)) {
-                $status                     = ImportJobStatus::fromArray(json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR));
+                try {
+                    $status = ImportJobStatus::fromArray(json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR));
+                } catch (JsonException $e) {
+                    $status = new ImportJobStatus;
+                }
                 $status->messages[$index]   = $status->messages[$index] ?? [];
                 $status->messages[$index][] = $message;
                 self::storeJobStatus($identifier, $status);
             }
         } catch (FileNotFoundException $e) {
-            Log::error($e);
+            Log::error($e->getMessage());
         }
     }
 
@@ -126,6 +141,8 @@ class ImportJobStatusManager
     /**
      * @param string $status
      *
+     * @throws JsonException
+     * @throws JsonException
      * @return ImportJobStatus
      */
     public static function setJobStatus(string $status): ImportJobStatus
@@ -150,7 +167,12 @@ class ImportJobStatusManager
     {
         Log::debug(sprintf('Now in storeJobStatus(%s): %s', $identifier, $status->status));
         $disk = Storage::disk('jobs');
-        $disk->put($identifier, json_encode($status->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
+        try {
+            $disk->put($identifier, json_encode($status->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
+        } catch (JsonException $e) {
+            // do nothing
+            Log::error($e->getMessage());
+        }
         Log::debug('Done with storing.');
     }
 }

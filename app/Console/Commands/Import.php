@@ -27,6 +27,7 @@ use App\Console\HaveAccess;
 use App\Console\StartImport;
 use App\Console\VerifyJSON;
 use Illuminate\Console\Command;
+use JsonException;
 use Log;
 
 /**
@@ -53,7 +54,7 @@ class Import extends Command
     /**
      * Execute the console command.
      *
-     * @throws \JsonException
+     * @throws JsonException
      * @return int
      */
     public function handle(): int
@@ -67,8 +68,8 @@ class Import extends Command
 
         $this->info(sprintf('Welcome to the Firefly III CSV importer, v%s', config('csv_importer.version')));
         Log::debug(sprintf('Now in %s', __METHOD__));
-        $file   = $this->argument('file');
-        $config = $this->argument('config');
+        $file   = (string) $this->argument('file');
+        $config = (string) $this->argument('config');
         if (!file_exists($file) || (file_exists($file) && !is_file($file))) {
             $message = sprintf('The importer can\'t import: CSV file "%s" does not exist or could not be read.', $file);
             $this->error($message);

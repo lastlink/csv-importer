@@ -26,7 +26,11 @@ namespace App\Http\Controllers;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Request\SystemInformationRequest;
 use GrumpyDictator\FFIIIApiSupport\Response\SystemInformationResponse;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
+use Illuminate\View\View;
 
 /**
  * Class TokenController
@@ -47,17 +51,20 @@ class TokenController extends Controller
         try {
             $result = $request->get();
         } catch (ApiHttpException $e) {
-            $response = ['result' => 'NOK', 'message' => $e->getMessage()];
+            return ['result' => 'NOK', 'message' => $e->getMessage()];
         }
         // -1 = OK (minimum is smaller)
         // 0 = OK (same version)
         // 1 = NOK (too low a version)
 
-        $minimum = config('csv_importer.minimum_version');
+        $minimum = (string) config('csv_importer.minimum_version');
         $compare = version_compare($minimum, $result->version);
         if (1 === $compare) {
-            $errorMessage = sprintf('Your Firefly III version %s is below the minimum required version %s', $result->version, $minimum);
-            $response = ['result' => 'NOK', 'message' => $errorMessage];
+            $errorMessage = sprintf(
+                'Your Firefly III version %s is below the minimum required version %s',
+                $result->version, $minimum
+            );
+            $response     = ['result' => 'NOK', 'message' => $errorMessage];
         }
 
         return response()->json($response);
@@ -66,7 +73,7 @@ class TokenController extends Controller
     /**
      * Same thing but not over JSON.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     * @return Factory|RedirectResponse|Redirector|View
      */
     public function index()
     {
@@ -77,6 +84,7 @@ class TokenController extends Controller
         $isError      = false;
         $result       = null;
         $compare      = 1;
+        $minimum      = '';
         try {
             /** @var SystemInformationResponse $result */
             $result = $request->get();

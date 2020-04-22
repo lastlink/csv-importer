@@ -25,7 +25,7 @@ namespace App\Services\CSV\Configuration;
 
 use App\Services\CSV\Specifics\SpecificService;
 use Log;
-use RuntimeException;
+use UnexpectedValueException;
 
 /**
  * Class Configuration
@@ -103,8 +103,6 @@ class Configuration
     {
         $version = $array['version'] ?? 1;
 
-        // TODO now have room to do version based array parsing.
-
         $object                              = new self;
         $object->headers                     = $array['headers'];
         $object->date                        = $array['date'];
@@ -173,11 +171,10 @@ class Configuration
         $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
         $object->rules                       = $array['rules'];
         $object->skipForm                    = $array['skip_form'];
-        //$object->specifics                   = $array['specifics'];
-        $object->roles     = $array['roles'];
-        $object->mapping   = $array['mapping'];
-        $object->doMapping = $array['do_mapping'];
-        $object->specifics = [];
+        $object->roles                       = $array['roles'];
+        $object->mapping                     = $array['mapping'];
+        $object->doMapping                   = $array['do_mapping'];
+        $object->specifics                   = [];
         foreach ($array['specifics'] as $key => $enabled) {
             if (true === $enabled) {
                 $object->specifics[] = $key;
@@ -268,7 +265,7 @@ class Configuration
             Log::debug('v2.');
             return self::fromVersionTwo($data);
         }
-        throw new RuntimeException(sprintf('Configuration file version "%s" cannot be parsed.', $version));
+        throw new UnexpectedValueException(sprintf('Configuration file version "%s" cannot be parsed.', $version));
     }
 
     /**
@@ -344,21 +341,19 @@ class Configuration
     }
 
     /**
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function hasSpecific(string $name): bool
-    {
-        return in_array($name, $this->specifics, true);
-    }
-
-    /**
      * @return bool
      */
     public function isHeaders(): bool
     {
         return $this->headers;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRules(): bool
+    {
+        return $this->rules;
     }
 
     /**

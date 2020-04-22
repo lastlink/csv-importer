@@ -35,6 +35,8 @@ class FileReader
 {
     /**
      * Get a CSV file reader and fill it with data from CSV file.
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      * @return Reader
      */
     public static function getReaderFromSession(): Reader

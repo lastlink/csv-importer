@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Support\Steam;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -37,9 +38,14 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
-        //
+        $this->app->bind(
+            'steam',
+            static function () {
+                return new Steam;
+            }
+        );
     }
 
     /**
@@ -47,7 +53,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         //
     }

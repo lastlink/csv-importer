@@ -31,6 +31,7 @@ use App\Services\Import\Routine\ColumnValueConverter;
 use App\Services\Import\Routine\CSVFileProcessor;
 use App\Services\Import\Routine\LineProcessor;
 use App\Services\Import\Routine\PseudoTransactionProcessor;
+use JsonException;
 use League\Csv\Reader;
 use Log;
 use Storage;
@@ -68,6 +69,8 @@ class ImportRoutineManager
      * ImportRoutineManager constructor.
      *
      * @param string|null $identifier
+     *
+     * @throws JsonException
      */
     public function __construct(string $identifier = null)
     {
@@ -145,6 +148,8 @@ class ImportRoutineManager
      * Start the import.
      *
      * @throws ImportException
+     * @throws JsonException
+     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      */
     public function start(): void
     {
@@ -184,12 +189,12 @@ class ImportRoutineManager
         $disk  = Storage::disk('jobs');
         $count = 0;
         do {
-            $identifier = Str::random(16);
+            $generatedId = Str::random(16);
             $count++;
-            Log::debug(sprintf('Attempt #%d results in "%s"', $count, $identifier));
-        } while ($count < 30 && $disk->exists($identifier));
-        $this->identifier = $identifier;
-        Log::info(sprintf('Job identifier is "%s"', $identifier));
+            Log::debug(sprintf('Attempt #%d results in "%s"', $count, $generatedId));
+        } while ($count < 30 && $disk->exists($generatedId));
+        $this->identifier = $generatedId;
+        Log::info(sprintf('Job identifier is "%s"', $generatedId));
     }
 
     /**

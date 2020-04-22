@@ -25,6 +25,8 @@ namespace App\Http\Request;
 
 
 use App\Services\CSV\Specifics\SpecificService;
+use JsonException;
+use Log;
 
 /**
  * Class ConfigurationPostRequest
@@ -46,10 +48,45 @@ class ConfigurationPostRequest extends Request
      */
     public function getAll(): array
     {
-        $roles     = $this->get('roles') ? json_decode(base64_decode($this->get('roles')), true) : null;
-        $mapping   = $this->get('mapping') ? json_decode(base64_decode($this->get('mapping')), true) : null;
-        $doMapping = $this->get('do_mapping') ? json_decode(base64_decode($this->get('do_mapping')), true) : null;
-
+        try {
+            $roles = $this->get('roles') ?
+                json_decode(base64_decode($this->get('roles')), true, 512, JSON_THROW_ON_ERROR) : null;
+        } catch (JsonException $e) {
+            Log::warning(
+                sprintf(
+                    'Could not decode roles JSON "%s" ("%s") but this is not a problem.',
+                    $this->get('roles'),
+                    $e->getMessage()
+                )
+            );
+            $roles = [];
+        }
+        try {
+            $mapping = $this->get('mapping') ?
+                json_decode(base64_decode($this->get('mapping')), true, 512, JSON_THROW_ON_ERROR) : null;
+        } catch (JsonException $e) {
+            Log::warning(
+                sprintf(
+                    'Could not decode mapping JSON "%s" ("%s") but this is not a problem.',
+                    $this->get('mapping'),
+                    $e->getMessage()
+                )
+            );
+            $mapping = [];
+        }
+        try {
+            $doMapping = $this->get('do_mapping') ?
+                json_decode(base64_decode($this->get('do_mapping')), true, 512, JSON_THROW_ON_ERROR) : null;
+        } catch (JsonException $e) {
+            Log::warning(
+                sprintf(
+                    'Could not decode doMapping JSON "%s" ("%s") but this is not a problem.',
+                    $this->get('do_mapping'),
+                    $e->getMessage()
+                )
+            );
+            $doMapping = [];
+        }
 
         $result = [
             'headers'                       => $this->convertBoolean($this->get('headers')),

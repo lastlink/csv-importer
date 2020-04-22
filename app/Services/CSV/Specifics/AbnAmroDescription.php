@@ -192,7 +192,7 @@ class AbnAmroDescription implements SpecificInterface
     protected function parseTRTPDescription(): bool
     {
         // See if the current description is formatted in TRTP format
-        if (preg_match_all('!\/([A-Z]{3,4})\/([^/]*)!', $this->row[7], $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('!/([A-Z]{3,4})/([^/]*)!', $this->row[7], $matches, PREG_SET_ORDER)) {
             $type           = '';
             $name           = '';
             $reference      = '';

@@ -37,12 +37,14 @@ class AmountCredit implements ConverterInterface
      */
     public function convert($value): string
     {
+        if (null === $value || '' === $value) {
+            return '';
+        }
         /** @var ConverterInterface $converter */
         $converter = app(Amount::class);
         $result    = $converter->convert($value);
-        $result    = Amount::positive($result);
 
-        return $result;
+        return Amount::positive($result);
     }
     /**
      * Add extra configuration parameters.

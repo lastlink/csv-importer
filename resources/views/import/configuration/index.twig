@@ -102,7 +102,7 @@
                                 <div class="col-sm-3">Rules</div>
                                 <div class="col-sm-9">
                                     <div class="form-check">
-                                        <input class="form-check-input" {% if configuration.isRules %}checked{% endif %} type="checkbox" id="rules" name="rules" value="1" aria-describedby="rulesHelp">
+                                        <input class="form-check-input" {% if configuration.isRules or null == configuration %}checked{% endif %} type="checkbox" id="rules" name="rules" value="1" aria-describedby="rulesHelp">
                                         <label class="form-check-label" for="rules">
                                             Yes
                                         </label>
@@ -118,14 +118,14 @@
                                 <div class="col-sm-9">
 
                                     <div class="form-check">
-                                        <input class="form-check-input" {% if configuration.isIgnoreDuplicateLines %}checked{% endif %} type="checkbox" value="1" id="ignore_duplicate_lines" name="ignore_duplicate_lines" aria-describedby="duplicateHelp">
+                                        <input class="form-check-input" {% if configuration.isIgnoreDuplicateLines or null == configuration %}checked{% endif %} type="checkbox" value="1" id="ignore_duplicate_lines" name="ignore_duplicate_lines" aria-describedby="duplicateHelp">
                                         <label class="form-check-label" for="ignore_duplicate_lines">
                                             Do not import duplicate lines in the CSV file.
                                         </label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" {% if configuration.isIgnoreDuplicateTransactions %}checked{% endif %} type="checkbox" value="1" id="ignore_duplicate_transactions" name="ignore_duplicate_transactions" aria-describedby="duplicateHelp">
+                                        <input class="form-check-input" {% if configuration.isIgnoreDuplicateTransactions or null == configuration %}checked{% endif %} type="checkbox" value="1" id="ignore_duplicate_transactions" name="ignore_duplicate_transactions" aria-describedby="duplicateHelp">
                                         <label class="form-check-label" for="ignore_duplicate_transactions">
                                             Do not import already existing transactions.
                                         </label>

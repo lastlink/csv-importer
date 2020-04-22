@@ -27,6 +27,8 @@ namespace App\Http\Controllers\Import;
 use App\Http\Controllers\Controller;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\Session\Constants;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Response;
 
 /**
  * Class DownloadController
@@ -34,13 +36,13 @@ use App\Services\Session\Constants;
 class DownloadController extends Controller
 {
     /**
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return ResponseFactory|Response
      */
     public function download()
     {
         // do something
         $config = Configuration::fromArray(session()->get(Constants::CONFIGURATION))->toArray();
-        $result = json_encode($config, JSON_PRETTY_PRINT);
+        $result = json_encode($config, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 512);
 
         $response = response($result);
         $name     = sprintf('import_config_%s.json', date('Y-m-d'));

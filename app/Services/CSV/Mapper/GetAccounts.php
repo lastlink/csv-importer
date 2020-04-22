@@ -1,0 +1,179 @@
+<?php
+declare(strict_types=1);
+/**
+ * GetAccounts.php
+ * Copyright (c) 2020 james@firefly-iii.org
+ *
+ * This file is part of the Firefly III CSV importer
+ * (https://github.com/firefly-iii/csv-importer).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+namespace App\Services\CSV\Mapper;
+
+use App\Exceptions\ImportException;
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
+use GrumpyDictator\FFIIIApiSupport\Model\Account;
+use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
+use GrumpyDictator\FFIIIApiSupport\Response\GetAccountsResponse;
+
+/**
+ * Trait GetAccounts
+ */
+trait GetAccounts
+{
+
+    /**
+     * Returns a combined list of asset accounts and all liability accounts.
+     *
+     * @throws ImportException
+     * @throws ApiHttpException
+     * @return array
+     */
+    protected function getAllAccounts(): array
+    {
+        // get list of asset accounts:
+        $accounts = [];
+        $uri      = (string) config('csv_importer.uri');
+        $token    = (string) config('csv_importer.access_token');
+        $request  = new GetAccountsRequest($uri, $token);
+        $request->setType(GetAccountsRequest::ALL);
+
+        /** @var GetAccountsResponse $response */
+        $response = $request->get();
+
+        if ($response instanceof GetAccountsResponse) {
+            $accounts = $this->toArray($response);
+        }
+
+        if (!$response instanceof GetAccountsResponse) {
+            throw new ImportException('Could not get list of ALL accounts.');
+        }
+
+        return array_merge($accounts);
+    }
+
+    /**
+     * Returns a combined list of asset accounts and all liability accounts.
+     *
+     * @throws ImportException
+     * @throws ApiHttpException
+     * @throws ApiHttpException
+     * @return array
+     */
+    protected function getAssetAccounts(): array
+    {
+        // get list of asset accounts:
+        $accounts    = [];
+        $liabilities = [];
+        $uri         = (string) config('csv_importer.uri');
+        $token       = (string) config('csv_importer.access_token');
+        $request     = new GetAccountsRequest($uri, $token);
+        $request->setType(GetAccountsRequest::ASSET);
+
+        /** @var GetAccountsResponse $response */
+        $response = $request->get();
+
+        if ($response instanceof GetAccountsResponse) {
+            $accounts = $this->toArray($response);
+        }
+
+        if (!$response instanceof GetAccountsResponse) {
+            throw new ImportException('Could not get list of asset accounts.');
+        }
+
+        $request = new GetAccountsRequest($uri, $token);
+        $request->setType(GetAccountsRequest::LIABILITIES);
+
+        /** @var GetAccountsResponse $response */
+        $response = $request->get();
+
+        if ($response instanceof GetAccountsResponse) {
+            $liabilities = $this->toArray($response);
+        }
+
+        if (!$response instanceof GetAccountsResponse) {
+            throw new ImportException('Could not get list of asset accounts.');
+        }
+
+        return array_merge($accounts, $liabilities);
+    }
+
+    /**
+     * Merge all arrays into <select> ready list.
+     *
+     * @param array $accounts
+     *
+     * @return array
+     */
+    protected function mergeAll(array $accounts): array
+    {
+        $result = [];
+        /** @var Account $account */
+        foreach ($accounts as $account) {
+            $name = $account->name;
+            if (null !== $account->iban) {
+                $name = sprintf('%s (%s)', $account->name, $account->iban);
+            }
+            // add optgroup to result:
+            $group                        = trans(sprintf('import.account_types_%s', $account->type));
+            $result[$group]               = $result[$group] ?? [];
+            $result[$group][$account->id] = $name;
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * Merge all arrays into <select> ready list.
+     *
+     * @param array $accounts
+     *
+     * @return array
+     */
+    protected function mergeWithIBAN(array $accounts): array
+    {
+        $result = [];
+        /** @var Account $account */
+        foreach ($accounts as $account) {
+            // only merge if IBAN is not null.
+            if (null !== $account->iban) {
+                $name = sprintf('%s (%s)', $account->name, $account->iban);
+                // add optgroup to result:
+                $group                        = trans(sprintf('import.account_types_%s', $account->type));
+                $result[$group]               = $result[$group] ?? [];
+                $result[$group][$account->id] = $name;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param GetAccountsResponse $list
+     *
+     * @return array
+     */
+    private function toArray(GetAccountsResponse $list): array
+    {
+        $return = [];
+        foreach ($list as $account) {
+            $return[] = $account;
+        }
+
+        return $return;
+    }
+}

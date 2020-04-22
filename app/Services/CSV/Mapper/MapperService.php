@@ -25,11 +25,11 @@ namespace App\Services\CSV\Mapper;
 
 
 use App\Services\CSV\Specifics\SpecificService;
+use InvalidArgumentException;
 use League\Csv\Exception;
 use League\Csv\Reader;
 use League\Csv\Statement;
 use Log;
-use RuntimeException;
 
 /**
  * Class MapperService
@@ -41,10 +41,12 @@ class MapperService
      * Appends the given array with data from the CSV file in the config.
      *
      * @param string $content
+     * @param string $delimiter
      * @param bool   $hasHeaders
      * @param array  $specifics
      * @param array  $data
      *
+     * @throws Exception
      * @return array
      */
     public static function getMapData(string $content, string $delimiter, bool $hasHeaders, array $specifics, array $data): array
@@ -64,18 +66,18 @@ class MapperService
             $records = $stmt->process($reader);
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            throw new RuntimeException($e->getMessage());
+            throw new InvalidArgumentException($e->getMessage());
         }
         // loop each row, apply specific:
-        foreach ($records as $rowIndex => $row) {
+        foreach ($records as $row) {
             $row = SpecificService::runSpecifics($row, $specifics);
             // loop each column, put in $data
             foreach ($row as $columnIndex => $column) {
-                if(!isset($data[$columnIndex])) {
+                if (!isset($data[$columnIndex])) {
                     // don't need to handle this. Continue.
                     continue;
                 }
-                if('' !== $column) {
+                if ('' !== $column) {
                     $data[$columnIndex]['values'][] = trim($column);
                 }
             }

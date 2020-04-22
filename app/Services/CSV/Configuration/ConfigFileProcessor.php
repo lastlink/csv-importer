@@ -25,6 +25,7 @@ namespace App\Services\CSV\Configuration;
 
 
 use App\Services\Storage\StorageService;
+use JsonException;
 use Log;
 
 /**
@@ -37,6 +38,8 @@ class ConfigFileProcessor
      *
      * @param string $fileName
      *
+     * @throws JsonException
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      * @return Configuration
      */
     public static function convertConfigFile(string $fileName): Configuration

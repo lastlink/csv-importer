@@ -90,6 +90,8 @@ class IngDescription implements SpecificInterface
                     $this->moveValutadatumDescription(); // Move "Valutadatum" from description to new column
                     $this->addNameIngDescription();
                     break;
+                default:
+                    break;
             }
         }
 

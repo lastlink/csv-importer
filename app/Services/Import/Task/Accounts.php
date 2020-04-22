@@ -23,7 +23,13 @@ declare(strict_types=1);
 
 namespace App\Services\Import\Task;
 
+use App\Exceptions\ApiHttpException;
+use App\Exceptions\ImportException;
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException;
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException as GrumpyApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
+use GrumpyDictator\FFIIIApiSupport\Request\GetSearchAccountRequest;
+use GrumpyDictator\FFIIIApiSupport\Response\GetAccountsResponse;
 use Log;
 
 /**
@@ -35,7 +41,6 @@ class Accounts extends AbstractTask
     /**
      * @param array $group
      *
-     * @throws \App\Exceptions\ApiHttpException
      * @return array
      */
     public function process(array $group): array
@@ -75,6 +80,7 @@ class Accounts extends AbstractTask
      *
      * @param Account|null $defaultAccount
      *
+     * @throws ImportException
      * @return array
      */
     private function findAccount(array $array, ?Account $defaultAccount): array
@@ -85,6 +91,19 @@ class Accounts extends AbstractTask
         }
         if (null !== $defaultAccount) {
             Log::debug(sprintf('Default account is #%d ("%s")', $defaultAccount->id, $defaultAccount->name));
+        }
+
+        $result = null;
+        // if the ID is set, at least search for the ID.
+        if (is_int($array['id']) && $array['id'] > 0) {
+            Log::debug('Find by ID field.');
+            $result = $this->findById((string) $array['id']);
+        }
+        if (null !== $result) {
+            $return = $result->toArray();
+            Log::debug('Result of findById is not null, returning:', $return);
+
+            return $return;
         }
 
         Log::debug('Found no account or haven\'t searched for one.');
@@ -147,6 +166,45 @@ class Accounts extends AbstractTask
     }
 
     /**
+     * @param string $value
+     *
+     * @throws ImportException
+     * @return Account|null
+     */
+    private function findById(string $value): ?Account
+    {
+        Log::debug(sprintf('Going to search account with ID "%s"', $value));
+        $uri     = (string) config('csv_importer.uri');
+        $token   = (string) config('csv_importer.access_token');
+        $request = new GetSearchAccountRequest($uri, $token);
+        $request->setField('id');
+        $request->setQuery($value);
+        /** @var GetAccountsResponse $response */
+        try {
+            $response = $request->get();
+        } catch (GrumpyApiHttpException $e) {
+            throw new ImportException($e->getMessage());
+        }
+        if (1 === count($response)) {
+            /** @var Account $account */
+            try {
+                $account = $response->current();
+            } catch (ApiException $e) {
+                throw new ImportException($e->getMessage());
+            }
+
+            Log::debug(sprintf('[a] Found %s account #%d based on ID "%s"', $account->type, $account->id, $value));
+
+            return $account;
+        }
+
+        Log::debug('Found NOTHING.');
+
+        return null;
+    }
+
+
+    /**
      * @param array $transaction
      * @param array $source
      *
@@ -187,8 +245,6 @@ class Accounts extends AbstractTask
     }
 
     /**
-     * // TODO add warning when falling back on the default account.
-     *
      * @param array $transaction
      *
      * @return array
@@ -286,17 +342,20 @@ class Accounts extends AbstractTask
         Log::debug(sprintf('Now in determineType("%s", "%s")', $sourceType, $destinationType));
         if (null === $sourceType && null === $destinationType) {
             Log::debug('Return withdrawal, both are NULL');
+
             return 'withdrawal';
         }
 
         // if source is a asset and dest is NULL, its a withdrawal
         if ('asset' === $sourceType && null === $destinationType) {
             Log::debug('Return withdrawal, source is asset');
+
             return 'withdrawal';
         }
         // if destination is asset and source is NULL, its a deposit
-        if(null === $sourceType && 'asset' === $destinationType){
+        if (null === $sourceType && 'asset' === $destinationType) {
             Log::debug('Return deposit, dest is asset');
+
             return 'deposit';
         }
 

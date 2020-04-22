@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace App\Services\Import\Support;
 
 use App\Services\Import\ImportJobStatus\ImportJobStatusManager;
+use JsonException;
 
 /**
  * Trait ProgressInformation

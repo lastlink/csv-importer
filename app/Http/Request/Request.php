@@ -25,7 +25,6 @@ declare(strict_types=1);
 namespace App\Http\Request;
 
 use Carbon\Carbon;
-use Carbon\Exceptions\InvalidDateException;
 use Exception;
 use Illuminate\Foundation\Http\FormRequest;
 use Log;
@@ -39,26 +38,6 @@ use Log;
 class Request extends FormRequest
 {
     /**
-     * @param $array
-     *
-     * @return array|null
-     */
-    public function arrayFromValue($array): ?array
-    {
-        if (is_array($array)) {
-            return $array;
-        }
-        if (null === $array) {
-            return null;
-        }
-        if (is_string($array)) {
-            return explode(',', $array);
-        }
-
-        return null;
-    }
-
-    /**
      * @param string $value
      *
      * @return bool
@@ -68,47 +47,11 @@ class Request extends FormRequest
         if (null === $value) {
             return false;
         }
-        if ('true' === $value) {
-            return true;
-        }
-        if ('yes' === $value) {
-            return true;
-        }
-        if (1 === $value) {
-            return true;
-        }
-        if ('1' === $value) {
-            return true;
-        }
-        if (true === $value) {
+        if (in_array(trim($value), ['true', 'yes', '1'], true)) {
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * @param string|null $string
-     *
-     * @return Carbon|null
-     */
-    public function dateFromValue(?string $string): ?Carbon
-    {
-        if (null === $string) {
-            return null;
-        }
-        if ('' === $string) {
-            return null;
-        }
-        try {
-            $carbon = new Carbon($string);
-        } catch (Exception $e) {
-            Log::debug(sprintf('Invalid date: %s: %s', $string, $e->getMessage()));
-
-            return null;
-        }
-
-        return $carbon;
     }
 
     /**
@@ -193,7 +136,7 @@ class Request extends FormRequest
             return null;
         }
 
-        return $this->cleanString((string)($this->get($field) ?? ''));
+        return app('steam')->cleanStringAndNewlines((string)($this->get($field) ?? ''));
     }
 
     /**
@@ -205,7 +148,7 @@ class Request extends FormRequest
      */
     public function string(string $field): string
     {
-        return $this->cleanString((string)($this->get($field) ?? ''));
+        return app('steam')->cleanStringAndNewlines((string)($this->get($field) ?? ''));
     }
 
     /**
@@ -220,7 +163,7 @@ class Request extends FormRequest
         if (null === $string) {
             return null;
         }
-        $result = $this->cleanString($string);
+        $result = app('steam')->cleanStringAndNewlines($string);
 
         return '' === $result ? null : $result;
 
@@ -243,105 +186,5 @@ class Request extends FormRequest
         }
 
         return $result;
-    }
-
-    /**
-     * Return date time or NULL.
-     *
-     * @param string $field
-     *
-     * @return Carbon|null
-     */
-    protected function dateTime(string $field): ?Carbon
-    {
-        if (null === $this->get($field)) {
-            return null;
-        }
-        $value = (string)$this->get($field);
-        if (10 === strlen($value)) {
-            // probably a date format.
-            try {
-                $result = Carbon::createFromFormat('Y-m-d', $value);
-            } catch (InvalidDateException $e) {
-                Log::error(sprintf('"%s" is not a valid date: %s', $value, $e->getMessage()));
-
-                return null;
-            }
-
-            return $result;
-        }
-        // is an atom string, I hope?
-        try {
-            $result = Carbon::parse($value);
-        } catch (InvalidDateException $e) {
-            Log::error(sprintf('"%s" is not a valid date or time: %s', $value, $e->getMessage()));
-
-            return null;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Remove weird chars from strings.
-     *
-     * @param string $string
-     *
-     * @return string
-     */
-    private function cleanString(string $string): string
-    {
-        $search  = [
-            "\u{0001}", // start of heading
-            "\u{0002}", // start of text
-            "\u{0003}", // end of text
-            "\u{0004}", // end of transmission
-            "\u{0005}", // enquiry
-            "\u{0006}", // ACK
-            "\u{0007}", // BEL
-            "\u{0008}", // backspace
-            "\u{000E}", // shift out
-            "\u{000F}", // shift in
-            "\u{0010}", // data link escape
-            "\u{0011}", // DC1
-            "\u{0012}", // DC2
-            "\u{0013}", // DC3
-            "\u{0014}", // DC4
-            "\u{0015}", // NAK
-            "\u{0016}", // SYN
-            "\u{0017}", // ETB
-            "\u{0018}", // CAN
-            "\u{0019}", // EM
-            "\u{001A}", // SUB
-            "\u{001B}", // escape
-            "\u{001C}", // file separator
-            "\u{001D}", // group separator
-            "\u{001E}", // record separator
-            "\u{001F}", // unit separator
-            "\u{007F}", // DEL
-            "\u{00A0}", // non-breaking space
-            "\u{1680}", // ogham space mark
-            "\u{180E}", // mongolian vowel separator
-            "\u{2000}", // en quad
-            "\u{2001}", // em quad
-            "\u{2002}", // en space
-            "\u{2003}", // em space
-            "\u{2004}", // three-per-em space
-            "\u{2005}", // four-per-em space
-            "\u{2006}", // six-per-em space
-            "\u{2007}", // figure space
-            "\u{2008}", // punctuation space
-            "\u{2009}", // thin space
-            "\u{200A}", // hair space
-            "\u{200B}", // zero width space
-            "\u{202F}", // narrow no-break space
-            "\u{3000}", // ideographic space
-            "\u{FEFF}", // zero width no -break space
-        ];
-        $replace = "\x20"; // plain old normal space
-        $string  = str_replace($search, $replace, $string);
-        $string  = str_replace(["\n", "\t", "\r"], "\x20", $string);
-
-        return trim($string);
     }
 }

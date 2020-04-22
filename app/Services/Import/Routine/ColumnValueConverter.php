@@ -27,7 +27,7 @@ use App\Services\CSV\Configuration\Configuration;
 use App\Services\Import\ColumnValue;
 use App\Services\Import\Support\ProgressInformation;
 use Log;
-use RuntimeException;
+use UnexpectedValueException;
 
 /**
  * Class ColumnValueConverter
@@ -68,8 +68,8 @@ class ColumnValueConverter
         $processed = [];
         $count     = count($lines);
         Log::info(sprintf('Now parsing and combining %d lines.', $count));
-        foreach ($lines as $index => $line) {
-            $processed[] = $this->processValueArray($index, $line);
+        foreach ($lines as $line) {
+            $processed[] = $this->processValueArray($line);
         }
         Log::info(sprintf('Done parsing and combining %d lines.', $count));
 
@@ -77,21 +77,20 @@ class ColumnValueConverter
     }
 
     /**
-     * @param int   $index
      * @param array $line
      *
      * @return array
      */
-    private function processValueArray(int $index, array $line): array
+    private function processValueArray(array $line): array
     {
         $count = count($line);
         Log::debug(sprintf('Now in %s with %d columns in this line.', __METHOD__, $count));
         // make a new transaction:
         $transaction = [
             //'user'          => 1, // ??
-            'group_title' => null,
+            'group_title'             => null,
             'error_if_duplicate_hash' => $this->configuration->isIgnoreDuplicateTransactions(),
-            'transactions' => [
+            'transactions'            => [
                 [
                     //'user'=> 1,
                     'type'             => 'withdrawal',
@@ -163,7 +162,7 @@ class ColumnValueConverter
             $transactionField = $this->roleToTransaction[$role] ?? null;
             $parsedValue      = $value->getParsedValue();
             if (null === $transactionField) {
-                throw new RuntimeException(sprintf('No place for role "%s"', $value->getRole()));
+                throw new UnexpectedValueException(sprintf('No place for role "%s"', $value->getRole()));
             }
             if (null === $parsedValue) {
                 Log::debug(sprintf('Skip column #%d with role "%s" (in field "%s")', $columnIndex+1, $role, $transactionField));
@@ -205,7 +204,7 @@ class ColumnValueConverter
     private function toString($value): string
     {
         if (is_array($value)) {
-            return json_encode($value);
+            return json_encode($value, JSON_THROW_ON_ERROR, 512);
         }
 
         return (string)$value;

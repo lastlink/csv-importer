@@ -23,9 +23,10 @@ declare(strict_types=1);
 
 namespace App\Services\Storage;
 
-use RuntimeException;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Storage;
 use Str;
+use UnexpectedValueException;
 
 /**
  * Class StorageService
@@ -49,6 +50,7 @@ class StorageService
     /**
      * @param string $name
      *
+     * @throws FileNotFoundException
      * @return string
      */
     public static function getContent(string $name): string
@@ -57,7 +59,7 @@ class StorageService
         if ($disk->exists($name)) {
             return $disk->get($name);
         }
-        throw new RuntimeException(sprintf('No such file %s', $name));
+        throw new UnexpectedValueException(sprintf('No such file %s', $name));
     }
 
 }

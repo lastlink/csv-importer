@@ -49,4 +49,12 @@ trait HaveAccess
 
         return true;
     }
+
+    /**
+     * @param      $string
+     * @param null $verbosity
+     *
+     * @return void
+     */
+    abstract public function error($string, $verbosity = null);
 }

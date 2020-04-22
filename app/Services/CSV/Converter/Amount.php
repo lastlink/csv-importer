@@ -68,12 +68,10 @@ class Amount implements ConverterInterface
      */
     public function convert($value): string
     {
-        if (null === $value) {
+        if (null === $value || '' === $value) {
             return '0';
         }
-        if('' === $value) {
-            return '0';
-        }
+
         Log::debug(sprintf('Start with amount "%s"', $value));
         $original = $value;
         $value    = $this->stripAmount((string)$value);
@@ -231,9 +229,7 @@ class Amount implements ConverterInterface
         $value = str_replace($search, '', $value);
 
         /** @noinspection CascadeStringReplacementInspection */
-        $value = str_replace(',', '.', $value);
-
-        return $value;
+        return str_replace(',', '.', $value);
     }
 
     /**
@@ -250,7 +246,7 @@ class Amount implements ConverterInterface
         }
         // have to strip the € because apparantly the Postbank (DE) thinks "1.000,00 €" is a normal way to format a number.
         $value = trim((string)str_replace(['€'], '', $value));
-        $str   = preg_replace('/[^\-\(\)\.\,0-9 ]/', '', $value);
+        $str   = preg_replace('/[^\-().,0-9 ]/', '', $value);
         $len   = strlen($str);
         if (0 === strpos($str, '(') && ')' === $str[$len - 1]) {
             $str = '-' . substr($str, 1, $len - 2);

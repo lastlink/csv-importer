@@ -37,13 +37,15 @@ class AmountDebit implements ConverterInterface
      */
     public function convert($value): string
     {
+        if (null === $value || '' === $value) {
+            return '';
+        }
+        
         /** @var ConverterInterface $converter */
         $converter = app(Amount::class);
         $result    = $converter->convert($value);
         $result    = Amount::positive($result);
-        $result    = bcmul($result, '-1');
-
-        return $result;
+        return bcmul($result, '-1');
     }
     /**
      * Add extra configuration parameters.
