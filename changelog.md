@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.5] - 2020-04-22
+
+### Fixed
+- [Issue 3268](https://github.com/firefly-iii/firefly-iii/issues/3268) Issue with asset management.
+- [Issue 3271](https://github.com/firefly-iii/firefly-iii/issues/3271) Bad handing of debit/credit columns.
+- [Issue 3279](https://github.com/firefly-iii/firefly-iii/issues/3279) Issue handling JSON.
+
+
 ## [1.0.4] - 2020-04-16
 
 - [Issue 3266](https://github.com/firefly-iii/firefly-iii/issues/3266) Import loop due to bad bccomp call.
