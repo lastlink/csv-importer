@@ -118,6 +118,14 @@ class Configuration
         $object->doMapping                   = $array['do_mapping'];
         $object->version                     = $version;
 
+        // due to a bug, the "specifics" array could still be broken at this point.
+        // do a quick check and verification.
+        $firstValue = count(array_values($array['specifics'])) > 0 ? array_values($array['specifics'])[0] : null;
+        $firstKey   = count(array_values($array['specifics'])) > 0 ? array_keys($array['specifics'])[0] : null;
+        if (is_bool($firstValue) && is_string($firstKey)) {
+            $object->specifics = array_keys($array['specifics']);
+        }
+
         return $object;
     }
 
@@ -259,6 +267,7 @@ class Configuration
         $version = $data['version'] ?? 1;
         if (1 === $version) {
             Log::debug('v1, going for classic.');
+
             return self::fromClassicFile($data);
         }
         if (2 === $version) {

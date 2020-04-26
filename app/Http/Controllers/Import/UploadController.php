@@ -77,6 +77,7 @@ class UploadController extends Controller
         if (null !== $csvFile && 0 === $errorNumber) {
             $csvFileName = StorageService::storeContent(file_get_contents($csvFile->getPathname()));
             session()->put(Constants::UPLOAD_CSV_FILE, $csvFileName);
+            session()->put(Constants::HAS_UPLOAD, 'true');
         }
 
         // if present, and no errors, upload the config file and store it in the session.

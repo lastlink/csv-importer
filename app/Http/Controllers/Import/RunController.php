@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Import;
 use App\Exceptions\ImportException;
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\ReadyForImport;
+use App\Mail\ImportFinished;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\File\FileReader;
 use App\Services\Import\ImportJobStatus\ImportJobStatus;
@@ -38,6 +39,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use JsonException;
 use Log;
+use Mail;
 use TypeError;
 
 
@@ -65,6 +67,17 @@ class RunController extends Controller
         $mainTitle = 'Import the data';
         $subTitle  = 'Connect to Firefly III and store your data';
 
+        // get configuration object.
+        $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
+        if ([] === $configuration->getDoMapping()) {
+            // no mapping, back to roles
+            $jobBackUri = route('back.roles');
+        }
+        if ([] !== $configuration->getDoMapping()) {
+            // back to mapping
+            $jobBackUri = route('back.mapping');
+        }
+
         // job ID may be in session:
         $identifier = session()->get(Constants::JOB_IDENTIFIER);
         $routine    = new ImportRoutineManager($identifier);
@@ -76,7 +89,7 @@ class RunController extends Controller
         session()->put(Constants::JOB_IDENTIFIER, $identifier);
         Log::debug(sprintf('Stored "%s" under "%s"', $identifier, Constants::JOB_IDENTIFIER));
 
-        return view('import.run.index', compact('mainTitle', 'subTitle', 'identifier'));
+        return view('import.run.index', compact('mainTitle', 'subTitle', 'identifier', 'jobBackUri'));
     }
 
     /**
@@ -113,6 +126,21 @@ class RunController extends Controller
 
         // set done:
         ImportJobStatusManager::setJobStatus(ImportJobStatus::JOB_DONE);
+
+        // if configured, send report!
+        $log
+            = [
+            'messages' => $routine->getAllMessages(),
+            'warnings' => $routine->getAllWarnings(),
+            'errors'   => $routine->getAllErrors(),
+        ];
+
+        $send = config('mail.enable_mail_report');
+        Log::debug('Log log', $log);
+        if (true === $send) {
+            Log::debug('SEND MAIL');
+            Mail::to(config('mail.destination'))->send(new ImportFinished($log));
+        }
 
         return response()->json($importJobStatus->toArray());
     }

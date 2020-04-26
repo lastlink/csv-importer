@@ -23,18 +23,27 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-header">Import <status></status></div>
+                <div class="card-header">Import status</div>
                 <div class="card-body" v-if="'waiting_to_start' === this.status && false === this.triedToStart">
                     <p>
                         The tool is ready to import your data. Press "start job" to start.
                         <a :href="this.downloadUri" title="Download configuration file.">
                             You can download a configuration file of your import</a>, so you can make a quick start the next time you import.
                     </p>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <!-- go back to upload -->
+                            <a :href="this.jobBackUri" class="btn btn-secondary">&larr; Go back</a>
+                        </div>
+                        <div class="col-lg-6">
+                            <button
+                                    class="btn btn-success float-right"
+                                    v-on:click="callStart" type="button">Start job &rarr;
+                            </button>
+                        </div>
+                    </div>
                     <p>
-                        <button
-                                class="btn btn-success"
-                                v-on:click="callStart" type="button">Start job
-                        </button>
+
                     </p>
                 </div>
                 <div class="card-body" v-if="'waiting_to_start' === this.status && true === this.triedToStart">
@@ -99,6 +108,7 @@
                 warnings: [],
                 errors: [],
                 downloadUri: window.configDownloadUri,
+                jobBackUri: window.jobBackUri,
                 flushUri: window.flushUri
             };
         },

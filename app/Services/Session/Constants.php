@@ -29,6 +29,8 @@ namespace App\Services\Session;
 class Constants
 {
     /** @var string  */
+    public const HAS_UPLOAD = 'has_uploaded_file';
+    /** @var string  */
     public const UPLOAD_CSV_FILE = 'csv_file_path';
     /** @var string  */
     public const UPLOAD_CONFIG_FILE = 'config_file_path';

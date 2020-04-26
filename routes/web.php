@@ -28,12 +28,21 @@ Route::get('/', 'IndexController@index')->name('index');
 Route::get('/token', 'TokenController@index')->name('token.index');
 Route::get('/token/validate', 'TokenController@doValidate')->name('token.validate');
 
+// routes to go back to other steps (also takes care of session vars)
+Route::get('/back/start', 'NavController@toStart')->name('back.start');
+Route::get('/back/upload', 'NavController@toUpload')->name('back.upload');
+Route::get('/back/config', 'NavController@toConfig')->name('back.config');
+Route::get('/back/roles', 'NavController@toRoles')->name('back.roles');
+Route::get('/back/mapping', 'NavController@toRoles')->name('back.mapping');
+
+
 // clear session
 Route::get('/flush','IndexController@flush')->name('flush');
 
 // start import thing.
 Route::get('/import/start', ['uses' => 'Import\StartController@index', 'as' => 'import.start']);
 Route::post('/import/upload', ['uses' => 'Import\UploadController@upload', 'as' => 'import.upload']);
+
 Route::get('/import/configure', ['uses' => 'Import\ConfigurationController@index', 'as' => 'import.configure.index']);
 Route::post('/import/configure', ['uses' => 'Import\ConfigurationController@postIndex', 'as' => 'import.configure.post']);
 

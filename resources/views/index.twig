@@ -22,7 +22,7 @@
                             in the <a href="https://firefly-iii.gitbook.io/firefly-iii-csv-importer/" target="_blank">
                                 official documentation</a>. Any links you see to the docs will open in a new window or tab.
                         </p>
-                        <a class="btn btn-success disabled" id="start" href="{{ route('import.start') }}">...</a>
+                        <a class="float-right btn btn-primary disabled" id="start" href="{{ route('import.start') }}">...</a>
                     </div>
                 </div>
             </div>
@@ -39,7 +39,7 @@
         var tokenPageUri = '{{ route('token.index') }}';
         $.getJSON(uri).done(function (data) {
             if ('OK' === data.result) {
-                $('#start').removeClass('disabled').text('Start here');
+                $('#start').removeClass('disabled').html('Start here &rarr;');
             } else {
                 $('#start').hide();
                 window.location = tokenPageUri;
