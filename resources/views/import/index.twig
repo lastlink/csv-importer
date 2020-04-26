@@ -44,7 +44,17 @@
                                     <input type="file" class="form-control" id="config_file" name="config_file" placeholder="Configuration file" />
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Upload</button>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <!-- go back to start -->
+                                    <a href="{{ route('back.start') }}" class="btn btn-secondary">&larr; Go back to index</a>
+                                </div>
+                                <div class="col-lg-6">
+                                    <!-- continue -->
+                                    <button type="submit" class="float-right btn btn-primary">Upload &rarr;</button>
+                                </div>
+                            </div>
+
                         </form>
                     </div>
                 </div>

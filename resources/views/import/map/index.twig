@@ -74,8 +74,19 @@
                                 </table>
                             {% endfor %}
                             <p>
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                                &nbsp;
                             </p>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <!-- go back to roles -->
+                                    <a href="{{ route('back.roles') }}" class="btn btn-secondary">&larr; Go back to role selection</a>
+                                    <br>
+                                    <small class="text-muted">Changes on this page will not be saved.</small>
+                                </div>
+                                <div class="col-lg-6">
+                                    <button type="submit" class="btn btn-primary float-right">Submit &rarr;</button>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>

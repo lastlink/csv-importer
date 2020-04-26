@@ -33,6 +33,7 @@ use App\Services\CSV\Specifics\SnsDescription;
 use App\Services\Import\Task\Accounts;
 use App\Services\Import\Task\Amount;
 use App\Services\Import\Task\Currency;
+use App\Services\Import\Task\EmptyAccounts;
 use App\Services\Import\Task\EmptyDescription;
 use App\Services\Import\Task\PositiveAmount;
 use App\Services\Import\Task\Tags;
@@ -88,6 +89,7 @@ return [
         Accounts::class,
         PositiveAmount::class,
         EmptyDescription::class,
+        EmptyAccounts::class,
     ],
 
     /*

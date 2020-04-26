@@ -21,6 +21,7 @@
     <script type="text/javascript">
         var jobStatusUri = '{{ route('import.job.status') }}?identifier={{ identifier }}';
         var jobStartUri = '{{ route('import.job.start') }}?identifier={{ identifier }}';
+        var jobBackUri = '{{ jobBackUri }}';
         var configDownloadUri = '{{ route('import.job.configuration.download') }}?identifier={{ identifier }}';
         var flushUri = '{{ route('flush') }}';
     </script>

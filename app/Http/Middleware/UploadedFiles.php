@@ -43,7 +43,8 @@ class UploadedFiles
      */
     public function handle(Request $request, Closure $next)
     {
-        if (session()->has(Constants::UPLOAD_CSV_FILE)) {
+
+        if (session()->has(Constants::HAS_UPLOAD)) {
             return redirect()->route('import.configure.index');
         }
 

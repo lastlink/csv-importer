@@ -59,13 +59,9 @@ class ConfigurationController extends Controller
     }
 
     /**
-     * @throws ApiHttpException
-     * @throws JsonException
-     * @throws JsonException
-     * @throws JsonException
      * @return Factory|RedirectResponse|View
      */
-    public function index()
+    public function index(Request $request)
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
         $mainTitle = 'Import routine';
@@ -77,7 +73,8 @@ class ConfigurationController extends Controller
             $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
         }
         // if config says to skip it, skip it:
-        if (null !== $configuration && true === $configuration->isSkipForm()) {
+        $overruleSkip = $request->get('overruleskip') === 'true';
+        if (null !== $configuration && true === $configuration->isSkipForm() && false === $overruleSkip) {
             // skipForm
             return redirect()->route('import.roles.index');
         }
