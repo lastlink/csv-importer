@@ -77,16 +77,16 @@
     ],
     "require": {
         "php": "^7.3",
-        "ext-json": "*",
         "ext-bcmath": "*",
-        "firefly-iii/api-support-classes": "dev-master",
+        "ext-json": "*",
         "doctrine/dbal": "^2.9",
         "fideloper/proxy": "^4.0",
-        "guzzlehttp/guzzle": "^6.3",
+        "firefly-iii/api-support-classes": "dev-master",
+        "fruitcake/laravel-cors": "^1.0",
+        "guzzlehttp/guzzle": "^6.5",
         "laravel/framework": "7.*",
         "laravel/tinker": "^2.0",
         "league/csv": "9.*",
-        "fruitcake/laravel-cors": "^1.0",
         "rcrowe/twigbridge": "^0.11.0"
     },
     "require-dev": {

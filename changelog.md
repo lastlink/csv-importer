@@ -2,6 +2,32 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.6] - 2020-04-26
+
+⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
+
+### Added
+- You can now navigate back and forth between steps.
+- You can configure the importer to send email reports. Checkout `.env.example`.
+
+### Changed
+- ⚠️ When the destination of a withdrawal is empty, *or* the source of a deposit is empty, the CSV importer will substitute these values with `(no name)` as
+ it used to do when the CSV importer was part of Firefly III itself.
+
+### Deprecated
+- Initial release.
+
+### Removed
+- Initial release.
+
+### Fixed
+- Initial release.
+
+### Security
+- Initial release.
+
+
+
 ## [1.0.5] - 2020-04-22
 
 ### Fixed

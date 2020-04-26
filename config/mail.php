@@ -105,10 +105,12 @@ return [
     |
     */
 
-    'from' => [
+    'from'               => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name'    => env('MAIL_FROM_NAME', 'Example'),
+        'name'    => env('MAIL_FROM_NAME', 'Firefly III CSV Importer'),
     ],
+    'destination'        => env('YOUR_OWN_EMAIL@example.com', 'badly_configured@example.com'),
+    'enable_mail_report' => env('ENABLE_MAIL_REPORT', false),
 
     /*
     |--------------------------------------------------------------------------

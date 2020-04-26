@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Import;
 use App\Exceptions\ImportException;
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\ReadyForImport;
+use App\Mail\ImportFinished;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\File\FileReader;
 use App\Services\Import\ImportJobStatus\ImportJobStatus;
@@ -38,6 +39,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use JsonException;
 use Log;
+use Mail;
 use TypeError;
 
 
@@ -124,6 +126,21 @@ class RunController extends Controller
 
         // set done:
         ImportJobStatusManager::setJobStatus(ImportJobStatus::JOB_DONE);
+
+        // if configured, send report!
+        $log
+            = [
+            'messages' => $routine->getAllMessages(),
+            'warnings' => $routine->getAllWarnings(),
+            'errors'   => $routine->getAllErrors(),
+        ];
+
+        $send = config('mail.enable_mail_report');
+        Log::debug('Log log', $log);
+        if (true === $send) {
+            Log::debug('SEND MAIL');
+            Mail::to(config('mail.destination'))->send(new ImportFinished($log));
+        }
 
         return response()->json($importJobStatus->toArray());
     }
