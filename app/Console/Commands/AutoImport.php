@@ -26,8 +26,10 @@ namespace App\Console\Commands;
 use App\Console\HaveAccess;
 use App\Console\StartImport;
 use App\Console\VerifyJSON;
+use App\Exceptions\ImportException;
 use Illuminate\Console\Command;
 use JsonException;
+use Log;
 
 /**
  * Class AutoImport
@@ -56,7 +58,6 @@ class AutoImport extends Command
     /**
      * Execute the console command.
      *
-     * @throws JsonException
      * @return int
      */
     public function handle(): int
@@ -80,8 +81,12 @@ class AutoImport extends Command
             return 1;
         }
         $this->line(sprintf('Found %d CSV + JSON file sets in %s', count($files), $this->directory));
-
-        $this->importFiles($files);
+        try {
+            $this->importFiles($files);
+        } catch (ImportException $e) {
+            Log::error($e->getMessage());
+            $this->error(sprintf('Import exception (see the logs): %s', $e->getMessage()));
+        }
 
         return 0;
     }
@@ -150,7 +155,7 @@ class AutoImport extends Command
     /**
      * @param string $file
      *
-     * @throws JsonException
+     * @throws ImportException
      */
     private function importFile(string $file): void
     {
@@ -165,7 +170,12 @@ class AutoImport extends Command
 
             return;
         }
-        $configuration = json_decode(file_get_contents($jsonFile), true, 512, JSON_THROW_ON_ERROR);
+        try {
+            $configuration = json_decode(file_get_contents($jsonFile), true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            Log::error($e->getMessage());
+            throw new ImportException(sprintf('Bad JSON in configuration file: %s', $e->getMessage()));
+        }
         $this->line(sprintf('Going to import from file %s using configuration %s.', $csvFile, $jsonFile));
         // create importer
         $csv    = file_get_contents($csvFile);
@@ -183,7 +193,7 @@ class AutoImport extends Command
     /**
      * @param array $files
      *
-     * @throws JsonException
+     * @throws ImportException
      */
     private function importFiles(array $files): void
     {

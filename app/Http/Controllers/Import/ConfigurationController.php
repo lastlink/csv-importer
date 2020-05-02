@@ -32,7 +32,6 @@ use App\Services\CSV\Specifics\SpecificService;
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
 use Carbon\Carbon;
-use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
 use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
 use Illuminate\Contracts\View\Factory;
@@ -100,9 +99,16 @@ class ConfigurationController extends Controller
         $doMapping = '{}';
         $mapping   = '{}';
         if (null !== $configuration) {
-            $roles     = base64_encode(json_encode($configuration->getRoles(), JSON_THROW_ON_ERROR, 512));
-            $doMapping = base64_encode(json_encode($configuration->getDoMapping(), JSON_THROW_ON_ERROR, 512));
-            $mapping   = base64_encode(json_encode($configuration->getMapping(), JSON_THROW_ON_ERROR, 512));
+            try {
+                $roles     = base64_encode(json_encode($configuration->getRoles(), JSON_THROW_ON_ERROR, 512));
+                $doMapping = base64_encode(json_encode($configuration->getDoMapping(), JSON_THROW_ON_ERROR, 512));
+                $mapping   = base64_encode(json_encode($configuration->getMapping(), JSON_THROW_ON_ERROR, 512));
+            } catch (JsonException $e) {
+                Log::error($e->getMessage());
+                $roles     = base64_encode('[]');
+                $doMapping = base64_encode('[]');
+                $mapping   = base64_encode('[]');
+            }
         }
 
         return view(
@@ -137,7 +143,13 @@ class ConfigurationController extends Controller
         // store config on drive.
         $fromRequest   = $request->getAll();
         $configuration = Configuration::fromRequest($fromRequest);
-        StorageService::storeContent(json_encode($configuration, JSON_THROW_ON_ERROR, 512));
+        $json          = '[]';
+        try {
+            $json = json_encode($configuration, JSON_THROW_ON_ERROR, 512)
+        } catch (JsonException $e) {
+            Log::error($e->getMessage());
+        }
+        StorageService::storeContent($json);
 
         session()->put(Constants::CONFIGURATION, $configuration->toArray());
 
