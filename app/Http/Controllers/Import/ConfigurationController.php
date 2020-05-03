@@ -145,7 +145,7 @@ class ConfigurationController extends Controller
         $configuration = Configuration::fromRequest($fromRequest);
         $json          = '[]';
         try {
-            $json = json_encode($configuration, JSON_THROW_ON_ERROR, 512)
+            $json = json_encode($configuration, JSON_THROW_ON_ERROR, 512);
         } catch (JsonException $e) {
             Log::error($e->getMessage());
         }

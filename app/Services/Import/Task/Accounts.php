@@ -355,6 +355,9 @@ class Accounts extends AbstractTask
          */
         if ('revenue' === $destination['type'] && 'withdrawal' === $transaction['type']) {
             Log::warning('The found destination account is of type revenue but this is a withdrawal. Out of cheese error.');
+            Log::debug(
+                sprintf('CSV importer will submit name "%s" and IBAN "%s" and let Firefly III sort it out.', $destination['name'], $destination['iban'])
+            );
             $transaction['destination_id']   = null;
             $transaction['destination_name'] = $destination['name'];
             $transaction['destination_iban'] = $destination['iban'];
@@ -367,6 +370,7 @@ class Accounts extends AbstractTask
          */
         if ('expense' === $source['type'] && 'deposit' === $transaction['type']) {
             Log::warning('The found source account is of type expense but this is a deposit. Out of cheese error.');
+            Log::debug(sprintf('CSV importer will submit name "%s" and IBAN "%s" and let Firefly III sort it out.', $source['name'], $source['iban']));
             $transaction['source_id']   = null;
             $transaction['source_name'] = $source['name'];
             $transaction['source_iban'] = $source['iban'];

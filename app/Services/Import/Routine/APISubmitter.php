@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace App\Services\Import\Routine;
 
-use App\Exceptions\ImportException;
 use App\Services\Import\Support\ProgressInformation;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Transaction;
@@ -133,21 +132,28 @@ class APISubmitter
         if ($response instanceof PostTransactionResponse) {
             /** @var TransactionGroup $group */
             $group = $response->getTransactionGroup();
-            /** @var Transaction $transaction */
-            $transaction = $group->transactions[0];
-            $message     = sprintf(
-                'Created %s <a target="_blank" href="%s">#%d "%s"</a> (%s %s)',
-                $transaction->type,
-                sprintf('%s/transactions/show/%d', env('FIREFLY_III_URI'), $group->id),
-                $group->id,
-                e($transaction->description),
-                $transaction->currencyCode,
-                round($transaction->amount, $transaction->currencyDecimalPlaces)
-            );
-            // plus 1 to keep the count.
-            $this->addMessage($index, $message);
-            $this->compareArrays($index, $line, $group);
-            Log::info($message);
+            if (null === $group) {
+                $message = 'Could not create transaction. Unexpected empty response from Firefly III. Check the logs.';
+                Log::error($message, $response->getRawData());
+                $this->addError($index, $message);
+            }
+            if (null !== $group) {
+                /** @var Transaction $transaction */
+                $transaction = $group->transactions[0];
+                $message     = sprintf(
+                    'Created %s <a target="_blank" href="%s">#%d "%s"</a> (%s %s)',
+                    $transaction->type,
+                    sprintf('%s/transactions/show/%d', env('FIREFLY_III_URI'), $group->id),
+                    $group->id,
+                    e($transaction->description),
+                    $transaction->currencyCode,
+                    round($transaction->amount, $transaction->currencyDecimalPlaces)
+                );
+                // plus 1 to keep the count.
+                $this->addMessage($index, $message);
+                $this->compareArrays($index, $line, $group);
+                Log::info($message);
+            }
         }
     }
 
