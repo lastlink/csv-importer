@@ -28,6 +28,7 @@ use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Transaction;
 use GrumpyDictator\FFIIIApiSupport\Model\TransactionGroup;
 use GrumpyDictator\FFIIIApiSupport\Request\PostTransactionRequest;
+use GrumpyDictator\FFIIIApiSupport\Request\PutTransactionRequest;
 use GrumpyDictator\FFIIIApiSupport\Response\PostTransactionResponse;
 use GrumpyDictator\FFIIIApiSupport\Response\ValidationErrorResponse;
 use Log;
@@ -39,22 +40,78 @@ class APISubmitter
 {
     use ProgressInformation;
 
+    /** @var string */
+    private $tag;
+
+    /** @var bool */
+    private $addTag;
+
     /**
      * @param array $lines
      */
     public function processTransactions(array $lines): void
     {
-        $count = count($lines);
+        $this->tag = sprintf('CSV Import on %s', date('Y-m-d \@ H:i'));
+        $count     = count($lines);
         Log::info(sprintf('Going to submit %d transactions to your Firefly III instance.', $count));
         /**
          * @var int   $index
          * @var array $line
          */
         foreach ($lines as $index => $line) {
-            $this->processTransaction($index, $line);
+            $groupInfo = $this->processTransaction($index, $line);
+            $this->addTagToGroups($groupInfo);
         }
         Log::info(sprintf('Done submitting %d transactions to your Firefly III instance.', $count));
     }
+
+    /**
+     * @param bool $addTag
+     */
+    public function setAddTag(bool $addTag): void
+    {
+        $this->addTag = $addTag;
+    }
+
+    /**
+     * @param array $groupInfo
+     */
+    private function addTagToGroups(array $groupInfo): void
+    {
+        if ([] === $groupInfo) {
+            Log::info('No info on group.');
+
+            return;
+        }
+        if (false === $this->addTag) {
+            Log::debug('Will not add import tag.');
+            return;
+        }
+
+        $groupId = (int) $groupInfo['group_id'];
+        Log::debug(sprintf('Going to add import tag to transaction group #%d', $groupId));
+        $body = [
+            'transactions' => [],
+        ];
+        /**
+         * @var int   $journalId
+         * @var array $currentTags
+         */
+        foreach ($groupInfo['journals'] as $journalId => $currentTags) {
+            $currentTags[]          = $this->tag;
+            $body['transactions'][] = [
+                'transaction_journal_id' => $journalId,
+                'tags'                   => $currentTags,
+            ];
+        }
+        $uri     = (string) config('csv_importer.uri');
+        $token   = (string) config('csv_importer.access_token');
+        $request = new PutTransactionRequest($uri, $token, $groupId);
+        $request->setBody($body);
+        $request->put();
+
+    }
+
 
     /**
      * @param int              $lineIndex
@@ -97,12 +154,15 @@ class APISubmitter
     /**
      * @param int   $index
      * @param array $line
+     *
+     * @return array
      */
-    private function processTransaction(int $index, array $line): void
+    private function processTransaction(int $index, array $line): array
     {
-        $uri     = (string) config('csv_importer.uri');
-        $token   = (string) config('csv_importer.access_token');
-        $request = new PostTransactionRequest($uri, $token);
+        $response = [];
+        $uri      = (string) config('csv_importer.uri');
+        $token    = (string) config('csv_importer.access_token');
+        $request  = new PostTransactionRequest($uri, $token);
         Log::debug('Submitting to Firefly III:', $line);
         $request->setBody($line);
 
@@ -113,7 +173,8 @@ class APISubmitter
             Log::error($e->getTraceAsString());
             $message = sprintf(sprintf('Submission HTTP error: %s', $e->getMessage()));
             $this->addError($index, $message);
-            return;
+
+            return $response;
         }
 
         if ($response instanceof ValidationErrorResponse) {
@@ -126,7 +187,8 @@ class APISubmitter
                     Log::error($msg);
                 }
             }
-            return;
+
+            return $response;
         }
 
         if ($response instanceof PostTransactionResponse) {
@@ -136,25 +198,34 @@ class APISubmitter
                 $message = 'Could not create transaction. Unexpected empty response from Firefly III. Check the logs.';
                 Log::error($message, $response->getRawData());
                 $this->addError($index, $message);
+
+                return $response;
             }
             if (null !== $group) {
-                /** @var Transaction $transaction */
-                $transaction = $group->transactions[0];
-                $message     = sprintf(
-                    'Created %s <a target="_blank" href="%s">#%d "%s"</a> (%s %s)',
-                    $transaction->type,
-                    sprintf('%s/transactions/show/%d', env('FIREFLY_III_URI'), $group->id),
-                    $group->id,
-                    e($transaction->description),
-                    $transaction->currencyCode,
-                    round($transaction->amount, $transaction->currencyDecimalPlaces)
-                );
-                // plus 1 to keep the count.
-                $this->addMessage($index, $message);
-                $this->compareArrays($index, $line, $group);
-                Log::info($message);
+                $response = [
+                    'group_id' => $group->id,
+                    'journals' => [],
+                ];
+                foreach ($group->transactions as $transaction) {
+                    $message = sprintf(
+                        'Created %s <a target="_blank" href="%s">#%d "%s"</a> (%s %s)',
+                        $transaction->type,
+                        sprintf('%s/transactions/show/%d', env('FIREFLY_III_URI'), $group->id),
+                        $group->id,
+                        e($transaction->description),
+                        $transaction->currencyCode,
+                        round($transaction->amount, $transaction->currencyDecimalPlaces)
+                    );
+                    // plus 1 to keep the count.
+                    $this->addMessage($index, $message);
+                    $this->compareArrays($index, $line, $group);
+                    Log::info($message);
+                    $response['journals'][$transaction->id] = $transaction->tags;
+                }
             }
         }
+
+        return $response;
     }
 
     /**

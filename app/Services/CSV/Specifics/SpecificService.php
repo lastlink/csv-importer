@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Services\CSV\Specifics;
 
+use Log;
 
 /**
  * Class SpecificService
@@ -81,6 +82,7 @@ class SpecificService
         if (0 === count($specifics)) {
             return $row;
         }
+        Log::debug(sprintf('Going to run %d specifics on this row.', count($specifics)), $specifics);
 
         // little hack.
         $newSpecifics = $specifics;
