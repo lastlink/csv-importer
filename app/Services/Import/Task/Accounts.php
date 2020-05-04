@@ -27,6 +27,7 @@ use App\Exceptions\ImportException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException as GrumpyApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
+use GrumpyDictator\FFIIIApiSupport\Model\AccountType;
 use GrumpyDictator\FFIIIApiSupport\Request\GetSearchAccountRequest;
 use GrumpyDictator\FFIIIApiSupport\Response\GetAccountsResponse;
 use Log;
@@ -117,6 +118,19 @@ class Accounts extends AbstractTask
 
             return $return;
         }
+
+        // find by name, return only if it's an asset or liability account.
+        if (isset($array['name']) && '' !== (string) $array['name']) {
+            Log::debug('Find by name.');
+            $result = $this->findByName((string) $array['name']);
+        }
+        if (null !== $result) {
+            $return = $result->toArray();
+            Log::debug('Result of findByName is not null, returning:', $return);
+
+            return $return;
+        }
+
         Log::debug('Found no account or haven\'t searched for one.');
 
         // append an empty type to the array for consistency's sake.
@@ -257,6 +271,43 @@ class Accounts extends AbstractTask
 
         if (2 === count($response)) {
             Log::debug('Found 2 results, Firefly III will have to make the correct decision.');
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @throws ImportException
+     * @return Account|null
+     */
+    private function findByName(string $name): ?Account
+    {
+        Log::debug(sprintf('Going to search account with name "%s"', $name));
+        $uri     = (string) config('csv_importer.uri');
+        $token   = (string) config('csv_importer.access_token');
+        $request = new GetSearchAccountRequest($uri, $token);
+        $request->setField('name');
+        $request->setQuery($name);
+        /** @var GetAccountsResponse $response */
+        try {
+            $response = $request->get();
+        } catch (GrumpyApiHttpException $e) {
+            throw new ImportException($e->getMessage());
+        }
+        if (0 === count($response)) {
+            Log::debug('Found NOTHING.');
+
+            return null;
+        }
+        /** @var Account $account */
+        foreach ($response as $account) {
+            if (in_array($account->type, [AccountType::ASSET, AccountType::LOAN, AccountType::DEBT, AccountType::MORTGAGE], true)) {
+                Log::debug(sprintf('[b] Found "%s" account #%d based on name "%s"', $account->type, $account->id, $name));
+
+                return $account;
+            }
         }
 
         return null;
