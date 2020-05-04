@@ -27,8 +27,10 @@ use App\Services\Import\Support\ProgressInformation;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Transaction;
 use GrumpyDictator\FFIIIApiSupport\Model\TransactionGroup;
+use GrumpyDictator\FFIIIApiSupport\Request\PostTagRequest;
 use GrumpyDictator\FFIIIApiSupport\Request\PostTransactionRequest;
 use GrumpyDictator\FFIIIApiSupport\Request\PutTransactionRequest;
+use GrumpyDictator\FFIIIApiSupport\Response\PostTagResponse;
 use GrumpyDictator\FFIIIApiSupport\Response\PostTransactionResponse;
 use GrumpyDictator\FFIIIApiSupport\Response\ValidationErrorResponse;
 use Log;
@@ -43,6 +45,9 @@ class APISubmitter
     /** @var string */
     private $tag;
 
+    /** @var string */
+    private $tagDate;
+
     /** @var bool */
     private $addTag;
 
@@ -51,9 +56,14 @@ class APISubmitter
      */
     public function processTransactions(array $lines): void
     {
-        $this->tag = sprintf('CSV Import on %s', date('Y-m-d \@ H:i'));
-        $count     = count($lines);
+        $this->tag     = sprintf('CSV Import on %s', date('Y-m-d \@ H:i'));
+        $this->tagDate = date('Y-m-d');
+        $count         = count($lines);
         Log::info(sprintf('Going to submit %d transactions to your Firefly III instance.', $count));
+
+        // create the tag, to be used later on.
+        $this->createTag();
+
         /**
          * @var int   $index
          * @var array $line
@@ -148,6 +158,40 @@ class APISubmitter
                 );
             }
 
+        }
+    }
+
+    private function createTag(): void
+    {
+        if (false === $this->addTag) {
+            Log::debug('Not instructed to add a tag, so will not create one.');
+
+            return;
+        }
+        $uri     = (string) config('csv_importer.uri');
+        $token   = (string) config('csv_importer.access_token');
+        $request = new PostTagRequest($uri, $token);
+        $body    = [
+            'tag'  => $this->tag,
+            'date' => $this->tagDate,
+        ];
+        $request->setBody($body);
+
+        try {
+            /** @var PostTagResponse $response */
+            $response = $request->post();
+        } catch (ApiHttpException $e) {
+            Log::error(sprintf('Could not create tag. %s', $e->getMessage()));
+
+            return;
+        }
+        if ($response instanceof ValidationErrorResponse) {
+            Log::error($response->errors);
+
+            return;
+        }
+        if (null !== $response->getTag()) {
+            Log::info(sprintf('Created tag #%d "%s"', $response->getTag()->id, $response->getTag()->tag));
         }
     }
 
