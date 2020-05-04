@@ -23,6 +23,9 @@ declare(strict_types=1);
 
 namespace App\Services\CSV\Converter;
 
+use ErrorException;
+use Log;
+
 /**
  * Class Iban
  */
@@ -60,14 +63,20 @@ class Iban implements ConverterInterface
                     '32', '33', '34', '35',];
 
         // take
-        $first    = substr($value, 0, 4);
-        $last     = substr($value, 4);
-        $iban     = $last . $first;
-        $iban     = str_replace($search, $replace, $iban);
-        $checksum = bcmod($iban, '97');
+        $first = substr($value, 0, 4);
+        $last  = substr($value, 4);
+        $iban  = $last . $first;
+        $iban  = str_replace($search, $replace, $iban);
+        try {
+            $checksum = bcmod($iban, '97');
+        } catch (ErrorException $e) {
+            Log::error(sprintf('Bad IBAN: %s', $e->getMessage()));
+            $checksum = 2;
+        }
 
-        return 1 === (int)$checksum;
+        return 1 === (int) $checksum;
     }
+
     /**
      * Add extra configuration parameters.
      *

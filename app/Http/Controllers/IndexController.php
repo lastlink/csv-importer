@@ -23,14 +23,12 @@
 declare(strict_types=1);
 
 namespace App\Http\Controllers;
-use App\Mail\ImportFinished;
 use Artisan;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\View\View;
 use Log;
-use Mail;
 
 /**
  *

@@ -23,11 +23,11 @@ declare(strict_types=1);
 
 namespace App\Services\Import\Task;
 
-use App\Exceptions\ApiHttpException;
 use App\Exceptions\ImportException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException as GrumpyApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
+use GrumpyDictator\FFIIIApiSupport\Model\AccountType;
 use GrumpyDictator\FFIIIApiSupport\Request\GetSearchAccountRequest;
 use GrumpyDictator\FFIIIApiSupport\Response\GetAccountsResponse;
 use Log;
@@ -102,6 +102,31 @@ class Accounts extends AbstractTask
         if (null !== $result) {
             $return = $result->toArray();
             Log::debug('Result of findById is not null, returning:', $return);
+
+            return $return;
+        }
+
+        // if the IBAN is set, search for the IBAN.
+        if (isset($array['iban']) && '' !== (string) $array['iban']) {
+            Log::debug('Find by IBAN.');
+            $transactionType = (string) ($array['transaction_type'] ?? null);
+            $result          = $this->findByIban((string) $array['iban'], $transactionType);
+        }
+        if (null !== $result) {
+            $return = $result->toArray();
+            Log::debug('Result of findByIBAN is not null, returning:', $return);
+
+            return $return;
+        }
+
+        // find by name, return only if it's an asset or liability account.
+        if (isset($array['name']) && '' !== (string) $array['name']) {
+            Log::debug('Find by name.');
+            $result = $this->findByName((string) $array['name']);
+        }
+        if (null !== $result) {
+            $return = $result->toArray();
+            Log::debug('Result of findByName is not null, returning:', $return);
 
             return $return;
         }
@@ -205,6 +230,91 @@ class Accounts extends AbstractTask
 
 
     /**
+     * @param string $iban
+     * @param string $transactionType
+     *
+     * @throws ImportException
+     * @return Account|null
+     */
+    private function findByIban(string $iban, string $transactionType): ?Account
+    {
+        Log::debug(sprintf('Going to search account with IBAN "%s"', $iban));
+        $uri     = (string) config('csv_importer.uri');
+        $token   = (string) config('csv_importer.access_token');
+        $request = new GetSearchAccountRequest($uri, $token);
+        $request->setField('iban');
+        $request->setQuery($iban);
+        /** @var GetAccountsResponse $response */
+        try {
+            $response = $request->get();
+        } catch (GrumpyApiHttpException $e) {
+            throw new ImportException($e->getMessage());
+        }
+        if (0 === count($response)) {
+            Log::debug('Found NOTHING.');
+
+            return null;
+        }
+
+        if (1 === count($response)) {
+            /** @var Account $account */
+            try {
+                $account = $response->current();
+            } catch (ApiException $e) {
+                throw new ImportException($e->getMessage());
+            }
+
+            Log::debug(sprintf('[a] Found %s account #%d based on IBAN "%s"', $account->type, $account->id, $iban));
+
+            return $account;
+        }
+
+        if (2 === count($response)) {
+            Log::debug('Found 2 results, Firefly III will have to make the correct decision.');
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @throws ImportException
+     * @return Account|null
+     */
+    private function findByName(string $name): ?Account
+    {
+        Log::debug(sprintf('Going to search account with name "%s"', $name));
+        $uri     = (string) config('csv_importer.uri');
+        $token   = (string) config('csv_importer.access_token');
+        $request = new GetSearchAccountRequest($uri, $token);
+        $request->setField('name');
+        $request->setQuery($name);
+        /** @var GetAccountsResponse $response */
+        try {
+            $response = $request->get();
+        } catch (GrumpyApiHttpException $e) {
+            throw new ImportException($e->getMessage());
+        }
+        if (0 === count($response)) {
+            Log::debug('Found NOTHING.');
+
+            return null;
+        }
+        /** @var Account $account */
+        foreach ($response as $account) {
+            if (in_array($account->type, [AccountType::ASSET, AccountType::LOAN, AccountType::DEBT, AccountType::MORTGAGE], true)) {
+                Log::debug(sprintf('[b] Found "%s" account #%d based on name "%s"', $account->type, $account->id, $name));
+
+                return $account;
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
      * @param array $transaction
      * @param array $source
      *
@@ -296,6 +406,9 @@ class Accounts extends AbstractTask
          */
         if ('revenue' === $destination['type'] && 'withdrawal' === $transaction['type']) {
             Log::warning('The found destination account is of type revenue but this is a withdrawal. Out of cheese error.');
+            Log::debug(
+                sprintf('CSV importer will submit name "%s" and IBAN "%s" and let Firefly III sort it out.', $destination['name'], $destination['iban'])
+            );
             $transaction['destination_id']   = null;
             $transaction['destination_name'] = $destination['name'];
             $transaction['destination_iban'] = $destination['iban'];
@@ -308,6 +421,7 @@ class Accounts extends AbstractTask
          */
         if ('expense' === $source['type'] && 'deposit' === $transaction['type']) {
             Log::warning('The found source account is of type expense but this is a deposit. Out of cheese error.');
+            Log::debug(sprintf('CSV importer will submit name "%s" and IBAN "%s" and let Firefly III sort it out.', $source['name'], $source['iban']));
             $transaction['source_id']   = null;
             $transaction['source_name'] = $source['name'];
             $transaction['source_iban'] = $source['iban'];

@@ -97,6 +97,7 @@ class ConfigurationPostRequest extends Request
             'ignore_duplicate_lines'        => $this->convertBoolean($this->get('ignore_duplicate_lines')),
             'ignore_duplicate_transactions' => $this->convertBoolean($this->get('ignore_duplicate_transactions')),
             'skip_form'                     => $this->convertBoolean($this->get('skip_form')),
+            'add_import_tag'                => $this->convertBoolean($this->get('add_import_tag')),
             'specifics'                     => [],
             'roles'                         => $roles,
             'mapping'                       => $mapping,
@@ -126,6 +127,7 @@ class ConfigurationPostRequest extends Request
             'ignore_duplicate_lines'        => 'numeric|between:0,1',
             'ignore_duplicate_transactions' => 'numeric|between:0,1',
             'skip_form'                     => 'numeric|between:0,1',
+            'add_import_tag'                => 'numeric|between:0,1',
         ];
         // rules for specifics:
         $specifics = SpecificService::getSpecifics();

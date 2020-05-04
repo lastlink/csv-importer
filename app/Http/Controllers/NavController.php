@@ -30,7 +30,7 @@ use App\Services\Session\Constants;
 class NavController extends Controller
 {
     /**
-     * Return back to upload.
+     * Return back to config
      */
     public function toConfig()
     {

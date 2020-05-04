@@ -112,6 +112,20 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                <div class="col-sm-3">Import tag</div>
+                                <div class="col-sm-9">
+                                    <div class="form-check">
+                                        <input class="form-check-input" {% if configuration.isAddImportTag or null == configuration %}checked{% endif %} type="checkbox" id="rules" name="add_import_tag" value="1" aria-describedby="add_import_tagHelp">
+                                        <label class="form-check-label" for="rules">
+                                            Yes
+                                        </label>
+                                        <small id="add_import_tagHelp" class="form-text text-muted">
+                                            When selected Firefly III will add a tag to each imported transaction denoting the import; this groups your import under a tag.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="form-group row">
                                 <label for="X" class="col-sm-3 col-form-label">Unique transactions</label>

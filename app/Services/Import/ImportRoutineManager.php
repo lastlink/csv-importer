@@ -110,6 +110,9 @@ class ImportRoutineManager
         $this->columnValueConverter->setIdentifier($this->identifier);
         $this->csvFileProcessor->setIdentifier($this->identifier);
 
+        // set config:
+        $this->apiSubmitter->setAddTag($this->configuration->isAddImportTag());
+
     }
 
     /**

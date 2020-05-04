@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.7] - 2020-05-04
+
+⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
+
+### Added
+- ⚠️ Reimplement the search for IBANs and names. This makes it easier to import using incomplete data. This changes the importer's behavior.
+- CSV import can add a tag to your import.
+
+### Fixed
+- [Issue 3290](https://github.com/firefly-iii/firefly-iii/issues/3290) Issues with refunds from credit cards.
+- [Issue 3299](https://github.com/firefly-iii/firefly-iii/issues/3299) Issue with bcmod.
+- Merge [fix](https://github.com/firefly-iii/csv-importer/pull/5) for mail config.
+- Catch JSON errors, so the importer handles invalid UTF8 data properly. 
+
 ## [1.0.6] - 2020-04-26
 
 ⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.

@@ -58,6 +58,9 @@ class Configuration
     /** @var array */
     private $doMapping;
 
+    /** @var bool */
+    private $addImportTag;
+
     /** @var array */
     private $mapping;
     /** @var int */
@@ -77,6 +80,7 @@ class Configuration
         $this->ignoreDuplicateLines        = true;
         $this->rules                       = true;
         $this->skipForm                    = false;
+        $this->addImportTag                = true;
         $this->specifics                   = [];
         $this->roles                       = [];
         $this->mapping                     = [];
@@ -92,7 +96,13 @@ class Configuration
         return $this->skipForm;
     }
 
-
+    /**
+     * @return bool
+     */
+    public function isAddImportTag(): bool
+    {
+        return $this->addImportTag;
+    }
 
     /**
      * @param array $array
@@ -112,19 +122,27 @@ class Configuration
         $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
         $object->rules                       = $array['rules'];
         $object->skipForm                    = $array['skip_form'];
+        $object->addImportTag                = $array['add_import_tag'] ?? true;
         $object->specifics                   = $array['specifics'];
         $object->roles                       = $array['roles'];
         $object->mapping                     = $array['mapping'];
         $object->doMapping                   = $array['do_mapping'];
         $object->version                     = $version;
 
-        // due to a bug, the "specifics" array could still be broken at this point.
-        // do a quick check and verification.
         $firstValue = count(array_values($array['specifics'])) > 0 ? array_values($array['specifics'])[0] : null;
         $firstKey   = count(array_values($array['specifics'])) > 0 ? array_keys($array['specifics'])[0] : null;
+
+        // due to a bug, the "specifics" array could still be broken at this point.
+        // do a quick check and verification.
+        $actualSpecifics = [];
         if (is_bool($firstValue) && is_string($firstKey)) {
-            $object->specifics = array_keys($array['specifics']);
+            foreach ($array['specifics'] as $key => $value) {
+                if (true === $value) {
+                    $actualSpecifics[] = $key;
+                }
+            }
         }
+        $object->specifics = $actualSpecifics;
 
         return $object;
     }
@@ -179,6 +197,7 @@ class Configuration
         $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
         $object->rules                       = $array['rules'];
         $object->skipForm                    = $array['skip_form'];
+        $object->addImportTag                = $array['add_import_tag'] ?? true;
         $object->roles                       = $array['roles'];
         $object->mapping                     = $array['mapping'];
         $object->doMapping                   = $array['do_mapping'];
@@ -317,6 +336,7 @@ class Configuration
             'ignore_duplicate_transactions' => $this->ignoreDuplicateTransactions,
             'rules'                         => $this->rules,
             'skip_form'                     => $this->skipForm,
+            'add_import_tag'                => $this->addImportTag,
             'specifics'                     => $this->specifics,
             'roles'                         => $this->roles,
             'do_mapping'                    => $this->doMapping,

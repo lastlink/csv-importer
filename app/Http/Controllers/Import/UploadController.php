@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Import;
 
 
+use App\Exceptions\ImportException;
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\UploadedFiles;
 use App\Services\CSV\Configuration\ConfigFileProcessor;
@@ -33,7 +34,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\MessageBag;
-use JsonException;
 use Log;
 
 /**
@@ -53,7 +53,6 @@ class UploadController extends Controller
     /**
      * @param Request $request
      *
-     * @throws JsonException
      * @return RedirectResponse|Redirector
      */
     public function upload(Request $request)
@@ -96,8 +95,12 @@ class UploadController extends Controller
                 session()->put(Constants::UPLOAD_CONFIG_FILE, $configFileName);
 
                 // process the config file
-                $configuration = ConfigFileProcessor::convertConfigFile($configFileName);
-                session()->put(Constants::CONFIGURATION, $configuration->toArray());
+                try {
+                    $configuration = ConfigFileProcessor::convertConfigFile($configFileName);
+                    session()->put(Constants::CONFIGURATION, $configuration->toArray());
+                } catch (ImportException $e) {
+                    $errors->add('config_file', $e->getMessage());
+                }
             }
         }
 

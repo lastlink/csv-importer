@@ -54,7 +54,6 @@ class Import extends Command
     /**
      * Execute the console command.
      *
-     * @throws JsonException
      * @return int
      */
     public function handle(): int
@@ -92,7 +91,14 @@ class Import extends Command
 
             return 1;
         }
-        $configuration = json_decode(file_get_contents($config), true, 512, JSON_THROW_ON_ERROR);
+        try {
+            $configuration = json_decode(file_get_contents($config), true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            Log::error($e->getMessage());
+            $this->error(sprintf('Invalid JSON in configuration file: %s', $e->getMessage()));
+
+            return 1;
+        }
 
         $this->line('The import routine is about to start.');
         $this->line('This is invisible and may take quite some time.');

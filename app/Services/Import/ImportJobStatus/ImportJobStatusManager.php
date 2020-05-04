@@ -47,8 +47,16 @@ class ImportJobStatusManager
             Log::debug(sprintf('Try to see if file exists for job %s.', $identifier));
             if ($disk->exists($identifier)) {
                 Log::debug(sprintf('Status file exists for job %s.', $identifier));
-                $array = json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR);
-                return ImportJobStatus::fromArray($array);
+                try {
+                    $array  = json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR);
+                    $status = ImportJobStatus::fromArray($array);
+                } catch (FileNotFoundException|JsonException $e) {
+                    Log::error($e->getMessage());
+                    $status = new ImportJobStatus;
+                }
+
+                return $status;
+
             }
         } catch (FileNotFoundException $e) {
             Log::error('Could not find file, write a new one.');
@@ -173,6 +181,6 @@ class ImportJobStatusManager
             // do nothing
             Log::error($e->getMessage());
         }
-        Log::debug('Done with storing.');
+        //Log::debug('Done with storing.');
     }
 }
