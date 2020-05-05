@@ -203,7 +203,7 @@ class APISubmitter
      */
     private function processTransaction(int $index, array $line): array
     {
-        $response = [];
+        $return = [];
         $uri      = (string) config('csv_importer.uri');
         $token    = (string) config('csv_importer.access_token');
         $request  = new PostTransactionRequest($uri, $token);
@@ -218,7 +218,7 @@ class APISubmitter
             $message = sprintf(sprintf('Submission HTTP error: %s', $e->getMessage()));
             $this->addError($index, $message);
 
-            return $response;
+            return $return;
         }
 
         if ($response instanceof ValidationErrorResponse) {
@@ -232,7 +232,7 @@ class APISubmitter
                 }
             }
 
-            return $response;
+            return $return;
         }
 
         if ($response instanceof PostTransactionResponse) {
@@ -243,10 +243,10 @@ class APISubmitter
                 Log::error($message, $response->getRawData());
                 $this->addError($index, $message);
 
-                return $response;
+                return $return;
             }
             if (null !== $group) {
-                $response = [
+                $return = [
                     'group_id' => $group->id,
                     'journals' => [],
                 ];
@@ -264,12 +264,12 @@ class APISubmitter
                     $this->addMessage($index, $message);
                     $this->compareArrays($index, $line, $group);
                     Log::info($message);
-                    $response['journals'][$transaction->id] = $transaction->tags;
+                    $return['journals'][$transaction->id] = $transaction->tags;
                 }
             }
         }
 
-        return $response;
+        return $return;
     }
 
     /**

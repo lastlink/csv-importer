@@ -384,7 +384,7 @@ class Accounts extends AbstractTask
         $amount = (string) $transaction['amount'];
         $amount = '' === $amount ? '0' : $amount;
 
-        if('0'===$amount) {
+        if ('0' === $amount) {
             Log::error('Amount is ZERO. This will give trouble further down the line.');
         }
 
