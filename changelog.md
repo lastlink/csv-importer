@@ -28,20 +28,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - ⚠️ When the destination of a withdrawal is empty, *or* the source of a deposit is empty, the CSV importer will substitute these values with `(no name)` as
  it used to do when the CSV importer was part of Firefly III itself.
 
-### Deprecated
-- Initial release.
-
-### Removed
-- Initial release.
-
-### Fixed
-- Initial release.
-
-### Security
-- Initial release.
-
-
-
 ## [1.0.5] - 2020-04-22
 
 ### Fixed
