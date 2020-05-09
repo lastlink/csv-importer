@@ -65,11 +65,11 @@ class Date implements ConverterInterface
             } catch (InvalidArgumentException|Exception $e) {
                 Log::error(sprintf('%s converting the date: %s', get_class($e), $e->getMessage()));
 
-                return Carbon::today()->startOfDay()->format('!Y-m-d H:i:s');
+                return Carbon::today()->startOfDay()->format('Y-m-d H:i:s');
             }
         }
 
-        return $carbon->format('!Y-m-d H:i:s');
+        return $carbon->format('Y-m-d H:i:s');
     }
 
     /**
