@@ -228,6 +228,15 @@ class Configuration
         $object->defaultAccount = $data['import-account'] ?? $object->defaultAccount;
         $object->rules          = $data['apply-rules'] ?? true;
 
+        if (isset($data['ignore_duplicates']) && true === $data['ignore_duplicates']) {
+            Log::debug('Will ignore duplicates.');
+            $object->ignoreDuplicateTransactions = true;
+        }
+        if (isset($data['ignore_lines']) && true === $data['ignore_lines']) {
+            Log::debug('Will ignore duplicate lines.');
+            $object->ignoreDuplicateLines = true;
+        }
+
         // array values
         $object->specifics = [];
         $object->roles     = [];
