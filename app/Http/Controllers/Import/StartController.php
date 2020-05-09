@@ -29,6 +29,7 @@ use App\Http\Middleware\UploadedFiles;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\View\View;
 use Log;
+use Storage;
 
 /**
  * Class StartController
@@ -54,7 +55,11 @@ class StartController extends Controller
         $mainTitle = 'Import routine';
         $subTitle  = 'Start page and instructions';
 
-        return view('import.index', compact('mainTitle', 'subTitle'));
+        // get existing configs.
+        $disk = Storage::disk('configurations');
+        $list = $disk->files();
+
+        return view('import.index', compact('mainTitle', 'subTitle', 'list'));
     }
 
 }

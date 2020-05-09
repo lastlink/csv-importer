@@ -66,19 +66,23 @@ return [
 
     'disks' => [
 
-        'local' => [
+        'local'          => [
             'driver' => 'local',
             'root'   => storage_path('app'),
         ],
-        'uploads' => [
+        'uploads'        => [
             'driver' => 'local',
             'root'   => storage_path('uploads'),
         ],
-        'jobs' => [
+        'jobs'           => [
             'driver' => 'local',
             'root'   => storage_path('jobs'),
         ],
-        'public' => [
+        'configurations' => [
+            'driver' => 'local',
+            'root'   => env('JSON_CONFIGURATION_DIR', storage_path('configurations')),
+        ],
+        'public'         => [
             'driver'     => 'local',
             'root'       => storage_path('app/public'),
             'url'        => env('APP_URL') . '/storage',
