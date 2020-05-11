@@ -104,7 +104,7 @@ class UploadController extends Controller
             }
         }
         // if no uploaded config file, read and use the submitted existing file, if any.
-        $existingFile = $request->get('existing_config');
+        $existingFile = (string)$request->get('existing_config');
 
         if (null === $configFile && '' !== $existingFile) {
             Log::debug('User selected a config file from the store.');

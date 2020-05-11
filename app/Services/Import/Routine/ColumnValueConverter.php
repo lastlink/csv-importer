@@ -89,7 +89,7 @@ class ColumnValueConverter
         $transaction = [
             //'user'          => 1, // ??
             'group_title'             => null,
-            'error_if_duplicate_hash' => !$this->configuration->isIgnoreDuplicateTransactions(),
+            'error_if_duplicate_hash' => $this->configuration->isIgnoreDuplicateTransactions(),
             'transactions'            => [
                 [
                     //'user'=> 1,
