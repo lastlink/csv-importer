@@ -134,15 +134,16 @@ class Configuration
 
         // due to a bug, the "specifics" array could still be broken at this point.
         // do a quick check and verification.
-        $actualSpecifics = [];
         if (is_bool($firstValue) && is_string($firstKey)) {
+            $actualSpecifics = [];
             foreach ($array['specifics'] as $key => $value) {
                 if (true === $value) {
                     $actualSpecifics[] = $key;
                 }
             }
+            $object->specifics = $actualSpecifics;
         }
-        $object->specifics = $actualSpecifics;
+
 
         return $object;
     }
