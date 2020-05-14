@@ -127,6 +127,7 @@ class LineProcessor
             // the role might change because of the mapping.
             $role        = $this->getRoleForColumn($columnIndex, $mapped);
             $appendValue = config(sprintf('csv_importer.import_roles.%s.append_value', $originalRole));
+            Log::debug(sprintf('Append value config: %s', sprintf('csv_importer.import_roles.%s.append_value', $originalRole)));
 
             $columnValue = new ColumnValue;
             $columnValue->setValue($value);

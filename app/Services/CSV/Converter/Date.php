@@ -47,10 +47,16 @@ class Date implements ConverterInterface
     {
         $string = app('steam')->cleanStringAndNewlines($value);
         $carbon = null;
+
+        if ('!' !== $this->dateFormat[0]) {
+            $this->dateFormat = sprintf('!%s', $this->dateFormat);
+        }
+
         if ('' === $string) {
             Log::warning('Empty date string, so date is set to today.');
             /** @var Carbon $carbon */
             $carbon = Carbon::today();
+            $carbon->startOfDay();
         }
         if ('' !== $string) {
             Log::debug(sprintf('Date converter is going to work on "%s" using format "%s"', $string, $this->dateFormat));
@@ -58,11 +64,12 @@ class Date implements ConverterInterface
                 $carbon = Carbon::createFromFormat($this->dateFormat, $string);
             } catch (InvalidArgumentException|Exception $e) {
                 Log::error(sprintf('%s converting the date: %s', get_class($e), $e->getMessage()));
-                return Carbon::today()->format('Y-m-d');
+
+                return Carbon::today()->startOfDay()->format('Y-m-d H:i:s');
             }
         }
 
-        return $carbon->format('Y-m-d');
+        return $carbon->format('Y-m-d H:i:s');
     }
 
     /**

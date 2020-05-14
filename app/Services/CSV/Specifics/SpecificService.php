@@ -80,6 +80,7 @@ class SpecificService
     {
         // if the array keys are strings, pluck those.
         if (0 === count($specifics)) {
+            Log::debug('Not configured to do any specifics.');
             return $row;
         }
         Log::debug(sprintf('Going to run %d specifics on this row.', count($specifics)), $specifics);

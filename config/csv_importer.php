@@ -39,14 +39,14 @@ use App\Services\Import\Task\PositiveAmount;
 use App\Services\Import\Task\Tags;
 
 return [
-    'version'         => '1.0.7',
-    'access_token'    => env('FIREFLY_III_ACCESS_TOKEN'),
-    'uri'             => env('FIREFLY_III_URI'),
-    'upload_path'     => storage_path('uploads'),
-    'minimum_version' => '5.2.0',
-    'cache_api_calls' => false,
-    'trusted_proxies' => env('TRUSTED_PROXIES', ''),
-    'delimiters'      => [
+    'version'             => '1.0.8',
+    'access_token'        => env('FIREFLY_III_ACCESS_TOKEN'),
+    'uri'                 => env('FIREFLY_III_URI'),
+    'upload_path'         => storage_path('uploads'),
+    'minimum_version'     => '5.2.0',
+    'cache_api_calls'     => false,
+    'trusted_proxies'     => env('TRUSTED_PROXIES', ''),
+    'delimiters'          => [
         'comma'     => ',',
         'semicolon' => ';',
         'tab'       => "\t",
@@ -54,7 +54,15 @@ return [
         ';'         => ';',
         "\t"        => "\t",
     ],
-    'classic_roles'   => [
+    'delimiters_reversed' => [
+        'comma'     => 'comma',
+        'semicolon' => 'semicolon',
+        'tab'       => 'tab',
+        ','         => 'comma',
+        ';'         => 'semicolon',
+        "\t"        => 'tab',
+    ],
+    'classic_roles'       => [
         'original-source'    => 'original_source',
         'sepa-cc'            => 'sepa_cc',
         'sepa-ct-op'         => 'sepa_ct_op',
@@ -73,7 +81,7 @@ return [
         'date-due'           => 'date_due',
         'date-transaction'   => 'date_transaction',
     ],
-    'specifics'         => [
+    'specifics'           => [
         AbnAmroDescription::class,
         AppendHash::class,
         Belfius::class,

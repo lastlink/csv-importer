@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.8] - 2020-05-14
+
+⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
+
+### Added
+- The import tag now has a date as well.
+- ⚠️ [issue 3346](https://github.com/firefly-iii/firefly-iii/issues/3346) If your file has them, you can import the timestamp with the transaction.
+- You can store your import configurations under `storage/configurations` for easy access during the import.
+- The UI would not respect specifics in your JSON config.
+
+### Fixed
+- If the API response was bad, the importer would crash. No longer.
+- [Issue 3345](https://github.com/firefly-iii/firefly-iii/issues/3345) Would ignore the delimiter in some cases.
+
 ## [1.0.7] - 2020-05-04
 
 ⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
@@ -27,20 +41,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - ⚠️ When the destination of a withdrawal is empty, *or* the source of a deposit is empty, the CSV importer will substitute these values with `(no name)` as
  it used to do when the CSV importer was part of Firefly III itself.
-
-### Deprecated
-- Initial release.
-
-### Removed
-- Initial release.
-
-### Fixed
-- Initial release.
-
-### Security
-- Initial release.
-
-
 
 ## [1.0.5] - 2020-04-22
 

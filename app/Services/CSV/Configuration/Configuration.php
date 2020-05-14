@@ -111,13 +111,13 @@ class Configuration
      */
     public static function fromArray(array $array): self
     {
-        $version = $array['version'] ?? 1;
-
+        $version                             = $array['version'] ?? 1;
+        $delimiters                          = config('csv_importer.delimiters_reversed');
         $object                              = new self;
         $object->headers                     = $array['headers'];
         $object->date                        = $array['date'];
         $object->defaultAccount              = $array['default_account'];
-        $object->delimiter                   = $array['delimiter'];
+        $object->delimiter                   = $delimiters[$array['delimiter']] ?? 'comma';
         $object->ignoreDuplicateLines        = $array['ignore_duplicate_lines'];
         $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
         $object->rules                       = $array['rules'];
@@ -134,15 +134,16 @@ class Configuration
 
         // due to a bug, the "specifics" array could still be broken at this point.
         // do a quick check and verification.
-        $actualSpecifics = [];
         if (is_bool($firstValue) && is_string($firstKey)) {
+            $actualSpecifics = [];
             foreach ($array['specifics'] as $key => $value) {
                 if (true === $value) {
                     $actualSpecifics[] = $key;
                 }
             }
+            $object->specifics = $actualSpecifics;
         }
-        $object->specifics = $actualSpecifics;
+
 
         return $object;
     }
@@ -187,12 +188,13 @@ class Configuration
      */
     public static function fromRequest(array $array): self
     {
+        $delimiters                          = config('csv_importer.delimiters_reversed');
         $object                              = new self;
         $object->version                     = self::VERSION;
         $object->headers                     = $array['headers'];
         $object->date                        = $array['date'];
         $object->defaultAccount              = $array['default_account'];
-        $object->delimiter                   = $array['delimiter'];
+        $object->delimiter                   = $delimiters[$array['delimiter']] ?? 'comma';
         $object->ignoreDuplicateLines        = $array['ignore_duplicate_lines'];
         $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
         $object->rules                       = $array['rules'];
@@ -218,14 +220,23 @@ class Configuration
      */
     private static function fromClassicFile(array $data): self
     {
-        $delimiters             = config('csv_importer.delimiters');
+        $delimiters             = config('csv_importer.delimiters_reversed');
         $classicRoleNames       = config('csv_importer.classic_roles');
         $object                 = new self;
         $object->headers        = $data['has-headers'] ?? false;
         $object->date           = $data['date-format'] ?? $object->date;
-        $object->delimiter      = $delimiters[$data['delimiter'] ?? ','];
+        $object->delimiter      = $delimiters[$data['delimiter']] ?? 'comma';
         $object->defaultAccount = $data['import-account'] ?? $object->defaultAccount;
         $object->rules          = $data['apply-rules'] ?? true;
+
+        if (isset($data['ignore_duplicates']) && true === $data['ignore_duplicates']) {
+            Log::debug('Will ignore duplicates.');
+            $object->ignoreDuplicateTransactions = true;
+        }
+        if (isset($data['ignore_lines']) && true === $data['ignore_lines']) {
+            Log::debug('Will ignore duplicate lines.');
+            $object->ignoreDuplicateLines = true;
+        }
 
         // array values
         $object->specifics = [];

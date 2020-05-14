@@ -24,6 +24,7 @@ declare(strict_types=1);
 
 namespace App\Services\CSV\Specifics;
 
+use Log;
 /**
  * Class IngDescription.
  *
@@ -85,6 +86,7 @@ class IngDescription implements SpecificInterface
                     $this->removeIngDescription();       // Remove "Omschrijving", but not the value from description
                     $this->moveValutadatumDescription(); // Move "Valutadatum" from description to new column
                     $this->MoveSavingsAccount();         // Move savings account number and name
+                    $this->moveDatumTijdValue();         // Move datum + tijd
                     break;
                 case 'BA':                              // Betaalautomaat
                     $this->moveValutadatumDescription(); // Move "Valutadatum" from description to new column
@@ -112,6 +114,7 @@ class IngDescription implements SpecificInterface
      */
     protected function removeIngDescription(): void
     {
+        Log::debug('Remove "Omschrijving:"');
         $this->row[8] = preg_replace('/Omschrijving: /', '', $this->row[8] ?? '');
     }
 
@@ -121,6 +124,7 @@ class IngDescription implements SpecificInterface
      */
     protected function removeIBANIngDescription(): void
     {
+        Log::debug('Remove IBAN.');
         // Try replace the iban number with nothing. The IBAN nr is found in the third column
         $this->row[8] = preg_replace('/\sIBAN:\s' . $this->row[3] . '/', '', $this->row[8]);
     }
@@ -130,6 +134,7 @@ class IngDescription implements SpecificInterface
      */
     protected function removeNameIngDescription(): void
     {
+        Log::debug('Remove Naam.');
         $this->row[8] = preg_replace('/Naam:.*?([a-zA-Z\/]+:)/', '$1', $this->row[8]);
     }
 
@@ -142,6 +147,18 @@ class IngDescription implements SpecificInterface
         if (preg_match('/Valutadatum: ([0-9-]+)/', $this->row[8], $matches)) {
             $this->row[9] = date('Ymd', strtotime($matches[1]));
             $this->row[8] = preg_replace('/Valutadatum: [0-9-]+/', '', $this->row[8]);
+        }
+    }
+
+    /**
+     * Move "Datum/Tijd" from the description to new column.
+     */
+    protected function moveDatumTijdValue(): void
+    {
+        $matches = [];
+        if (preg_match('/Datum\/Tijd: ([0-9- :]+)/', $this->row[8], $matches)) {
+            $this->row[10] = date('Ymd H:i:s', strtotime($matches[1]));
+            $this->row[8] = preg_replace('/Datum\/Tijd: ([0-9- :]+)/', '', $this->row[8]);
         }
     }
 
@@ -176,6 +193,8 @@ class IngDescription implements SpecificInterface
      */
     public function runOnHeaders(array $headers): array
     {
+        $headers[9] = 'Valutadatum';
+        $headers[10] = 'Datum + tijd';
         return $headers;
     }
 }
