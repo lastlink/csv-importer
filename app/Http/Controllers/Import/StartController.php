@@ -56,8 +56,13 @@ class StartController extends Controller
         $subTitle  = 'Start page and instructions';
 
         // get existing configs.
-        Log::debug(sprintf('Going to check directory for config files: %s', config('filesystems.configurations.root')));
         $disk = Storage::disk('configurations');
+        Log::debug(
+            sprintf(
+                'Going to check directory for config files: %s',
+                config('filesystems.disks.configurations.root'),
+            )
+        );
         $list = $disk->files();
 
         Log::debug('List of files:', $list);
