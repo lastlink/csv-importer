@@ -80,7 +80,7 @@ return [
         ],
         'configurations' => [
             'driver' => 'local',
-            'root'   => env('JSON_CONFIGURATION_DIR', storage_path('configurations')),
+            'root'   => envNonEmpty('JSON_CONFIGURATION_DIR', storage_path('configurations')),
         ],
         'public'         => [
             'driver'     => 'local',

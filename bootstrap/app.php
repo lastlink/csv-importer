@@ -24,6 +24,24 @@ declare(strict_types=1);
 
 bcscale(12);
 
+if (!function_exists('envNonEmpty')) {
+    /**
+     * @param string $key
+     * @param null   $default
+     *
+     * @return mixed|null
+     */
+    function envNonEmpty(string $key, $default = null)
+    {
+        $result = env($key, $default);
+        if (is_string($result) && '' === $result) {
+            $result = $default;
+        }
+
+        return $result;
+    }
+}
+
 /*
 |--------------------------------------------------------------------------
 | Create The Application
