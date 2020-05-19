@@ -118,7 +118,7 @@ class IngBelgium implements SpecificInterface
      */
     protected static function description(string $transactionDetails): string
     {
-        $description = self::parseInformationFromTransactionDetails($transactionDetails, '/(Mededeling|Communication):\s*(?<value>.+)$/');
+        $description = self::parseInformationFromTransactionDetails($transactionDetails, '/(Mededeling|Communication) ?:\s*(?<value>.+)$/');
         return self::convertStructuredDescriptionToProperFormat($description);
     }
 
