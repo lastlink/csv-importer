@@ -57,7 +57,15 @@ class StartController extends Controller
 
         // get existing configs.
         $disk = Storage::disk('configurations');
+        Log::debug(
+            sprintf(
+                'Going to check directory for config files: %s',
+                config('filesystems.disks.configurations.root'),
+            )
+        );
         $list = $disk->files();
+
+        Log::debug('List of files:', $list);
 
         return view('import.index', compact('mainTitle', 'subTitle', 'list'));
     }
