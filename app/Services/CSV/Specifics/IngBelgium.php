@@ -94,7 +94,7 @@ class IngBelgium implements SpecificInterface
      */
     protected static function opposingAccountName(string $transactionDetails): string
     {
-        return self::parseInformationFromTransactionDetails($transactionDetails, '/Van:\s*(.+?)(?=\s{2,})/');
+        return self::parseInformationFromTransactionDetails($transactionDetails, '/(De|faveur de|Vers|Van):\s*(?<value>.+?)(?=\s{2,})/');
 
     }
 
@@ -106,7 +106,7 @@ class IngBelgium implements SpecificInterface
      */
     protected static function opposingAccountIban(string $transactionDetails): string
     {
-        return self::parseInformationFromTransactionDetails($transactionDetails, '/IBAN:\s*(.+?)(?=\s+)/');
+        return self::parseInformationFromTransactionDetails($transactionDetails, '/IBAN:\s*(?<value>.+?)(?=\s+)/');
     }
 
     /**
@@ -118,7 +118,7 @@ class IngBelgium implements SpecificInterface
      */
     protected static function description(string $transactionDetails): string
     {
-        $description = self::parseInformationFromTransactionDetails($transactionDetails, '/Mededeling:\s*(.+)$/');
+        $description = self::parseInformationFromTransactionDetails($transactionDetails, '/(Mededeling|Communication):\s*(?<value>.+)$/');
         return self::convertStructuredDescriptionToProperFormat($description);
     }
 
@@ -146,8 +146,8 @@ class IngBelgium implements SpecificInterface
     {
         if(isset($transactionDetails)) {
             preg_match($regex, $transactionDetails, $matches);
-            if (isset($matches[1])) {
-                return trim($matches[1]);
+            if (isset($matches['value'])) {
+                return trim($matches['value']);
             }
         }
 
@@ -164,6 +164,7 @@ class IngBelgium implements SpecificInterface
      */
     public function runOnHeaders(array $headers): array
     {
+        array_push($headers, "opposingAccountName", "opposingAccountIBAN", "description");
         return $headers;
     }
 }
