@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.9] - 2020-05-19
+
+### Fixed
+- Fixed error message about "root directory" because the CSV importer submitted an empty string.
+
+### Changed
+- CSV importer requires the latest version of Firefly III.
+
+
 ## [1.0.8] - 2020-05-14
 
 ⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
