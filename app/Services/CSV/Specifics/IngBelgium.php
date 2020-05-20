@@ -77,12 +77,17 @@ class IngBelgium implements SpecificInterface
      */
     protected static function processTransactionDetails(array $row): array
     {
-        if(isset($row[9])) {
+        if(isset($row[9]) && $row[9] != '') {
             $transactionDetails = $row[9];
-            $row[11] = self::opposingAccountName($transactionDetails);
-            $row[12] = self::opposingAccountIban($transactionDetails);
-            $row[13] = self::description($transactionDetails);
+        } elseif(isset($row[8]) && $row[8] != '') {
+            $transactionDetails = $row[8];
         }
+
+        $row[11] = self::opposingAccountName($transactionDetails);
+        $row[12] = self::opposingAccountIban($transactionDetails);
+        $row[13] = self::description($transactionDetails);
+
+
         return $row;
     }
 
