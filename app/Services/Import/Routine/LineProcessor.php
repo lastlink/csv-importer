@@ -137,7 +137,8 @@ class LineProcessor
             $columnValue->setOriginalRole($originalRole);
 
             // if column role is 'date', add the date config for conversion:
-            if (in_array($originalRole, ['date_transaction', 'date_interest', 'date_process', 'date_book'], true)) {
+            if (in_array($originalRole, ['date_transaction', 'date_interest', 'date_due', 'date_payment', 'date_process', 'date_book', 'date_invoice'], true)) {
+                Log::debug(sprintf('Because role is %s, set date format to "%s" (via setConfiguration).', $originalRole, $this->dateFormat));
                 $columnValue->setConfiguration($this->dateFormat);
             }
 

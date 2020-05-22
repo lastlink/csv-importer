@@ -263,7 +263,18 @@ class Accounts extends AbstractTask
             } catch (ApiException $e) {
                 throw new ImportException($e->getMessage());
             }
+            // catch impossible combination "expense" with "deposit"
+            if ('expense' === $account->type && 'deposit' === $transactionType) {
+                Log::debug(
+                    sprintf(
+                        'Out of cheese error. Found Found %s account #%d based on IBAN "%s". But not going to use expense/deposit combi.',
+                        $account->type, $account->id, $iban
+                    )
+                );
+                Log::debug('Firefly III will have to make the correct decision.');
 
+                return null;
+            }
             Log::debug(sprintf('[a] Found %s account #%d based on IBAN "%s"', $account->type, $account->id, $iban));
 
             return $account;

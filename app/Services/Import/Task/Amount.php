@@ -120,6 +120,16 @@ class Amount extends AbstractTask
         unset($transaction['amount_credit'], $transaction['amount_debit'], $transaction['amount_negated']);
         $transaction['amount'] = $amount;
 
+        // depending on pos or min, also pre-set the expected type.
+        if (1 === bccomp('0', $amount)) {
+            Log::debug(sprintf('Amount %s is negative, so this is probably a withdrawal.', $amount));
+            $transaction['type'] = 'withdrawal';
+        }
+        if (-1 === bccomp('0', $amount)) {
+            Log::debug(sprintf('Amount %s is positive, so this is probably a deposit.', $amount));
+            $transaction['type'] = 'deposit';
+        }
+
         return $transaction;
     }
 
