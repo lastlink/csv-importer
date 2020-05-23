@@ -229,6 +229,8 @@ class Configuration
         $object->defaultAccount = $data['import-account'] ?? $object->defaultAccount;
         $object->rules          = $data['apply-rules'] ?? true;
 
+        $object->ignoreDuplicateTransactions = $data['ignore_duplicate_transactions'] ?? false;
+
         if (isset($data['ignore_duplicates']) && true === $data['ignore_duplicates']) {
             Log::debug('Will ignore duplicates.');
             $object->ignoreDuplicateTransactions = true;
