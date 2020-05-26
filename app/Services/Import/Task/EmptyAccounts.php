@@ -33,7 +33,6 @@ use Log;
  */
 class EmptyAccounts extends AbstractTask
 {
-
     /**
      * @param array $group
      *
@@ -69,72 +68,5 @@ class EmptyAccounts extends AbstractTask
     public function requiresTransactionCurrency(): bool
     {
         return false;
-    }
-
-    /**
-     * @param string|null $sourceType
-     * @param string|null $destinationType
-     *
-     * @return string
-     */
-    private function determineType(?string $sourceType, ?string $destinationType): string
-    {
-        Log::debug(sprintf('Now in determineType("%s", "%s")', $sourceType, $destinationType));
-        if (null === $sourceType && null === $destinationType) {
-            Log::debug('Return withdrawal, both are NULL');
-
-            return 'withdrawal';
-        }
-
-        // if source is a asset and dest is NULL, its a withdrawal
-        if ('asset' === $sourceType && null === $destinationType) {
-            Log::debug('Return withdrawal, source is asset');
-
-            return 'withdrawal';
-        }
-        // if destination is asset and source is NULL, its a deposit
-        if (null === $sourceType && 'asset' === $destinationType) {
-            Log::debug('Return deposit, dest is asset');
-
-            return 'deposit';
-        }
-
-        $key   = sprintf('transaction_types.account_to_transaction.%s.%s', $sourceType, $destinationType);
-        $type  = config($key);
-        $value = $type ?? 'withdrawal';
-        Log::debug(sprintf('Check config for "%s" and found "%s". Returning "%s"', $key, $type, $value));
-
-        return $value;
-    }
-
-    /**
-     * @param array $transaction
-     *
-     * @return array
-     */
-    private function processTransaction(array $transaction): array
-    {
-        Log::debug('Now in EmptyAccounts::processTransaction()');
-
-        if ('withdrawal' === $transaction['type']) {
-            $destName = $transaction['destination_name'] ?? '';
-            $destId   = (int) ($transaction['destination_id'] ?? 0);
-            $destIban = $transaction['destination_iban'] ?? '';
-            if ('' === $destName && 0 === $destId && ''=== $destIban) {
-                Log::debug('Destination name + ID + IBAN of withdrawal are empty, set to "(no name)".');
-                $transaction['destination_name'] = '(no name)';
-            }
-        }
-        if ('deposit' === $transaction['type']) {
-            $sourceName = $transaction['source_name'] ?? '';
-            $sourceId   = (int) ($transaction['source_id'] ?? 0);
-            $sourceIban = $transaction['source_iban'] ?? '';
-            if ('' === $sourceName && 0 === $sourceId && '' === $sourceIban) {
-                Log::debug('Source name + IBAN + ID of deposit are empty, set to "(no name)".');
-                $transaction['source_name'] = '(no name)';
-            }
-        }
-
-        return $transaction;
     }
 }

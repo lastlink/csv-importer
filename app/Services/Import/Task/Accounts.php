@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace App\Services\Import\Task;
 
 use App\Exceptions\ImportException;
+use App\Services\Import\DeterminesTransactionType;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException as GrumpyApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
@@ -37,6 +38,7 @@ use Log;
  */
 class Accounts extends AbstractTask
 {
+    use DeterminesTransactionType;
 
     /**
      * @param array $group
@@ -459,39 +461,4 @@ class Accounts extends AbstractTask
     }
 
 
-    /**
-     * @param string|null $sourceType
-     * @param string|null $destinationType
-     *
-     * @return string
-     */
-    private function determineType(?string $sourceType, ?string $destinationType): string
-    {
-        Log::debug(sprintf('Now in determineType("%s", "%s")', $sourceType, $destinationType));
-        if (null === $sourceType && null === $destinationType) {
-            Log::debug('Return withdrawal, both are NULL');
-
-            return 'withdrawal';
-        }
-
-        // if source is a asset and dest is NULL, its a withdrawal
-        if ('asset' === $sourceType && null === $destinationType) {
-            Log::debug('Return withdrawal, source is asset');
-
-            return 'withdrawal';
-        }
-        // if destination is asset and source is NULL, its a deposit
-        if (null === $sourceType && 'asset' === $destinationType) {
-            Log::debug('Return deposit, dest is asset');
-
-            return 'deposit';
-        }
-
-        $key   = sprintf('transaction_types.account_to_transaction.%s.%s', $sourceType, $destinationType);
-        $type  = config($key);
-        $value = $type ?? 'withdrawal';
-        Log::debug(sprintf('Check config for "%s" and found "%s". Returning "%s"', $key, $type, $value));
-
-        return $value;
-    }
 }
