@@ -69,4 +69,35 @@ class EmptyAccounts extends AbstractTask
     {
         return false;
     }
+    /**
+     * @param array $transaction
+     *
+     * @return array
+     */
+    private function processTransaction(array $transaction): array
+    {
+        Log::debug('Now in EmptyAccounts::processTransaction()');
+
+        if ('withdrawal' === $transaction['type']) {
+            $destName = $transaction['destination_name'] ?? '';
+            $destId   = (int) ($transaction['destination_id'] ?? 0);
+            $destIban = $transaction['destination_iban'] ?? '';
+            if ('' === $destName && 0 === $destId && ''=== $destIban) {
+                Log::debug('Destination name + ID + IBAN of withdrawal are empty, set to "(no name)".');
+                $transaction['destination_name'] = '(no name)';
+            }
+        }
+        if ('deposit' === $transaction['type']) {
+            $sourceName = $transaction['source_name'] ?? '';
+            $sourceId   = (int) ($transaction['source_id'] ?? 0);
+            $sourceIban = $transaction['source_iban'] ?? '';
+            if ('' === $sourceName && 0 === $sourceId && '' === $sourceIban) {
+                Log::debug('Source name + IBAN + ID of deposit are empty, set to "(no name)".');
+                $transaction['source_name'] = '(no name)';
+            }
+        }
+
+        return $transaction;
+    }
+
 }
