@@ -406,14 +406,18 @@ class Accounts extends AbstractTask
 
         /*
          * If the amount is positive, the transaction is a deposit. We switch Source
-         * and Destination and see if we can still handle the transaction:
+         * and Destination and see if we can still handle the transaction, but only if the transaction
+         * isn't already a deposit
          */
-        if (1 === bccomp($amount, '0')) {
+        if ('deposit' !== $transaction['type'] && 1 === bccomp($amount, '0')) {
             // amount is positive
             Log::debug(sprintf('%s is positive.', $amount));
             $transaction         = $this->setSource($transaction, $destination);
             $transaction         = $this->setDestination($transaction, $source);
             $transaction['type'] = $this->determineType($destination['type'], $source['type']);
+        }
+        if ('deposit' === $transaction['type'] && 1 === bccomp($amount, '0')) {
+            Log::debug('Transaction is a deposit, and amount is positive. Will not change account types.');
         }
 
         /*
