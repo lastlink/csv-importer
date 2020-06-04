@@ -12,7 +12,7 @@
                     <div class="card-body">
                         <h5 class="card-title text-danger">Error :(</h5>
                         <p class="card-text">
-                            The personal access token you added to the <code>.env</code> file is invalid. The error returned is:
+                            The Personal Access Token you added to the <code>.env</code> file is invalid. The error returned is:
                         </p>
                         <p class="card-text text-info">
                             {{ errorMessage }}
@@ -20,8 +20,13 @@
                         <p class="card-text">
                             This error can be a bit cryptic, and you can find common errors on <a href="https://firefly-iii.gitbook.io/firefly-iii-csv-importer/errors-and-trouble-shooting/token_errors" target="_blank">
                                 this page in the documentation</a>.
-                            Please refresh the page to validate your token again.
+                            Please refresh the page to validate your Personal Access Token again.
                         </p>
+                        <p><strong>Remember!</strong></p>
+                        <ul>
+                            <li>Do not use the "command line token". That's the wrong one.</li>
+                            <li>Do not use the "APP_KEY". That's the wrong one.</li>
+                        </ul>
                     </div>
                 </div>
             </div>

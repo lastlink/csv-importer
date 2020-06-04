@@ -33,7 +33,6 @@ use Log;
  */
 class EmptyAccounts extends AbstractTask
 {
-
     /**
      * @param array $group
      *
@@ -70,43 +69,6 @@ class EmptyAccounts extends AbstractTask
     {
         return false;
     }
-
-    /**
-     * @param string|null $sourceType
-     * @param string|null $destinationType
-     *
-     * @return string
-     */
-    private function determineType(?string $sourceType, ?string $destinationType): string
-    {
-        Log::debug(sprintf('Now in determineType("%s", "%s")', $sourceType, $destinationType));
-        if (null === $sourceType && null === $destinationType) {
-            Log::debug('Return withdrawal, both are NULL');
-
-            return 'withdrawal';
-        }
-
-        // if source is a asset and dest is NULL, its a withdrawal
-        if ('asset' === $sourceType && null === $destinationType) {
-            Log::debug('Return withdrawal, source is asset');
-
-            return 'withdrawal';
-        }
-        // if destination is asset and source is NULL, its a deposit
-        if (null === $sourceType && 'asset' === $destinationType) {
-            Log::debug('Return deposit, dest is asset');
-
-            return 'deposit';
-        }
-
-        $key   = sprintf('transaction_types.account_to_transaction.%s.%s', $sourceType, $destinationType);
-        $type  = config($key);
-        $value = $type ?? 'withdrawal';
-        Log::debug(sprintf('Check config for "%s" and found "%s". Returning "%s"', $key, $type, $value));
-
-        return $value;
-    }
-
     /**
      * @param array $transaction
      *
@@ -137,4 +99,5 @@ class EmptyAccounts extends AbstractTask
 
         return $transaction;
     }
+
 }

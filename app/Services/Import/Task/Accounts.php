@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace App\Services\Import\Task;
 
 use App\Exceptions\ImportException;
+use App\Services\Import\DeterminesTransactionType;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException as GrumpyApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
@@ -37,6 +38,7 @@ use Log;
  */
 class Accounts extends AbstractTask
 {
+    use DeterminesTransactionType;
 
     /**
      * @param array $group
@@ -263,7 +265,18 @@ class Accounts extends AbstractTask
             } catch (ApiException $e) {
                 throw new ImportException($e->getMessage());
             }
+            // catch impossible combination "expense" with "deposit"
+            if ('expense' === $account->type && 'deposit' === $transactionType) {
+                Log::debug(
+                    sprintf(
+                        'Out of cheese error (IBAN). Found Found %s account #%d based on IBAN "%s". But not going to use expense/deposit combi.',
+                        $account->type, $account->id, $iban
+                    )
+                );
+                Log::debug('Firefly III will have to make the correct decision.');
 
+                return null;
+            }
             Log::debug(sprintf('[a] Found %s account #%d based on IBAN "%s"', $account->type, $account->id, $iban));
 
             return $account;
@@ -271,7 +284,9 @@ class Accounts extends AbstractTask
 
         if (2 === count($response)) {
             Log::debug('Found 2 results, Firefly III will have to make the correct decision.');
+            return null;
         }
+        Log::debug(sprintf('Found %d result(s), Firefly III will have to make the correct decision.', count($response)));
 
         return null;
     }
@@ -309,6 +324,7 @@ class Accounts extends AbstractTask
                 return $account;
             }
         }
+        Log::debug(sprintf('Found %d account(s) searching for "%s" but not going to use them. Firefly III must handle the values.', count($response), $name));
 
         return null;
     }
@@ -390,14 +406,18 @@ class Accounts extends AbstractTask
 
         /*
          * If the amount is positive, the transaction is a deposit. We switch Source
-         * and Destination and see if we can still handle the transaction:
+         * and Destination and see if we can still handle the transaction, but only if the transaction
+         * isn't already a deposit
          */
-        if (1 === bccomp($amount, '0')) {
+        if ('deposit' !== $transaction['type'] && 1 === bccomp($amount, '0')) {
             // amount is positive
             Log::debug(sprintf('%s is positive.', $amount));
             $transaction         = $this->setSource($transaction, $destination);
             $transaction         = $this->setDestination($transaction, $source);
             $transaction['type'] = $this->determineType($destination['type'], $source['type']);
+        }
+        if ('deposit' === $transaction['type'] && 1 === bccomp($amount, '0')) {
+            Log::debug('Transaction is a deposit, and amount is positive. Will not change account types.');
         }
 
         /*
@@ -445,39 +465,4 @@ class Accounts extends AbstractTask
     }
 
 
-    /**
-     * @param string|null $sourceType
-     * @param string|null $destinationType
-     *
-     * @return string
-     */
-    private function determineType(?string $sourceType, ?string $destinationType): string
-    {
-        Log::debug(sprintf('Now in determineType("%s", "%s")', $sourceType, $destinationType));
-        if (null === $sourceType && null === $destinationType) {
-            Log::debug('Return withdrawal, both are NULL');
-
-            return 'withdrawal';
-        }
-
-        // if source is a asset and dest is NULL, its a withdrawal
-        if ('asset' === $sourceType && null === $destinationType) {
-            Log::debug('Return withdrawal, source is asset');
-
-            return 'withdrawal';
-        }
-        // if destination is asset and source is NULL, its a deposit
-        if (null === $sourceType && 'asset' === $destinationType) {
-            Log::debug('Return deposit, dest is asset');
-
-            return 'deposit';
-        }
-
-        $key   = sprintf('transaction_types.account_to_transaction.%s.%s', $sourceType, $destinationType);
-        $type  = config($key);
-        $value = $type ?? 'withdrawal';
-        Log::debug(sprintf('Check config for "%s" and found "%s". Returning "%s"', $key, $type, $value));
-
-        return $value;
-    }
 }

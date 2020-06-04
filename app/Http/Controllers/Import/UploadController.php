@@ -70,7 +70,7 @@ class UploadController extends Controller
         }
         $errorNumber = $csvFile->getError();
         if (0 !== $errorNumber) {
-            $errors->add('csv_file', $errorNumber);
+            $errors->add('csv_file', $this->getError($errorNumber));
         }
 
         // upload the file to a temp directory and use it from there.
@@ -128,4 +128,26 @@ class UploadController extends Controller
 
         return redirect(route('import.configure.index'));
     }
+    /**
+     * @param int $error
+     *
+     * @return string
+     */
+    private function getError(int $error): string
+    {
+        app('log')->debug(sprintf('Now at %s', __METHOD__));
+        $errors = [
+            UPLOAD_ERR_OK         => 'There is no error, the file uploaded with success.',
+            UPLOAD_ERR_INI_SIZE   => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
+            UPLOAD_ERR_FORM_SIZE  => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
+            UPLOAD_ERR_PARTIAL    => 'The uploaded file was only partially uploaded.',
+            UPLOAD_ERR_NO_FILE    => 'No file was uploaded.',
+            UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
+            UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk. Introduced in PHP 5.1.0.',
+            UPLOAD_ERR_EXTENSION  => 'A PHP extension stopped the file upload.',
+        ];
+
+        return $errors[$error] ?? 'Unknown error';
+    }
+
 }

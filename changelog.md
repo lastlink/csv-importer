@@ -2,6 +2,25 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.10] - 2020-06-04
+
+⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
+
+### Added
+
+You can now set the timezone using the `TZ` environment variable.
+
+### Changed
+- Improved the error message when you forget to upload stuff.
+- All documentation will point to the `latest` branch for more consistency.
+- Some date values were not imported properly.
+
+### Fixed
+- ⚠️ Several edge cases exist where the CSV importer and Firefly III disagree on which account to use. This can result in errors like "*Could not find a
+ valid source account when searching for ...*." I have introduced several fixes to mitigate this issue. These fixes will most definitively change the
+  way transactions are handled, so be careful importing large batches.
+- IBAN in lower case or spaces works now. 
+
 ## [1.0.9] - 2020-05-19
 
 ### Fixed
