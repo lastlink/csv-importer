@@ -112,7 +112,7 @@ class IngBelgium implements SpecificInterface
      */
     protected static function opposingAccountIban(string $transactionDetails): string
     {
-        return self::parseInformationFromTransactionDetails($transactionDetails, '/IBAN:\s*(?<value>.+?)(?=\s+)/');
+        return self::parseInformationFromTransactionDetails($transactionDetails, '/(?<value>[a-zA-Z]{2}\d{14,31})/');
     }
 
     /**
