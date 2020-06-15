@@ -80,7 +80,7 @@ class IngBelgium implements SpecificInterface
         if(isset($row[9])) {
             $transactionDetails = $row[9];
         } 
-        if(isset($row[8]) && $transactionDetails = '') {
+        if(isset($row[8]) && $transactionDetails == '') {
             $transactionDetails = $row[8];
         }
 
