@@ -77,9 +77,10 @@ class IngBelgium implements SpecificInterface
      */
     protected static function processTransactionDetails(array $row): array
     {
-        if(isset($row[9]) && $row[9] != '') {
+        if(isset($row[9])) {
             $transactionDetails = $row[9];
-        } elseif(isset($row[8]) && $row[8] != '') {
+        } 
+        if(isset($row[8]) && $transactionDetails = '') {
             $transactionDetails = $row[8];
         }
 
