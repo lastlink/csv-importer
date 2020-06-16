@@ -35,6 +35,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use League\Csv\Exception;
+use Log;
 
 /**
  * Class RoleController
@@ -58,6 +59,7 @@ class RoleController extends Controller
      */
     public function index()
     {
+        Log::debug('Now in role controller');
         $mainTitle = 'Define roles';
         $subTitle  = 'Configure the role of each column in your file';
 
