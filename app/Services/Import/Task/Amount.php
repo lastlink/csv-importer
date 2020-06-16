@@ -117,7 +117,7 @@ class Amount extends AbstractTask
         }
 
         // unset those fields:
-        unset($transaction['amount_credit'], $transaction['amount_debit'], $transaction['amount_negated']);
+        unset($transaction['amount_credit'], $transaction['amount_debit'], $transaction['amount_negated'], $transaction['amount_modifier']);
         $transaction['amount'] = $amount;
 
         // depending on pos or min, also pre-set the expected type.
@@ -129,7 +129,6 @@ class Amount extends AbstractTask
             Log::debug(sprintf('Amount %s is positive, so this is probably a deposit.', $amount));
             $transaction['type'] = 'deposit';
         }
-
         return $transaction;
     }
 

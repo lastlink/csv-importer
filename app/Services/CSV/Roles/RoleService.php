@@ -81,10 +81,12 @@ class RoleService
             Log::debug('Detected file headers:', $headers);
         }
         if (false === $configuration->isHeaders()) {
+            Log::debug('Role service: file has no headers');
             try {
                 $stmt    = (new Statement)->limit(1)->offset(0);
                 $records = $stmt->process($reader);
                 $count   = count($records->fetchOne());
+                Log::debug(sprintf('Role service: first row has %d columns', $count));
                 for ($i = 0; $i < $count; $i++) {
                     $headers[] = sprintf('Column #%d', $i + 1);
                 }
