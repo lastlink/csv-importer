@@ -72,7 +72,7 @@ class ConfigurationController extends Controller
             $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
         }
         // if config says to skip it, skip it:
-        $overruleSkip = $request->get('overruleskip') === 'true';
+        $overruleSkip = 'true' === $request->get('overruleskip');
         if (null !== $configuration && true === $configuration->isSkipForm() && false === $overruleSkip) {
             // skipForm
             return redirect()->route('import.roles.index');
@@ -90,7 +90,18 @@ class ConfigurationController extends Controller
 
         /** @var Account $account */
         foreach ($response as $account) {
-            $accounts[$account->id] = $account;
+            $accounts['Asset accounts'][$account->id] = $account;
+        }
+
+        // also get liabilities
+        $uri   = (string)config('csv_importer.uri');
+        $token = (string)config('csv_importer.access_token');
+        $request = new GetAccountsRequest($uri, $token);
+        $request->setType(GetAccountsRequest::LIABILITIES);
+        $response = $request->get();
+        /** @var Account $account */
+        foreach ($response as $account) {
+            $accounts['Liabilities'][$account->id] = $account;
         }
 
 

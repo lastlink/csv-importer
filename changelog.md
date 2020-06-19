@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.12] - 2020-06-19
+
+Now liabilities can be selected as the default account.
+
 ## [1.0.11] - 2020-06-16
 
 Some changes in the ING (Belgium) parser.
