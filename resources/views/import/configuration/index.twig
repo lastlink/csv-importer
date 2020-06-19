@@ -87,8 +87,13 @@
                                 <label for="default_account" class="col-sm-3 col-form-label">Default import account</label>
                                 <div class="col-sm-9">
                                     <select id="default_account" name="default_account" class="form-control" aria-describedby="defaultAccountHelp">
-                                        {% for account in accounts %}
-                                            <option {% if configuration.getDefaultAccount == account.id %}selected{% endif %} value="{{ account.id }}" label="{{ account.name }}">{{ account.name }}</option>
+                                        {% for accountGroup, accountList in accounts %}
+                                            <optgroup label="{{ accountGroup }}">
+                                                {% for account in accountList %}
+                                                    <option {% if configuration.getDefaultAccount == account.id %}selected{% endif %} value="{{ account.id }}"
+                                                            label="{{ account.name }}">{{ account.name }}</option>
+                                                {% endfor %}
+                                            </optgroup>
                                         {% endfor %}
                                     </select>
                                     <small id="defaultAccountHelp" class="form-text text-muted">
