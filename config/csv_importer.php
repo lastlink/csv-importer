@@ -45,6 +45,10 @@ return [
     'upload_path'         => storage_path('uploads'),
     'minimum_version'     => '5.2.5',
     'cache_api_calls'     => false,
+    'connection'          => [
+        'verify'  => env('VERIFY_TLS_SECURITY', true),
+        'timeout' => env('CONNECTION_TIMEOUT', 3.14),
+    ],
     'trusted_proxies'     => env('TRUSTED_PROXIES', ''),
     'delimiters'          => [
         'comma'     => ',',

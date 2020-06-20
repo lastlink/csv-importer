@@ -48,6 +48,10 @@ class TokenController extends Controller
         $uri   = (string)config('csv_importer.uri');
         $token   = (string)config('csv_importer.access_token');
         $request  = new SystemInformationRequest($uri, $token);
+
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
+
         try {
             $result = $request->get();
         } catch (ApiHttpException $e) {
@@ -85,6 +89,10 @@ class TokenController extends Controller
         $result       = null;
         $compare      = 1;
         $minimum      = '';
+
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
+
         try {
             /** @var SystemInformationResponse $result */
             $result = $request->get();
