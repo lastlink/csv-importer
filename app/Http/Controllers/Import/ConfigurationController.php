@@ -83,6 +83,8 @@ class ConfigurationController extends Controller
         $token = (string)config('csv_importer.access_token');
         $request = new GetAccountsRequest($uri, $token);
         $request->setType(GetAccountsRequest::ASSET);
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
         $response = $request->get();
 
         // get list of specifics:
@@ -97,6 +99,8 @@ class ConfigurationController extends Controller
         $uri   = (string)config('csv_importer.uri');
         $token = (string)config('csv_importer.access_token');
         $request = new GetAccountsRequest($uri, $token);
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setType(GetAccountsRequest::LIABILITIES);
         $response = $request->get();
         /** @var Account $account */

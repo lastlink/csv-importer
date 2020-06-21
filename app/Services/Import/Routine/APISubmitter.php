@@ -117,6 +117,8 @@ class APISubmitter
         $uri     = (string) config('csv_importer.uri');
         $token   = (string) config('csv_importer.access_token');
         $request = new PutTransactionRequest($uri, $token, $groupId);
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setBody($body);
         $request->put();
 
@@ -171,6 +173,8 @@ class APISubmitter
         $uri     = (string) config('csv_importer.uri');
         $token   = (string) config('csv_importer.access_token');
         $request = new PostTagRequest($uri, $token);
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
         $body    = [
             'tag'  => $this->tag,
             'date' => $this->tagDate,
@@ -207,6 +211,8 @@ class APISubmitter
         $uri      = (string) config('csv_importer.uri');
         $token    = (string) config('csv_importer.access_token');
         $request  = new PostTransactionRequest($uri, $token);
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
         Log::debug('Submitting to Firefly III:', $line);
         $request->setBody($line);
 

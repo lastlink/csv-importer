@@ -45,6 +45,10 @@ class Budgets implements MapperInterface
         $uri     = (string)config('csv_importer.uri');
         $token   = (string)config('csv_importer.access_token');
         $request  = new GetBudgetsRequest($uri, $token);
+
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
+
         $response = $request->get();
         /** @var Budget $budget */
         foreach ($response as $budget) {

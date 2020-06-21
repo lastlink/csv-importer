@@ -204,6 +204,8 @@ class Accounts extends AbstractTask
         $uri     = (string) config('csv_importer.uri');
         $token   = (string) config('csv_importer.access_token');
         $request = new GetSearchAccountRequest($uri, $token);
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setField('id');
         $request->setQuery($value);
         /** @var GetAccountsResponse $response */
@@ -244,6 +246,8 @@ class Accounts extends AbstractTask
         $uri     = (string) config('csv_importer.uri');
         $token   = (string) config('csv_importer.access_token');
         $request = new GetSearchAccountRequest($uri, $token);
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setField('iban');
         $request->setQuery($iban);
         /** @var GetAccountsResponse $response */
@@ -303,6 +307,8 @@ class Accounts extends AbstractTask
         $uri     = (string) config('csv_importer.uri');
         $token   = (string) config('csv_importer.access_token');
         $request = new GetSearchAccountRequest($uri, $token);
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setField('name');
         $request->setQuery($name);
         /** @var GetAccountsResponse $response */

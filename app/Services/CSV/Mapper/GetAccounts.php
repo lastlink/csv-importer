@@ -49,6 +49,9 @@ trait GetAccounts
         $uri      = (string) config('csv_importer.uri');
         $token    = (string) config('csv_importer.access_token');
         $request  = new GetAccountsRequest($uri, $token);
+
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setType(GetAccountsRequest::ALL);
 
         /** @var GetAccountsResponse $response */
@@ -81,7 +84,10 @@ trait GetAccounts
         $uri         = (string) config('csv_importer.uri');
         $token       = (string) config('csv_importer.access_token');
         $request     = new GetAccountsRequest($uri, $token);
+
         $request->setType(GetAccountsRequest::ASSET);
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
 
         /** @var GetAccountsResponse $response */
         $response = $request->get();
@@ -95,7 +101,10 @@ trait GetAccounts
         }
 
         $request = new GetAccountsRequest($uri, $token);
+
         $request->setType(GetAccountsRequest::LIABILITIES);
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
 
         /** @var GetAccountsResponse $response */
         $response = $request->get();
