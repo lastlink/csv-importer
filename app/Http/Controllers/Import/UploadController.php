@@ -75,7 +75,18 @@ class UploadController extends Controller
 
         // upload the file to a temp directory and use it from there.
         if (null !== $csvFile && 0 === $errorNumber) {
-            $csvFileName = StorageService::storeContent(file_get_contents($csvFile->getPathname()));
+            $content = file_get_contents($csvFile->getPathname());
+
+            // https://stackoverflow.com/questions/11066857/detect-eol-type-using-php
+            // because apparantly there are banks that use "\r" as newline. Looking at the morons of KBC Bank, Belgium.
+            // This one is for you: 🤦‍♀️
+            $eol = $this->detectEOL($content);
+            if("\r" === $eol) {
+                Log::error('You bank is dumb. Tell them to fix their CSV files.');
+                $content = str_replace("\r","\n", $content);
+            }
+
+            $csvFileName = StorageService::storeContent($content);
             session()->put(Constants::UPLOAD_CSV_FILE, $csvFileName);
             session()->put(Constants::HAS_UPLOAD, 'true');
         }
@@ -148,6 +159,34 @@ class UploadController extends Controller
         ];
 
         return $errors[$error] ?? 'Unknown error';
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    private function detectEOL(string $string): string
+    {
+        $eols     = [
+            '\n\r' => "\n\r",  // 0x0A - 0x0D - acorn BBC
+            '\r\n' => "\r\n",  // 0x0D - 0x0A - Windows, DOS OS/2
+            '\n'   => "\n",    // 0x0A -      - Unix, OSX
+            '\r'   => "\r",    // 0x0D -      - Apple ][, TRS80
+        ];
+        $curCount = 0;
+        $curEol   = '';
+        foreach ($eols as $eolKey => $eol) {
+            $count = substr_count($string, $eol);
+            Log::debug(sprintf('Counted %dx "%s" EOL in upload.', $count, $eolKey));
+            if ($count > $curCount) {
+                $curCount = $count;
+                $curEol   = $eol;
+                Log::debug(sprintf('Conclusion: "%s" is the EOL in this file.', $eolKey));
+            }
+        }
+
+        return $curEol;
     }
 
 }
