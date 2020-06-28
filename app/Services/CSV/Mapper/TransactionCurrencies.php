@@ -44,7 +44,11 @@ class TransactionCurrencies implements MapperInterface
         $result   = [];
         $uri     = (string)config('csv_importer.uri');
         $token   = (string)config('csv_importer.access_token');
+
         $request  = new GetCurrenciesRequest($uri, $token);
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
+
         $response = $request->get();
         /** @var TransactionCurrency $currency */
         foreach ($response as $currency) {

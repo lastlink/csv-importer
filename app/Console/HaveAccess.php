@@ -39,6 +39,10 @@ trait HaveAccess
         $uri   = (string)config('csv_importer.uri');
         $token     = (string)config('csv_importer.access_token');
         $request = new SystemInformationRequest($uri, $token);
+
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
+
         try {
             $request->get();
         } catch (ApiHttpException $e) {
