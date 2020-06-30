@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.14] - 2020-06-30
+
+Fixes [issue 3501](https://github.com/firefly-iii/firefly-iii/issues/3501).
+
 ## [1.0.12] - 2020-06-19
 
 Now liabilities can be selected as the default account.
