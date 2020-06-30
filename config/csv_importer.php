@@ -39,7 +39,7 @@ use App\Services\Import\Task\PositiveAmount;
 use App\Services\Import\Task\Tags;
 
 return [
-    'version'             => '1.0.13',
+    'version'             => '1.0.14',
     'access_token'        => env('FIREFLY_III_ACCESS_TOKEN'),
     'uri'                 => env('FIREFLY_III_URI'),
     'upload_path'         => storage_path('uploads'),
@@ -47,7 +47,7 @@ return [
     'cache_api_calls'     => false,
     'connection'          => [
         'verify'  => env('VERIFY_TLS_SECURITY', true),
-        'timeout' => env('CONNECTION_TIMEOUT', 3.14),
+        'timeout' => 0.0 === (float) env('CONNECTION_TIMEOUT', 3.14) ? 3.1415 : (float) env('CONNECTION_TIMEOUT', 3.14),
     ],
     'trusted_proxies'     => env('TRUSTED_PROXIES', ''),
     'delimiters'          => [
