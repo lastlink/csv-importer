@@ -70,6 +70,7 @@ class MapController extends Controller
         $configuration   = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
         $roles           = $configuration->getRoles();
         $existingMapping = $configuration->getMapping();
+        $doMapping       = $configuration->getDoMapping();
         $data            = [];
 
         foreach ($roles as $index => $role) {
@@ -79,6 +80,10 @@ class MapController extends Controller
                 continue;
             }
             if (false === $mappable) {
+                continue;
+            }
+            $mapColumn = $doMapping[$index] ?? false;
+            if(false === $mapColumn) {
                 continue;
             }
             Log::debug(sprintf('Mappable role is "%s"', $role));
