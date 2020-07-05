@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.15] - 2020-07-05
+
+⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
+
+### Fixed
+- ⚠️ The importer will no longer match account names like `online` to accounts like `online account`. If you were relying on this behavior, please use the
+ "mapping" function instead.
+- The "mapping" page would always show you all mappable fields, even when you only selected one field to map.
+
+### Security
+- Initial release.
+
+
 ## [1.0.14] - 2020-06-30
 
 Fixes [issue 3501](https://github.com/firefly-iii/firefly-iii/issues/3501).

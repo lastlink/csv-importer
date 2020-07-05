@@ -325,9 +325,11 @@ class Accounts extends AbstractTask
         /** @var Account $account */
         foreach ($response as $account) {
             if (in_array($account->type, [AccountType::ASSET, AccountType::LOAN, AccountType::DEBT, AccountType::MORTGAGE], true)) {
-                Log::debug(sprintf('[b] Found "%s" account #%d based on name "%s"', $account->type, $account->id, $name));
+                if (strtolower($account->name) === strtolower($name)) {
+                    Log::debug(sprintf('[b] Found "%s" account #%d based on name "%s"', $account->type, $account->id, $name));
 
-                return $account;
+                    return $account;
+                }
             }
         }
         Log::debug(sprintf('Found %d account(s) searching for "%s" but not going to use them. Firefly III must handle the values.', count($response), $name));
