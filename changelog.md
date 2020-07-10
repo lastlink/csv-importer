@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.0] - 2020-07-10
+
+### Changed
+- Now requires PHP 7.4. Make sure you update!
+- Can now use a vanity URL. See the example environment variables file, `.env.example` for instructions.
+- This version requires Firefly III v5.3.0
+
 ## [1.0.15] - 2020-07-05
 
 ⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
@@ -10,10 +17,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - ⚠️ The importer will no longer match account names like `online` to accounts like `online account`. If you were relying on this behavior, please use the
  "mapping" function instead.
 - The "mapping" page would always show you all mappable fields, even when you only selected one field to map.
-
-### Security
-- Initial release.
-
 
 ## [1.0.14] - 2020-06-30
 
