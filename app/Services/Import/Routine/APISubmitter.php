@@ -45,11 +45,9 @@ class APISubmitter
     /** @var string */
     private $tag;
 
-    /** @var string */
-    private $tagDate;
-
-    /** @var bool */
-    private $addTag;
+    private string $tagDate;
+    private bool   $addTag;
+    private string $rootURI;
 
     /**
      * @param array $lines
@@ -60,6 +58,12 @@ class APISubmitter
         $this->tagDate = date('Y-m-d');
         $count         = count($lines);
         Log::info(sprintf('Going to submit %d transactions to your Firefly III instance.', $count));
+
+        $this->rootURI = config('csv_importer.uri');
+        if ('' !== (string) config('csv_importer.vanity_uri')) {
+            $this->rootURI = config('csv_importer.vanity_uri');
+        }
+        Log::debug(sprintf('The root URI is "%s"', $this->rootURI));
 
         // create the tag, to be used later on.
         $this->createTag();
@@ -163,6 +167,9 @@ class APISubmitter
         }
     }
 
+    /**
+     *
+     */
     private function createTag(): void
     {
         if (false === $this->addTag) {
@@ -260,7 +267,7 @@ class APISubmitter
                     $message = sprintf(
                         'Created %s <a target="_blank" href="%s">#%d "%s"</a> (%s %s)',
                         $transaction->type,
-                        sprintf('%s/transactions/show/%d', env('FIREFLY_III_URI'), $group->id),
+                        sprintf('%s/transactions/show/%d', $this->rootURI, $group->id),
                         $group->id,
                         e($transaction->description),
                         $transaction->currencyCode,
