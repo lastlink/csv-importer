@@ -51,6 +51,7 @@ class BankDebitCredit implements ConverterInterface
             'Af', // ING (NL).
             'Debet', // Triodos (NL)
             'Debit', // ING (EN), thx Quibus!
+            'S', // Volksbank (DE), Short for "Soll"
         ];
         if (in_array(trim($value), $negative, true)) {
             return -1;
