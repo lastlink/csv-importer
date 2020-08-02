@@ -82,7 +82,7 @@
         "doctrine/dbal": "^2.9",
         "fideloper/proxy": "^4.0",
         "firefly-iii/api-support-classes": "dev-master",
-        "fruitcake/laravel-cors": "^1.0",
+        "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^6.5",
         "laravel/framework": "7.*",
         "laravel/tinker": "^2.0",
