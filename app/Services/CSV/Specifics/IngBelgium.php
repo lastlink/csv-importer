@@ -77,10 +77,11 @@ class IngBelgium implements SpecificInterface
      */
     protected static function processTransactionDetails(array $row): array
     {
-        if(isset($row[9])) {
+        $transactionDetails = '';
+        if (isset($row[9])) {
             $transactionDetails = $row[9];
-        } 
-        if(isset($row[8]) && $transactionDetails == '') {
+        }
+        if (isset($row[8]) && $transactionDetails == '') {
             $transactionDetails = $row[8];
         }
 
@@ -136,7 +137,7 @@ class IngBelgium implements SpecificInterface
     private static function convertStructuredDescriptionToProperFormat(string $description): string
     {
         preg_match('/^\*\*\*(\d{3}\/\d{4}\/\d{5})\*\*\*$/', $description, $matches);
-        if(isset($matches[1])) {
+        if (isset($matches[1])) {
             return '+++' . $matches[1] . '+++';
         }
         return $description;
@@ -150,7 +151,7 @@ class IngBelgium implements SpecificInterface
      */
     private static function parseInformationFromTransactionDetails(string $transactionDetails, string $regex): string
     {
-        if(isset($transactionDetails)) {
+        if (isset($transactionDetails)) {
             preg_match($regex, $transactionDetails, $matches);
             if (isset($matches['value'])) {
                 return trim($matches['value']);
