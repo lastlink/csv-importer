@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.2] - 2020-08-09
+
+### Added
+- Reset button
+
+### Fixed
+- [Issue 3644](https://github.com/firefly-iii/firefly-iii/issues/3644) Bank specific options were ignored.
+- [Issue 3676](https://github.com/firefly-iii/firefly-iii/issues/3676) Better error handling.
+
 ## [2.0.1] - 2020-08-01
 
 ### Changed
