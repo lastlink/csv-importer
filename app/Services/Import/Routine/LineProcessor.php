@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Services\Import\Routine;
 
+use App\Exceptions\ImportException;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\Import\ColumnValue;
 use App\Services\Import\Support\ProgressInformation;
@@ -84,8 +85,13 @@ class LineProcessor
 
         foreach ($lines as $index => $line) {
             Log::debug(sprintf('Now processing CSV line #%d/#%d', $index + 1, $count));
-            $processed[] = $this->process($line);
-            //sleep(1); // DEBUG
+            try {
+                $processed[] = $this->process($line);
+            } catch (ImportException $e) {
+                Log::error($e->getMessage());
+                Log::error($e->getTraceAsString());
+                $this->addError(0, $e->getMessage());
+            }
         }
 
         Log::info(sprintf('Done processing data in %d CSV lines...', $count));
@@ -100,6 +106,7 @@ class LineProcessor
      * @param array $line
      *
      * @return array
+     * @throws ImportException
      */
     private function process(array $line): array
     {
@@ -167,7 +174,7 @@ class LineProcessor
      * @param int $mapped
      *
      * @return string
-     * @throws RuntimeException
+     * @throws ImportException
      */
     private function getRoleForColumn(int $column, int $mapped): string
     {
@@ -209,7 +216,7 @@ class LineProcessor
             'opposing-number'       => 'opposing-id',
         ];
         if (!isset($roleMapping[$role])) {
-            throw new UnexpectedValueException(sprintf('Cannot indicate new role for mapped role "%s"', $role)); // @codeCoverageIgnore
+            throw new ImportException(sprintf('Cannot indicate new role for mapped role "%s"', $role)); // @codeCoverageIgnore
         }
         $newRole = $roleMapping[$role];
         if ($newRole !== $role) {

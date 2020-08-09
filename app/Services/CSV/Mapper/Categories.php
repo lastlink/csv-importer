@@ -23,10 +23,11 @@ declare(strict_types=1);
 
 namespace App\Services\CSV\Mapper;
 
+use App\Exceptions\ImportException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Category;
 use GrumpyDictator\FFIIIApiSupport\Request\GetCategoriesRequest;
-
+use Log;
 /**
  * Class Categories
  */
@@ -37,19 +38,25 @@ class Categories implements MapperInterface
      * Get map of objects.
      *
      * @return array
-     * @throws ApiHttpException
+     * @throws ImportException
      */
     public function getMap(): array
     {
-        $result   = [];
-        $uri     = (string)config('csv_importer.uri');
-        $token   = (string)config('csv_importer.access_token');
-        $request  = new GetCategoriesRequest($uri, $token);
+        $result  = [];
+        $uri     = (string) config('csv_importer.uri');
+        $token   = (string) config('csv_importer.access_token');
+        $request = new GetCategoriesRequest($uri, $token);
 
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
 
-        $response = $request->get();
+        try {
+            $response = $request->get();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            throw new ImportException(sprintf('Could not download categories: %s', $e->getMessage()));
+        }
         /** @var Category $category */
         foreach ($response as $category) {
             $result[$category->id] = sprintf('%s', $category->name);

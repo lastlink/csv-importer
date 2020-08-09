@@ -42,16 +42,11 @@ class CSVFileProcessor
 {
     use ProgressInformation;
 
-    /** @var bool */
-    private $hasHeaders;
-    /** @var Reader */
-    private $reader;
-    /** @var array */
-    private $specifics;
-    /** @var string */
-    private $delimiter;
-    /** @var Configuration */
-    private $configuration;
+    private bool          $hasHeaders;
+    private Reader        $reader;
+    private array         $specifics;
+    private string        $delimiter;
+    private Configuration $configuration;
 
     /**
      * CSVFileProcessor constructor.
@@ -82,8 +77,6 @@ class CSVFileProcessor
     /**
      * Get a reader, and start looping over each line.
      *
-     * @throws ImportException
-     * @throws JsonException
      * @return array
      */
     public function processCSVFile(): array
@@ -93,7 +86,11 @@ class CSVFileProcessor
         try {
             $this->reader->setDelimiter($this->delimiter);
         } catch (Exception $e) {
-            throw new ImportException(sprintf('Could not set delimiter: %s', $e->getMessage()));
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            $message = sprintf('Could not set delimiter: %s', $e->getMessage());
+            $this->addError(0, $message);
+            return [];
         }
         Log::debug(sprintf('Offset is %d', $offset));
         try {
@@ -101,10 +98,21 @@ class CSVFileProcessor
             $records = $stmt->process($this->reader);
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            throw new InvalidArgumentException($e->getMessage());
+            Log::error($e->getTraceAsString());
+            $message = sprintf('Could not read CSV: %s', $e->getMessage());
+            $this->addError(0, $message);
+            return [];
         }
 
-        return $this->processCSVLines($records);
+        try {
+            return $this->processCSVLines($records);
+        } catch (ImportException $e) {
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            $message = sprintf('Could not parse CSV: %s', $e->getMessage());
+            $this->addError(0, $message);
+            return [];
+        }
     }
 
     /**
@@ -136,8 +144,8 @@ class CSVFileProcessor
      *
      * @param ResultSet $records
      *
-     * @throws JsonException
      * @return array
+     * @throws ImportException
      */
     private function processCSVLines(ResultSet $records): array
     {
@@ -167,15 +175,21 @@ class CSVFileProcessor
     /**
      * @param array $array
      *
-     * @throws JsonException
      * @return array
+     * @throws ImportException
      */
     private function removeDuplicateLines(array $array): array
     {
         $hashes = [];
         $return = [];
         foreach ($array as $index => $line) {
-            $hash = hash('sha256', json_encode($line, JSON_THROW_ON_ERROR));
+            try {
+                $hash = hash('sha256', json_encode($line, JSON_THROW_ON_ERROR));
+            } catch (JsonException $e) {
+                Log::error($e->getMessage());
+                Log::error($e->getTraceAsString());
+                throw new ImportException(sprintf('Could not decode JSON line #%d: %s', $index, $e->getMessage()));
+            }
             if (in_array($hash, $hashes, true)) {
                 $message = sprintf('Going to skip line #%d because it\'s in the file twice. This may reset the count below.', $index);
                 Log::warning($message);

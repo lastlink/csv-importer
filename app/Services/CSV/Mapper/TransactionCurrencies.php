@@ -23,9 +23,11 @@ declare(strict_types=1);
 
 namespace App\Services\CSV\Mapper;
 
+use App\Exceptions\ImportException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\TransactionCurrency;
 use GrumpyDictator\FFIIIApiSupport\Request\GetCurrenciesRequest;
+use Log;
 
 /**
  * Class TransactionCurrencies
@@ -37,19 +39,25 @@ class TransactionCurrencies implements MapperInterface
      * Get map of objects.
      *
      * @return array
-     * @throws ApiHttpException
+     * @throws ImportException
      */
     public function getMap(): array
     {
-        $result   = [];
-        $uri     = (string)config('csv_importer.uri');
-        $token   = (string)config('csv_importer.access_token');
+        $result = [];
+        $uri    = (string) config('csv_importer.uri');
+        $token  = (string) config('csv_importer.access_token');
 
-        $request  = new GetCurrenciesRequest($uri, $token);
+        $request = new GetCurrenciesRequest($uri, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
 
-        $response = $request->get();
+        try {
+            $response = $request->get();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            throw new ImportException(sprintf('Could not download currencies: %s', $e->getMessage()));
+        }
         /** @var TransactionCurrency $currency */
         foreach ($response as $currency) {
             $result[$currency->id] = sprintf('%s (%s)', $currency->name, $currency->code);

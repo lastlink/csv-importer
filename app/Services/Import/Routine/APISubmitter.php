@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Services\Import\Routine;
 
+use App\Exceptions\ImportException;
 use App\Services\Import\Support\ProgressInformation;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Transaction;
@@ -42,9 +43,7 @@ class APISubmitter
 {
     use ProgressInformation;
 
-    /** @var string */
-    private $tag;
-
+    private string $tag;
     private string $tagDate;
     private bool   $addTag;
     private string $rootURI;
@@ -124,8 +123,13 @@ class APISubmitter
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setBody($body);
-        $request->put();
-
+        try {
+            $request->put();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            $this->addError(0, 'Could not store transaction: see the log files.');
+        }
     }
 
 
@@ -141,13 +145,13 @@ class APISubmitter
         foreach ($group->transactions as $index => $transaction) {
             // compare currency ID
             if (null !== $line['transactions'][$index]['currency_id']
-                && (int)$line['transactions'][$index]['currency_id'] !== (int)$transaction->currencyId
+                && (int) $line['transactions'][$index]['currency_id'] !== (int) $transaction->currencyId
             ) {
                 $this->addWarning(
                     $lineIndex,
                     sprintf(
                         'Line #%d may have had its currency changed (from ID #%d to ID #%d). This happens because the associated asset account overrules the currency of the transaction.',
-                        $lineIndex, $line['transactions'][$index]['currency_id'], (int)$transaction->currencyId
+                        $lineIndex, $line['transactions'][$index]['currency_id'], (int) $transaction->currencyId
                     )
                 );
             }
@@ -182,7 +186,7 @@ class APISubmitter
         $request = new PostTagRequest($uri, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
-        $body    = [
+        $body = [
             'tag'  => $this->tag,
             'date' => $this->tagDate,
         ];
@@ -192,12 +196,14 @@ class APISubmitter
             /** @var PostTagResponse $response */
             $response = $request->post();
         } catch (ApiHttpException $e) {
-            Log::error(sprintf('Could not create tag. %s', $e->getMessage()));
-
+            $message = sprintf('Could not create tag. %s', $e->getMessage());
+            Log::error($message);
+            Log::error($e->getTraceAsString());
+            $this->addError(0, $message);
             return;
         }
         if ($response instanceof ValidationErrorResponse) {
-            Log::error($response->errors);
+            Log::error(json_encode($response->errors->toArray()));
 
             return;
         }
@@ -214,10 +220,10 @@ class APISubmitter
      */
     private function processTransaction(int $index, array $line): array
     {
-        $return = [];
-        $uri      = (string) config('csv_importer.uri');
-        $token    = (string) config('csv_importer.access_token');
-        $request  = new PostTransactionRequest($uri, $token);
+        $return  = [];
+        $uri     = (string) config('csv_importer.uri');
+        $token   = (string) config('csv_importer.access_token');
+        $request = new PostTransactionRequest($uri, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         Log::debug('Submitting to Firefly III:', $line);
@@ -258,27 +264,25 @@ class APISubmitter
 
                 return $return;
             }
-            if (null !== $group) {
-                $return = [
-                    'group_id' => $group->id,
-                    'journals' => [],
-                ];
-                foreach ($group->transactions as $transaction) {
-                    $message = sprintf(
-                        'Created %s <a target="_blank" href="%s">#%d "%s"</a> (%s %s)',
-                        $transaction->type,
-                        sprintf('%s/transactions/show/%d', $this->rootURI, $group->id),
-                        $group->id,
-                        e($transaction->description),
-                        $transaction->currencyCode,
-                        round($transaction->amount, $transaction->currencyDecimalPlaces)
-                    );
-                    // plus 1 to keep the count.
-                    $this->addMessage($index, $message);
-                    $this->compareArrays($index, $line, $group);
-                    Log::info($message);
-                    $return['journals'][$transaction->id] = $transaction->tags;
-                }
+            $return = [
+                'group_id' => $group->id,
+                'journals' => [],
+            ];
+            foreach ($group->transactions as $transaction) {
+                $message = sprintf(
+                    'Created %s <a target="_blank" href="%s">#%d "%s"</a> (%s %s)',
+                    $transaction->type,
+                    sprintf('%s/transactions/show/%d', $this->rootURI, $group->id),
+                    $group->id,
+                    e($transaction->description),
+                    $transaction->currencyCode,
+                    round($transaction->amount, $transaction->currencyDecimalPlaces)
+                );
+                // plus 1 to keep the count.
+                $this->addMessage($index, $message);
+                $this->compareArrays($index, $line, $group);
+                Log::info($message);
+                $return['journals'][$transaction->id] = $transaction->tags;
             }
         }
 
@@ -294,15 +298,15 @@ class APISubmitter
     private function getOriginalValue(string $key, array $transaction): string
     {
         $parts = explode('.', $key);
-        if(1 === count($parts)) {
+        if (1 === count($parts)) {
             return $transaction[$key] ?? '(not found)';
         }
         if (3 !== count($parts)) {
             return '(unknown)';
         }
-        $index = (int)$parts[1];
+        $index = (int) $parts[1];
 
-        return (string)($transaction['transactions'][$index][$parts[2]] ?? '(not found)');
+        return (string) ($transaction['transactions'][$index][$parts[2]] ?? '(not found)');
     }
 
 }

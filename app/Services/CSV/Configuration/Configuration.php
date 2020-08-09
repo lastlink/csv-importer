@@ -97,6 +97,15 @@ class Configuration
     }
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasSpecific(string $name): bool
+    {
+        return in_array($name, $this->specifics, true);
+    }
+
+    /**
      * @return bool
      */
     public function isAddImportTag(): bool
@@ -229,7 +238,7 @@ class Configuration
         $object->defaultAccount = $data['import-account'] ?? $object->defaultAccount;
         $object->rules          = $data['apply-rules'] ?? true;
 
-        $object->ignoreDuplicateTransactions = $data['ignore_duplicate_transactions'] ?? false;
+        $object->ignoreDuplicateTransactions = $data['ignore_duplicate_transactions'] ?? true;
 
         if (isset($data['ignore_duplicates']) && true === $data['ignore_duplicates']) {
             Log::debug('Will ignore duplicates.');
@@ -272,14 +281,14 @@ class Configuration
         // loop do mapping from classic file.
         $doMapping = $data['column-do-mapping'] ?? [];
         foreach ($doMapping as $index => $map) {
-            $index                     = (int)$index;
+            $index                     = (int) $index;
             $object->doMapping[$index] = $map;
         }
 
         // loop mapping from classic file.
         $mapping = $data['column-mapping-config'] ?? [];
         foreach ($mapping as $index => $map) {
-            $index                   = (int)$index;
+            $index                   = (int) $index;
             $object->mapping[$index] = $map;
         }
         // set version to "2" and return.

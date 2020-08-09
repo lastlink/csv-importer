@@ -26,6 +26,7 @@ namespace App\Services\CSV\File;
 
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use League\Csv\Reader;
 
 /**
@@ -36,7 +37,7 @@ class FileReader
     /**
      * Get a CSV file reader and fill it with data from CSV file.
      *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws FileNotFoundException
      * @return Reader
      */
     public static function getReaderFromSession(): Reader

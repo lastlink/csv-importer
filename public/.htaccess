@@ -19,3 +19,9 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Protect the web.config file
+<Files "web.config">
+  Order Allow,Deny
+  Deny from all
+</Files>

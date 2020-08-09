@@ -39,7 +39,7 @@ use App\Services\Import\Task\PositiveAmount;
 use App\Services\Import\Task\Tags;
 
 return [
-    'version'             => '2.0.1',
+    'version'             => '2.0.2',
     'access_token'        => env('FIREFLY_III_ACCESS_TOKEN'),
     'uri'                 => env('FIREFLY_III_URI'),
     'upload_path'         => storage_path('uploads'),

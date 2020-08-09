@@ -149,10 +149,6 @@ class ImportRoutineManager
 
     /**
      * Start the import.
-     *
-     * @throws ImportException
-     * @throws JsonException
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      */
     public function start(): void
     {
@@ -163,7 +159,6 @@ class ImportRoutineManager
         $this->csvFileProcessor->setHasHeaders($this->configuration->isHeaders());
         $this->csvFileProcessor->setDelimiter($this->configuration->getDelimiter());
         $CSVLines = $this->csvFileProcessor->processCSVFile();
-
 
         // convert raw lines into arrays with individual ColumnValues
         $valueArrays = $this->lineProcessor->processCSVLines($CSVLines);

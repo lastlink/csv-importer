@@ -23,9 +23,11 @@ declare(strict_types=1);
 
 namespace App\Services\CSV\Mapper;
 
+use App\Exceptions\ImportException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Budget;
 use GrumpyDictator\FFIIIApiSupport\Request\GetBudgetsRequest;
+use Log;
 
 /**
  * Class Budgets
@@ -37,7 +39,7 @@ class Budgets implements MapperInterface
      * Get map of objects.
      *
      * @return array
-     * @throws ApiHttpException
+     * @throws ImportException
      */
     public function getMap(): array
     {
@@ -49,7 +51,15 @@ class Budgets implements MapperInterface
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
 
-        $response = $request->get();
+        try {
+            $response = $request->get();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            throw new ImportException(sprintf('Could not download budgets: %s', $e->getMessage()));
+        }
+
+
         /** @var Budget $budget */
         foreach ($response as $budget) {
             $result[$budget->id] = sprintf('%s', $budget->name);

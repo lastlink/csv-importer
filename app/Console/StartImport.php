@@ -27,13 +27,16 @@ use App\Exceptions\ImportException;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\File\FileReader;
 use App\Services\Import\ImportRoutineManager;
+use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use Log;
+
 /**
  * Trait StartImport
  */
 trait StartImport
 {
     use ManageMessages;
+
     /**
      * @param string $csv
      * @param array  $configuration
@@ -54,13 +57,7 @@ trait StartImport
             return 1;
         }
         $manager->setReader(FileReader::getReaderFromContent($csv));
-        try {
-            $manager->start();
-        } catch (ImportException $e) {
-            $this->error($e->getMessage());
-
-            return 1;
-        }
+        $manager->start();
 
         $messages = $manager->getAllMessages();
         $warnings = $manager->getAllWarnings();
