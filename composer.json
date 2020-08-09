@@ -62,18 +62,18 @@
         "docs": "https://firefly-iii.gitbook.io/firefly-iii-csv-importer/"
     },
     "funding": [
-      {
-        "type": "patreon",
-        "url": "https://www.patreon.com/JC5"
-      },
-      {
-        "type": "github",
-        "url": "https://github.com/sponsors/JC5"
-      },
-      {
-        "type": "paypal",
-        "url": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=L62W7DVD5ETPC&source=url"
-      }
+        {
+            "type": "patreon",
+            "url": "https://www.patreon.com/JC5"
+        },
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/JC5"
+        },
+        {
+            "type": "paypal",
+            "url": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=L62W7DVD5ETPC&source=url"
+        }
     ],
     "require": {
         "php": "^7.4",
@@ -81,7 +81,7 @@
         "ext-json": "*",
         "doctrine/dbal": "^2.9",
         "fideloper/proxy": "^4.0",
-        "firefly-iii/api-support-classes": "dev-master",
+        "firefly-iii/api-support-classes": "@dev",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^6.5",
         "laravel/framework": "7.*",
