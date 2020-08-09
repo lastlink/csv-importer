@@ -28,7 +28,7 @@ use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
 use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
 use GrumpyDictator\FFIIIApiSupport\Response\GetAccountsResponse;
-
+use Log;
 /**
  * Trait GetAccounts
  */
@@ -39,7 +39,6 @@ trait GetAccounts
      * Returns a combined list of asset accounts and all liability accounts.
      *
      * @throws ImportException
-     * @throws ApiHttpException
      * @return array
      */
     protected function getAllAccounts(): array
@@ -55,7 +54,13 @@ trait GetAccounts
         $request->setType(GetAccountsRequest::ALL);
 
         /** @var GetAccountsResponse $response */
-        $response = $request->get();
+        try {
+            $response = $request->get();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            throw new ImportException(sprintf('Could not download accounts: %s', $e->getMessage()));
+        }
 
         if ($response instanceof GetAccountsResponse) {
             $accounts = $this->toArray($response);
@@ -72,8 +77,6 @@ trait GetAccounts
      * Returns a combined list of asset accounts and all liability accounts.
      *
      * @throws ImportException
-     * @throws ApiHttpException
-     * @throws ApiHttpException
      * @return array
      */
     protected function getAssetAccounts(): array
@@ -90,7 +93,13 @@ trait GetAccounts
         $request->setTimeOut(config('csv_importer.connection.timeout'));
 
         /** @var GetAccountsResponse $response */
-        $response = $request->get();
+        try {
+            $response = $request->get();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            throw new ImportException(sprintf('Could not download asset accounts: %s', $e->getMessage()));
+        }
 
         if ($response instanceof GetAccountsResponse) {
             $accounts = $this->toArray($response);
@@ -107,7 +116,13 @@ trait GetAccounts
         $request->setTimeOut(config('csv_importer.connection.timeout'));
 
         /** @var GetAccountsResponse $response */
-        $response = $request->get();
+        try {
+            $response = $request->get();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            throw new ImportException(sprintf('Could not download liability accounts: %s', $e->getMessage()));
+        }
 
         if ($response instanceof GetAccountsResponse) {
             $liabilities = $this->toArray($response);

@@ -35,9 +35,8 @@ class AssetAccountIbans implements MapperInterface
     /**
      * Get map of objects.
      *
-     * @throws ImportException
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      * @return array
+     * @throws ImportException
      */
     public function getMap(): array
     {

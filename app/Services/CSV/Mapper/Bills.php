@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Services\CSV\Mapper;
 
+use App\Exceptions\ImportException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Bill;
 use GrumpyDictator\FFIIIApiSupport\Request\GetBillsRequest;
@@ -32,24 +33,29 @@ use GrumpyDictator\FFIIIApiSupport\Request\GetBillsRequest;
  */
 class Bills implements MapperInterface
 {
-
     /**
      * Get map of objects.
      *
      * @return array
-     * @throws ApiHttpException
+     * @throws ImportException
      */
     public function getMap(): array
     {
-        $result   = [];
-        $uri     = (string)config('csv_importer.uri');
-        $token   = (string)config('csv_importer.access_token');
-        $request  = new GetBillsRequest($uri, $token);
+        $result  = [];
+        $uri     = (string) config('csv_importer.uri');
+        $token   = (string) config('csv_importer.access_token');
+        $request = new GetBillsRequest($uri, $token);
 
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
 
-        $response = $request->get();
+        try {
+            $response = $request->get();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            throw new ImportException(sprintf('Could not download bills: %s', $e->getMessage()));
+        }
         /** @var Bill $bill */
         foreach ($response as $bill) {
             $result[$bill->id] = sprintf('%s (%s)', $bill->name, $bill->repeat_freq);

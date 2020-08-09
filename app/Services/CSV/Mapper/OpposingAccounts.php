@@ -36,7 +36,6 @@ class OpposingAccounts implements MapperInterface
      * Get map of objects.
      *
      * @throws ImportException
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
      * @return array
      */
     public function getMap(): array

@@ -24,8 +24,8 @@ declare(strict_types=1);
 namespace App\Services\CSV\Mapper;
 
 
+use App\Exceptions\ImportException;
 use App\Services\CSV\Specifics\SpecificService;
-use InvalidArgumentException;
 use League\Csv\Exception;
 use League\Csv\Reader;
 use League\Csv\Statement;
@@ -46,8 +46,8 @@ class MapperService
      * @param array  $specifics
      * @param array  $data
      *
-     * @throws Exception
      * @return array
+     * @throws ImportException
      */
     public static function getMapData(string $content, string $delimiter, bool $hasHeaders, array $specifics, array $data): array
     {
@@ -55,7 +55,13 @@ class MapperService
         $reader = Reader::createFromString($content);
 
         // reader not configured to use correct delimiter.
-        $reader->setDelimiter($delimiter);
+        try {
+            $reader->setDelimiter($delimiter);
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            throw new ImportException(sprintf('Could not set delimiter: %s', $e->getMessage()));
+        }
 
         $offset = 0;
         if (true === $hasHeaders) {
@@ -66,7 +72,7 @@ class MapperService
             $records = $stmt->process($reader);
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            throw new InvalidArgumentException($e->getMessage());
+            throw new ImportException($e->getMessage());
         }
         // loop each row, apply specific:
         foreach ($records as $row) {
@@ -83,7 +89,7 @@ class MapperService
             }
         }
         // loop data, clean up data:
-        foreach($data as $index => $columnInfo) {
+        foreach ($data as $index => $columnInfo) {
             $data[$index]['values'] = array_unique($data[$index]['values']);
             asort($data[$index]['values']);
         }
