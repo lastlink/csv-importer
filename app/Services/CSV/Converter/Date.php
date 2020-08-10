@@ -24,9 +24,12 @@ declare(strict_types=1);
 namespace App\Services\CSV\Converter;
 
 use Carbon\Carbon;
+use Carbon\Language;
 use Exception;
 use InvalidArgumentException;
 use Log;
+
+define('DATE_FORMAT_PATTERN', '/(?:('. join("|", array_keys(Language::all())).')\:)?(.+)/');
 
 /**
  * Class Date
@@ -34,6 +37,7 @@ use Log;
 class Date implements ConverterInterface
 {
     private $dateFormat = 'Y-m-d';
+    private $dateLocale = 'en';
 
     /**
      * Convert a value.
@@ -61,7 +65,7 @@ class Date implements ConverterInterface
         if ('' !== $string) {
             Log::debug(sprintf('Date converter is going to work on "%s" using format "%s"', $string, $this->dateFormat));
             try {
-                $carbon = Carbon::createFromFormat($this->dateFormat, $string);
+                $carbon = Carbon::createFromLocaleFormat($this->dateFormat, $this->dateLocale, $string);
             } catch (InvalidArgumentException|Exception $e) {
                 Log::error(sprintf('%s converting the date: %s', get_class($e), $e->getMessage()));
 
@@ -79,6 +83,19 @@ class Date implements ConverterInterface
      */
     public function setConfiguration(string $configuration): void
     {
-        $this->dateFormat = $configuration;
+        list($this->dateLocale, $this->dateFormat) = self::splitLocaleFormat($configuration);
+    }
+
+    public static function splitLocaleFormat(string $format): array
+    {
+        preg_match(DATE_FORMAT_PATTERN, $format, $dateFormatConfiguration);
+        if (empty($dateFormatConfiguration)) {
+            $dateLocale = 'en';
+            $dateFormat = 'Y-m-d';
+        } else {
+            $dateLocale = $dateFormatConfiguration[1] ?: 'en';
+            $dateFormat = $dateFormatConfiguration[2];
+        }
+        return [$dateLocale, $dateFormat];
     }
 }

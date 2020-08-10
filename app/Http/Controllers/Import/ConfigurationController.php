@@ -140,11 +140,10 @@ class ConfigurationController extends Controller
     public function phpDate(Request $request): JsonResponse
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
-        $format = $request->get('format');
-        $date   = Carbon::make('1984-09-17');
+        list($locale, $format) = \App\Services\CSV\Converter\Date::splitLocaleFormat($request->get('format'));
+        $date   = Carbon::make('1984-09-17')->locale($locale);
 
-        /** @noinspection NullPointerExceptionInspection */
-        return response()->json(['result' => $date->format($format)]);
+        return response()->json(['result' => $date->translatedFormat($format)]);
     }
 
     /**
