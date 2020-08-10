@@ -776,12 +776,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/JC5/api-support-classes.git",
-                "reference": "1f4921c8d8f16281bcc23d5bc9a07753b72cc1b2"
+                "reference": "c24b7f5457964315e6ab70fdc898ad2f7d5aef6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JC5/api-support-classes/zipball/1f4921c8d8f16281bcc23d5bc9a07753b72cc1b2",
-                "reference": "1f4921c8d8f16281bcc23d5bc9a07753b72cc1b2",
+                "url": "https://api.github.com/repos/JC5/api-support-classes/zipball/c24b7f5457964315e6ab70fdc898ad2f7d5aef6f",
+                "reference": "c24b7f5457964315e6ab70fdc898ad2f7d5aef6f",
                 "shasum": ""
             },
             "require": {
@@ -871,7 +871,7 @@
                     "type": "paypal"
                 }
             ],
-            "time": "2020-08-10T07:20:35+00:00"
+            "time": "2020-08-10T08:15:21+00:00"
         },
         {
             "name": "fruitcake/laravel-cors",
@@ -6651,16 +6651,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "9.1.1",
+            "version": "9.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "9e17fe39fcaf66375f3d9d2258b025c3f48e42ac"
+                "reference": "5210f9269e44e6d34419cb92242ef11aee9351ac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/9e17fe39fcaf66375f3d9d2258b025c3f48e42ac",
-                "reference": "9e17fe39fcaf66375f3d9d2258b025c3f48e42ac",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/5210f9269e44e6d34419cb92242ef11aee9351ac",
+                "reference": "5210f9269e44e6d34419cb92242ef11aee9351ac",
                 "shasum": ""
             },
             "require": {
@@ -6720,7 +6720,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-08-10T04:37:38+00:00"
+            "time": "2020-08-10T07:24:51+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",

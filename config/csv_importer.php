@@ -48,7 +48,7 @@ return [
     'vanity_uri'          => envNonEmpty('VANITY_URI'),
     'connection'          => [
         'verify'  => env('VERIFY_TLS_SECURITY', true),
-        'timeout' => 0.0 === (float) env('CONNECTION_TIMEOUT', 3.14) ? 3.1415 : (float) env('CONNECTION_TIMEOUT', 3.14),
+        'timeout' => 0.0 === (float) env('CONNECTION_TIMEOUT', 31.415) ? 31.415 : (float) env('CONNECTION_TIMEOUT', 31.415),
     ],
     'trusted_proxies'     => env('TRUSTED_PROXIES', ''),
     'delimiters'          => [
