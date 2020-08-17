@@ -39,6 +39,7 @@ class PositiveAmount extends AbstractTask
     public function process(array $group): array
     {
         foreach ($group['transactions'] as $index => $transaction) {
+            $group['transactions'][$index]['amount'] = $group['transactions'][$index]['amount'] ?? '0';
             $group['transactions'][$index]['amount'] = Amount::positive($group['transactions'][$index]['amount']);
         }
 
