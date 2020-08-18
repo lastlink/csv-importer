@@ -38,6 +38,7 @@ class Date implements ConverterInterface
 {
     private $dateFormat = 'Y-m-d';
     private $dateLocale = 'en';
+    public static $dateFormatPattern = '/(?:('. join("|", array_keys(Language::all())).')\:)?(.+)/';
 
     /**
      * Convert a value.
@@ -88,12 +89,12 @@ class Date implements ConverterInterface
 
     public static function splitLocaleFormat(string $format): array
     {
-        preg_match(DATE_FORMAT_PATTERN, $format, $dateFormatConfiguration);
-        if (empty($dateFormatConfiguration)) {
-            $dateLocale = 'en';
-            $dateFormat = 'Y-m-d';
-        } else {
-            $dateLocale = $dateFormatConfiguration[1] ?: 'en';
+        $dateLocale = 'en';
+        $dateFormat = 'Y-m-d';
+        $dateFormatConfiguration = [];
+        preg_match(self::$dateFormatPattern, $format, $dateFormatConfiguration);
+        if (3 == count($dateFormatConfiguration)) {
+            $dateLocale = $dateFormatConfiguration[1] ?: $dateLocale;
             $dateFormat = $dateFormatConfiguration[2];
         }
         return [$dateLocale, $dateFormat];
