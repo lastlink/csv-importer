@@ -93,7 +93,7 @@ class Date implements ConverterInterface
         $dateFormat = 'Y-m-d';
         $dateFormatConfiguration = [];
         preg_match(self::$dateFormatPattern, $format, $dateFormatConfiguration);
-        if (3 == count($dateFormatConfiguration)) {
+        if (3 === count($dateFormatConfiguration)) {
             $dateLocale = $dateFormatConfiguration[1] ?: $dateLocale;
             $dateFormat = $dateFormatConfiguration[2];
         }
