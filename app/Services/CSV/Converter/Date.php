@@ -29,16 +29,24 @@ use Exception;
 use InvalidArgumentException;
 use Log;
 
-define('DATE_FORMAT_PATTERN', '/(?:('. join("|", array_keys(Language::all())).')\:)?(.+)/');
-
 /**
  * Class Date
  */
 class Date implements ConverterInterface
 {
-    private $dateFormat = 'Y-m-d';
-    private $dateLocale = 'en';
-    public static $dateFormatPattern = '/(?:('. join("|", array_keys(Language::all())).')\:)?(.+)/';
+    private string $dateFormat;
+    private string $dateLocale;
+    private string $dateFormatPattern;
+
+    /**
+     * Date constructor.
+     */
+    public function __construct()
+    {
+        $this->dateFormat = 'Y-m-d';
+        $this->dateLocale = 'en';
+        $this->dateFormatPattern = '/(?:('. join("|", array_keys(Language::all())).')\:)?(.+)/';
+    }
 
     /**
      * Convert a value.
@@ -59,8 +67,7 @@ class Date implements ConverterInterface
 
         if ('' === $string) {
             Log::warning('Empty date string, so date is set to today.');
-            /** @var Carbon $carbon */
-            $carbon = Carbon::today();
+            $carbon = today();
             $carbon->startOfDay();
         }
         if ('' !== $string) {
@@ -84,15 +91,19 @@ class Date implements ConverterInterface
      */
     public function setConfiguration(string $configuration): void
     {
-        list($this->dateLocale, $this->dateFormat) = self::splitLocaleFormat($configuration);
+        list($this->dateLocale, $this->dateFormat) = $this->splitLocaleFormat($configuration);
     }
 
-    public static function splitLocaleFormat(string $format): array
+    /**
+     * @param string $format
+     * @return array|string[]
+     */
+    public function splitLocaleFormat(string $format): array
     {
         $dateLocale = 'en';
         $dateFormat = 'Y-m-d';
         $dateFormatConfiguration = [];
-        preg_match(self::$dateFormatPattern, $format, $dateFormatConfiguration);
+        preg_match($this->dateFormatPattern, $format, $dateFormatConfiguration);
         if (3 === count($dateFormatConfiguration)) {
             $dateLocale = $dateFormatConfiguration[1] ?: $dateLocale;
             $dateFormat = $dateFormatConfiguration[2];
