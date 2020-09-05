@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.1.1 - 2020-09-05
+
+### Added
+- Can now parse locale dates, see the [documentation](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/configure)
+
+### Fixed
+- [Issue 3706](https://github.com/firefly-iii/firefly-iii/issues/3706) Bug in amount parsing.
+- [Issue 3767](https://github.com/firefly-iii/firefly-iii/issues/3767) Date parsing was broken.
+
 ## 2.1.0 - 2020-09-05
 
 ### Added
