@@ -2,25 +2,33 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.0.5] - 2020-08-10
+## 2.1.0 - 2020-09-05
+
+### Added
+- Can now parse locale dates, see the [documentation](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/importing-data/configure)
+
+### Fixed
+- [Issue 3706](https://github.com/firefly-iii/firefly-iii/issues/3706) Bug in amount parsing.
+
+## 2.0.5 - 2020-08-10
 
 ### Fixed
 
 - Longer standard timeout for slow installations.
 
-## [2.0.4] - 2020-08-10
+## 2.0.4 - 2020-08-10
 
 ### Fixed
 
 - Nullpointer in support class.
 
-## [2.0.3] - 2020-08-09
+## 2.0.3 - 2020-08-09
 
 ### Fixed
 
 - Bad exception call in support class.
 
-## [2.0.2] - 2020-08-09
+## 2.0.2 - 2020-08-09
 
 ### Added
 - Reset button
@@ -29,19 +37,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [Issue 3644](https://github.com/firefly-iii/firefly-iii/issues/3644) Bank specific options were ignored.
 - [Issue 3676](https://github.com/firefly-iii/firefly-iii/issues/3676) Better error handling.
 
-## [2.0.1] - 2020-08-01
+## 2.0.1 - 2020-08-01
 
 ### Changed
 - Now supports the "S", when using the generic bank debit/credit selector (German banks use it)
 
-## [2.0.0] - 2020-07-10
+## 2.0.0 - 2020-07-10
 
 ### Changed
 - Now requires PHP 7.4. Make sure you update!
 - Can now use a vanity URL. See the example environment variables file, `.env.example` for instructions.
 - This version requires Firefly III v5.3.0
 
-## [1.0.15] - 2020-07-05
+## 1.0.15 - 2020-07-05
 
 ⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
 
@@ -50,19 +58,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  "mapping" function instead.
 - The "mapping" page would always show you all mappable fields, even when you only selected one field to map.
 
-## [1.0.14] - 2020-06-30
+## 1.0.14 - 2020-06-30
 
 Fixes [issue 3501](https://github.com/firefly-iii/firefly-iii/issues/3501).
 
-## [1.0.12] - 2020-06-19
+## 1.0.12 - 2020-06-19
 
 Now liabilities can be selected as the default account.
 
-## [1.0.11] - 2020-06-16
+## 1.0.11 - 2020-06-16
 
 Some changes in the ING (Belgium) parser.
 
-## [1.0.10] - 2020-06-04
+## 1.0.10 - 2020-06-04
 
 ⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
 
@@ -81,7 +89,7 @@ You can now set the timezone using the `TZ` environment variable.
   way transactions are handled, so be careful importing large batches.
 - IBAN in lower case or spaces works now. 
 
-## [1.0.9] - 2020-05-19
+## 1.0.9 - 2020-05-19
 
 ### Fixed
 - Fixed error message about "root directory" because the CSV importer submitted an empty string.
@@ -90,7 +98,7 @@ You can now set the timezone using the `TZ` environment variable.
 - CSV importer requires the latest version of Firefly III.
 
 
-## [1.0.8] - 2020-05-14
+## 1.0.8 - 2020-05-14
 
 ⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
 
@@ -104,7 +112,7 @@ You can now set the timezone using the `TZ` environment variable.
 - If the API response was bad, the importer would crash. No longer.
 - [Issue 3345](https://github.com/firefly-iii/firefly-iii/issues/3345) Would ignore the delimiter in some cases.
 
-## [1.0.7] - 2020-05-04
+## 1.0.7 - 2020-05-04
 
 ⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
 
@@ -118,7 +126,7 @@ You can now set the timezone using the `TZ` environment variable.
 - Merge [fix](https://github.com/firefly-iii/csv-importer/pull/5) for mail config.
 - Catch JSON errors, so the importer handles invalid UTF8 data properly. 
 
-## [1.0.6] - 2020-04-26
+## 1.0.6 - 2020-04-26
 
 ⚠️ Several changes in this release may break Firefly III's duplication detection. Be careful importing large batches.
 
@@ -130,7 +138,7 @@ You can now set the timezone using the `TZ` environment variable.
 - ⚠️ When the destination of a withdrawal is empty, *or* the source of a deposit is empty, the CSV importer will substitute these values with `(no name)` as
  it used to do when the CSV importer was part of Firefly III itself.
 
-## [1.0.5] - 2020-04-22
+## 1.0.5 - 2020-04-22
 
 ### Fixed
 - [Issue 3268](https://github.com/firefly-iii/firefly-iii/issues/3268) Issue with asset management.
@@ -138,17 +146,17 @@ You can now set the timezone using the `TZ` environment variable.
 - [Issue 3279](https://github.com/firefly-iii/firefly-iii/issues/3279) Issue handling JSON.
 
 
-## [1.0.4] - 2020-04-16
+## 1.0.4 - 2020-04-16
 
 - [Issue 3266](https://github.com/firefly-iii/firefly-iii/issues/3266) Import loop due to bad bccomp call.
 - Some code cleanup.
 
-## [1.0.3] - 2020-04-13
+## 1.0.3 - 2020-04-13
 
 - Fix issue with account selection.
 - Fix issue with amounts.
 
-## [1.0.2] - 2020-04-12
+## 1.0.2 - 2020-04-12
 
 ### Added
 - Add ability to handle `TRUSTED_PROXIES` environment variable.
@@ -160,14 +168,14 @@ You can now set the timezone using the `TZ` environment variable.
 - Better error handling (500 errors will not make the importer loop).
 - Fixed handling of specifics, thanks to @FelikZ
 
-## [1.0.1] - 2020-04-10
+## 1.0.1 - 2020-04-10
 
 ### Fixed
 - Call to `convertBoolean` with bad parameters.
 - Catch exception where Firefly III returns the wrong account.
 - Update minimum version for Firefly III to 5.2.0.
 
-## [1.0.0] - 2020-04-10
+## 1.0.0 - 2020-04-10
 
 This release was preceded by several alpha and beta versions:
 
