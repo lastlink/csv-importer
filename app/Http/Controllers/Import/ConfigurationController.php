@@ -28,6 +28,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Middleware\ConfigComplete;
 use App\Http\Request\ConfigurationPostRequest;
 use App\Services\CSV\Configuration\Configuration;
+use App\Services\CSV\Converter\Date;
 use App\Services\CSV\Specifics\SpecificService;
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
@@ -140,11 +141,10 @@ class ConfigurationController extends Controller
     public function phpDate(Request $request): JsonResponse
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
-        $format = $request->get('format');
-        $date   = Carbon::make('1984-09-17');
+        [$locale, $format] = Date::splitLocaleFormat($request->get('format'));
+        $date   = Carbon::make('1984-09-17')->locale($locale);
 
-        /** @noinspection NullPointerExceptionInspection */
-        return response()->json(['result' => $date->format($format)]);
+        return response()->json(['result' => $date->translatedFormat($format)]);
     }
 
     /**
