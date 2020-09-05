@@ -65,8 +65,8 @@ class ConfigurationController extends Controller
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
         $mainTitle = 'Import routine';
-        $subTitle  = 'Configure your CSV file import';
-        $accounts  = [];
+        $subTitle = 'Configure your CSV file import';
+        $accounts = [];
 
         $configuration = null;
         if (session()->has(Constants::CONFIGURATION)) {
@@ -80,7 +80,7 @@ class ConfigurationController extends Controller
         }
 
         // get list of asset accounts:
-        $uri   = (string)config('csv_importer.uri');
+        $uri = (string)config('csv_importer.uri');
         $token = (string)config('csv_importer.access_token');
         $request = new GetAccountsRequest($uri, $token);
         $request->setType(GetAccountsRequest::ASSET);
@@ -97,7 +97,7 @@ class ConfigurationController extends Controller
         }
 
         // also get liabilities
-        $uri   = (string)config('csv_importer.uri');
+        $uri = (string)config('csv_importer.uri');
         $token = (string)config('csv_importer.access_token');
         $request = new GetAccountsRequest($uri, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
@@ -111,19 +111,19 @@ class ConfigurationController extends Controller
 
 
         // send other values through the form. A bit of a hack but OK.
-        $roles     = '{}';
+        $roles = '{}';
         $doMapping = '{}';
-        $mapping   = '{}';
+        $mapping = '{}';
         if (null !== $configuration) {
             try {
-                $roles     = base64_encode(json_encode($configuration->getRoles(), JSON_THROW_ON_ERROR, 512));
+                $roles = base64_encode(json_encode($configuration->getRoles(), JSON_THROW_ON_ERROR, 512));
                 $doMapping = base64_encode(json_encode($configuration->getDoMapping(), JSON_THROW_ON_ERROR, 512));
-                $mapping   = base64_encode(json_encode($configuration->getMapping(), JSON_THROW_ON_ERROR, 512));
+                $mapping = base64_encode(json_encode($configuration->getMapping(), JSON_THROW_ON_ERROR, 512));
             } catch (JsonException $e) {
                 Log::error($e->getMessage());
-                $roles     = base64_encode('[]');
+                $roles = base64_encode('[]');
                 $doMapping = base64_encode('[]');
-                $mapping   = base64_encode('[]');
+                $mapping = base64_encode('[]');
             }
         }
 
@@ -141,8 +141,10 @@ class ConfigurationController extends Controller
     public function phpDate(Request $request): JsonResponse
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
-        [$locale, $format] = Date::splitLocaleFormat($request->get('format'));
-        $date   = Carbon::make('1984-09-17')->locale($locale);
+
+        $dateObj = new Date;
+        [$locale, $format] = $dateObj->splitLocaleFormat($request->get('format'));
+        $date = Carbon::make('1984-09-17')->locale($locale);
 
         return response()->json(['result' => $date->translatedFormat($format)]);
     }
@@ -156,9 +158,9 @@ class ConfigurationController extends Controller
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
         // store config on drive.
-        $fromRequest   = $request->getAll();
+        $fromRequest = $request->getAll();
         $configuration = Configuration::fromRequest($fromRequest);
-        $json          = '[]';
+        $json = '[]';
         try {
             $json = json_encode($configuration, JSON_THROW_ON_ERROR, 512);
         } catch (JsonException $e) {
