@@ -65,6 +65,7 @@ You can use this tool in several ways.
 
 1. [Install it on your server using composer](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/self_hosted).
 2. [Use the Docker-image](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/docker).
+3. [Use the public instance](#).
 
 Generally speaking, it's easiest to use and install this tool the same way as you use Firefly III. And although it features an excellent web-interface, you can also use the command line to import your data.
 
