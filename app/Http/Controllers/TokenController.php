@@ -25,7 +25,6 @@ namespace App\Http\Controllers;
 
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Request\SystemInformationRequest;
-use GrumpyDictator\FFIIIApiSupport\Response\SystemInformationResponse;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
@@ -34,6 +33,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\View\View;
 use InvalidArgumentException;
+use Log;
 use Str;
 
 /**
@@ -42,15 +42,89 @@ use Str;
 class TokenController extends Controller
 {
     /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|Factory|RedirectResponse|Redirector|View
+     */
+    public function index(Request $request)
+    {
+        Log::debug(sprintf('Now at %s', __METHOD__));
+        $configToken = (string) config('csv_importer.access_token');
+        $clientId    = (int) config('csv_importer.client_id');
+        $baseURL     = (string) config('csv_importer.uri');
+
+        // Option 1: access token and url are present:
+        if ('' !== $configToken && '' !== $baseURL) {
+            Log::debug(sprintf('Found personal access token + URL "%s" in config, set cookie and return to index.', $baseURL));
+
+            // set cookies.
+            $cookies = [
+                cookie('access_token', $configToken),
+                cookie('base_url', $baseURL),
+                cookie('refresh_token', ''),
+            ];
+
+            return redirect(route('index'))->withCookies($cookies);
+        }
+
+        // Option 2: client ID + base URL.
+        if (0 !== $clientId && '' !== $baseURL) {
+            Log::debug(sprintf('Found client ID "%d" + URL "%s" in config, redirect to Firefly III for permission.', $clientId, $baseURL));
+
+            // send user to vanity URL!
+            if ('' !== (string) config('csv_importer.vanity_uri')) {
+                $baseURL = config('csv_importer.vanity_uri');
+            }
+
+            return $this->redirectForPermission($request, $baseURL, $clientId);
+        }
+
+        // Option 3: either is empty, ask for client ID and/or base URL:
+        $baseURL  = config('csv_importer.uri');
+        $clientId = 0 === $clientId ? '' : $clientId;
+        return view('token.client_id', compact('baseURL', 'clientId'));
+    }
+
+
+    /**
+     * @param Request $request
+     */
+    public function submitClientId(Request $request)
+    {
+        Log::debug(sprintf('Now at %s', __METHOD__));
+        $data = $request->validate(
+            [
+                'client_id' => 'required|numeric|min:1|max:65536',
+                'base_url'  => 'url',
+            ]);
+        Log::debug('Submitted data: ', $data);
+
+        $data['client_id'] = (int) $data['client_id'];
+
+        // grab base URL from config first, otherwise from submitted data:
+        $baseURL = config('csv_importer.uri');
+        if ('' !== (string) config('csv_importer.vanity_uri')) {
+            $baseURL = config('csv_importer.vanity_uri');
+        }
+        if (array_key_exists('base_url', $data) && '' !== $data['base_url']) {
+            $baseURL = $data['base_url'];
+        }
+        $baseURL = rtrim($baseURL, '/');
+
+        // return request for permission:
+        return $this->redirectForPermission($request, $baseURL, $data['client_id']);
+    }
+
+    /**
      * Check if the Firefly III API responds properly.
      *
      * @return JsonResponse
      */
     public function doValidate(Request $request): JsonResponse
     {
+        Log::debug(sprintf('Now at %s', __METHOD__));
         $response = ['result' => 'OK', 'message' => null];
-        $uri      = (string) config('csv_importer.uri');
-        $token    = $request->cookie('access_token');
+        $uri      = (string) $request->cookie('base_url');
+        $token    = (string) $request->cookie('access_token');
         $request  = new SystemInformationRequest($uri, $token);
 
         $request->setVerify(config('csv_importer.connection.verify'));
@@ -59,7 +133,7 @@ class TokenController extends Controller
         try {
             $result = $request->get();
         } catch (ApiHttpException $e) {
-            return ['result' => 'NOK', 'message' => $e->getMessage()];
+            return response()->json(['result' => 'NOK', 'message' => $e->getMessage()]);
         }
         // -1 = OK (minimum is smaller)
         // 0 = OK (same version)
@@ -83,21 +157,19 @@ class TokenController extends Controller
      */
     public function callback(Request $request)
     {
+        Log::debug(sprintf('Now at %s', __METHOD__));
         $state        = (string) $request->session()->pull('state');
         $codeVerifier = (string) $request->session()->pull('code_verifier');
         $clientId     = (int) $request->session()->pull('form_client_id');
+        $baseURL      = (string) $request->session()->pull('form_base_url');
         $code         = $request->get('code');
-        $baseURL      = config('csv_importer.uri');
-        if ('' !== (string) config('csv_importer.vanity_uri')) {
-            $baseURL = config('csv_importer.vanity_uri');
-        }
 
         throw_unless(
             strlen($state) > 0 && $state === $request->state,
             InvalidArgumentException::class
         );
-
-        $response = (new Client)->post(sprintf('%s/oauth/token', $baseURL), [
+        $finalURL = sprintf('%s/oauth/token', $baseURL);
+        $params   = [
             'form_params' => [
                 'grant_type'    => 'authorization_code',
                 'client_id'     => $clientId,
@@ -105,144 +177,59 @@ class TokenController extends Controller
                 'code_verifier' => $codeVerifier,
                 'code'          => $code,
             ],
-        ]);
+        ];
+        Log::debug('State is valid!');
+        Log::debug('Params for access token', $params);
+        Log::debug(sprintf('Will contact "%s" for a token.', $finalURL));
+
+
+        $response = (new Client)->post($finalURL, $params);
         $data     = json_decode((string) $response->getBody(), true);
-        return redirect(route('index'))->cookie('access_token', $data['access_token']);
+
+        Log::debug('Response', $data);
+
+        // set cookies.
+        $cookies = [
+            cookie('access_token', (string) $data['access_token']),
+            cookie('base_url', $baseURL),
+            cookie('refresh_token', (string) $data['refresh_token']),
+        ];
+        Log::debug(sprintf('Return redirect with cookies to "%s"', route('index')));
+
+        return redirect(route('index'))->withCookies($cookies);
     }
 
     /**
      * @param Request $request
+     * @param string  $baseURL
+     * @param int     $clientId
+     * @return RedirectResponse
      */
-    public function submitClientId(Request $request)
+    private function redirectForPermission(Request $request, string $baseURL, int $clientId): RedirectResponse
     {
-        $clientId = (int) $request->get('client_id');
-        if (0 === $clientId) {
-            return redirect(route('token.index'));
-        }
-        $baseURL = config('csv_importer.uri');
-        if ('' !== (string) config('csv_importer.vanity_uri')) {
-            $baseURL = config('csv_importer.vanity_uri');
-        }
-
         $state        = Str::random(40);
         $codeVerifier = Str::random(128);
         $request->session()->put('state', $state);
         $request->session()->put('code_verifier', $codeVerifier);
         $request->session()->put('form_client_id', $clientId);
+        $request->session()->put('form_base_url', $baseURL);
 
         $codeChallenge = strtr(rtrim(base64_encode(hash('sha256', $codeVerifier, true)), '='), '+/', '-_');
-        $query         = http_build_query([
-                                              'client_id'             => $clientId,
-                                              'redirect_uri'          => route('token.callback'),
-                                              'response_type'         => 'code',
-                                              'scope'                 => '',
-                                              'state'                 => $state,
-                                              'code_challenge'        => $codeChallenge,
-                                              'code_challenge_method' => 'S256',
-                                          ]);
+        $params        = [
+            'client_id'             => $clientId,
+            'redirect_uri'          => route('token.callback'),
+            'response_type'         => 'code',
+            'scope'                 => '',
+            'state'                 => $state,
+            'code_challenge'        => $codeChallenge,
+            'code_challenge_method' => 'S256',
+        ];
+        $query         = http_build_query($params);
+        $finalURL      = sprintf('%s/oauth/authorize?', $baseURL);
+        Log::debug('Query parameters are', $params);
+        Log::debug(sprintf('Now redirecting to "%s" (params omitted)', $finalURL));
 
-        return redirect(sprintf('%s/oauth/authorize?', $baseURL) . $query);
-    }
-
-    /**
-     * Same thing but not over JSON.
-     *
-     * @return Factory|RedirectResponse|Redirector|View
-     */
-    public function index(Request $request)
-    {
-        $configToken = (string) config('csv_importer.access_token');
-        $clientId    = (int) config('csv_importer.client_id');
-        if ('' !== $configToken) {
-            // get access token, go back.
-            return redirect(route('index'))->cookie('access_token', $configToken);
-        }
-
-        if (0 !== $clientId) {
-            // base URL
-            $baseURL = config('csv_importer.uri');
-            if ('' !== (string) config('csv_importer.vanity_uri')) {
-                $baseURL = config('csv_importer.vanity_uri');
-            }
-
-            $state        = Str::random(40);
-            $codeVerifier = Str::random(128);
-            $request->session()->put('state', $state);
-            $request->session()->put('code_verifier', $codeVerifier);
-            $request->session()->put('form_client_id', $clientId);
-
-            $codeChallenge = strtr(rtrim(base64_encode(hash('sha256', $codeVerifier, true)), '='), '+/', '-_');
-            $query         = http_build_query([
-                                                  'client_id'             => $clientId,
-                                                  'redirect_uri'          => route('token.callback'),
-                                                  'response_type'         => 'code',
-                                                  'scope'                 => '',
-                                                  'state'                 => $state,
-                                                  'code_challenge'        => $codeChallenge,
-                                                  'code_challenge_method' => 'S256',
-                                              ]);
-
-            return redirect(sprintf('%s/oauth/authorize?', $baseURL) . $query);
-        }
-
-        // show view, ask for client ID.
-        $baseURL = config('csv_importer.uri');
-        if ('' !== (string) config('csv_importer.vanity_uri')) {
-            $baseURL = config('csv_importer.vanity_uri');
-        }
-        return view('token.client_id', compact('baseURL'));
-
-
-        die('hello');
-        $uri = (string) config('csv_importer.uri');
-
-        $sysInfoRequest = new SystemInformationRequest($uri, $token);
-        $errorMessage   = 'No error message.';
-        $isError        = false;
-        $result         = null;
-        $compare        = 1;
-        $minimum        = '';
-
-        $sysInfoRequest->setVerify(config('csv_importer.connection.verify'));
-        $sysInfoRequest->setTimeOut(config('csv_importer.connection.timeout'));
-
-        // new code
-        if (0 !== $clientId) {
-
-        }
-
-        // if the user has set a client ID, try to get a temporary access token.
-        // aparte functie die access token ophaalt bij Firefly III.
-        // eventueel user interface om dit te regelen.
-        // dan die ergens in een cookie. en done.
-        die('here we are');
-
-
-        try {
-            /** @var SystemInformationResponse $result */
-            $result = $request->get();
-        } catch (ApiHttpException $e) {
-            $errorMessage = $e->getMessage();
-            $isError      = true;
-        }
-        // -1 = OK (minimum is smaller)
-        // 0 = OK (same version)
-        // 1 = NOK (too low a version)
-        if (false === $isError) {
-            $minimum = config('csv_importer.minimum_version');
-            $compare = version_compare($minimum, $result->version);
-        }
-        if (false === $isError && 1 === $compare) {
-            $errorMessage = sprintf('Your Firefly III version %s is below the minimum required version %s', $result->version, $minimum);
-            $isError      = true;
-        }
-
-        if (false === $isError) {
-            return redirect(route('index'));
-        }
-        $pageTitle = 'Token error';
-
-        return view('token.index', compact('errorMessage', 'pageTitle'));
+        return redirect($finalURL . $query);
     }
 
 }

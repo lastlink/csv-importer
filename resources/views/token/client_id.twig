@@ -8,19 +8,36 @@
                         <h5 class="card-title">Client ID input form</h5>
                         <h6 class="card-subtitle mb-2 text-muted">v{{ version }}</h6>
                         <p class="card-text">
-                            In order to get access to your Firefly III installation at <a href="{{ baseURL }}">{{ baseURL }}</a>,
-                            you will need to submit a valid Client ID. This is usually a number, like <code>5</code> or <code>17</code>.
+                            {% if '' != baseURL %}
+                                In order to get access to your Firefly III installation at <a
+                                href="{{ baseURL }}">{{ baseURL }}</a>, you will need to submit a valid Client ID. This is a number.
+                            {% else %}
+                                In order to get access to your Firefly III installation, you will need to submit a valid Client ID. This is a number.
+                            {% endif %}
                         </p>
                         <p>
-                            If you don't have one, you can create on <a href="{{ baseURL }}/profile">in your profile</a> under "OAuth". Make sure you <em>remove</em> the checkbox under "Confidential".
+                            {% if '' != baseURL %}
+                                If you don't have one, you must create <a href="{{ baseURL }}/profile">in your
+                                profile</a> under "OAuth". Make sure you
+                                <em>remove</em> the checkbox under "Confidential".
+                            {% else %}
+                                If you don't have one, you must create in your profile under "OAuth". Make sure you <em>remove</em> the checkbox under "Confidential".
+                            {% endif %}
                         </p>
                         <form action="{{ route('token.submitClientId') }}" method="POST">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
+                            {% if '' == baseURL %}
+                                <div class="form-group">
+                                    <label for="input_base_url">Firefly III URL</label>
+                                    <input type="url" placeholder="https://" value="{{ baseURL }}" class="form-control" id="input_base_url" autocomplete="off" name="base_url">
+                                </div>
+                            {% endif %}
                             <div class="form-group">
                                 <label for="input_client_id">Client ID</label>
-                                <input type="number" step="1" min="1" class="form-control" id="input_client_id" autocomplete="off" name="client_id">
+                                <input type="number" step="1" min="1" class="form-control" id="input_client_id"
+                                       autocomplete="off" name="client_id" value="{{ clientId }}">
                             </div>
-                            <input type="submit" name="submit" value="Submit" class="float-right btn btn-success" />
+                            <input type="submit" name="submit" value="Submit" class="float-right btn btn-success"/>
                         </form>
 
                     </div>

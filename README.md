@@ -43,7 +43,9 @@
 <!-- /MarkdownTOC -->
 
 ## About the Firefly III CSV importer
-This is a tool to import CSV files into [Firefly III](https://github.com/firefly-iii/firefly-iii). It works by using a personal access token to access your Firefly III installation's API. It will then create transactions based upon the CSV files you upload.
+This is a tool to import CSV files into [Firefly III](https://github.com/firefly-iii/firefly-iii).
+
+It works with access to your Firefly III installation's API. It will then create transactions based upon the CSV files you upload.
 
 ### Purpose
 

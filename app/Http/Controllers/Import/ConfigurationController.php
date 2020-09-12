@@ -32,6 +32,7 @@ use App\Services\CSV\Converter\Date;
 use App\Services\CSV\Specifics\SpecificService;
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
+use App\Support\Token;
 use Carbon\Carbon;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
 use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
@@ -65,8 +66,8 @@ class ConfigurationController extends Controller
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
         $mainTitle = 'Import routine';
-        $subTitle = 'Configure your CSV file import';
-        $accounts = [];
+        $subTitle  = 'Configure your CSV file import';
+        $accounts  = [];
 
         $configuration = null;
         if (session()->has(Constants::CONFIGURATION)) {
@@ -80,8 +81,8 @@ class ConfigurationController extends Controller
         }
 
         // get list of asset accounts:
-        $uri = (string)config('csv_importer.uri');
-        $token = (string)config('csv_importer.access_token');
+        $uri     = Token::getURL();
+        $token   = Token::getAccessToken();
         $request = new GetAccountsRequest($uri, $token);
         $request->setType(GetAccountsRequest::ASSET);
         $request->setVerify(config('csv_importer.connection.verify'));
@@ -97,8 +98,8 @@ class ConfigurationController extends Controller
         }
 
         // also get liabilities
-        $uri = (string)config('csv_importer.uri');
-        $token = (string)config('csv_importer.access_token');
+        $uri     = Token::getURL();
+        $token   = Token::getAccessToken();
         $request = new GetAccountsRequest($uri, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
@@ -111,19 +112,19 @@ class ConfigurationController extends Controller
 
 
         // send other values through the form. A bit of a hack but OK.
-        $roles = '{}';
+        $roles     = '{}';
         $doMapping = '{}';
-        $mapping = '{}';
+        $mapping   = '{}';
         if (null !== $configuration) {
             try {
-                $roles = base64_encode(json_encode($configuration->getRoles(), JSON_THROW_ON_ERROR, 512));
+                $roles     = base64_encode(json_encode($configuration->getRoles(), JSON_THROW_ON_ERROR, 512));
                 $doMapping = base64_encode(json_encode($configuration->getDoMapping(), JSON_THROW_ON_ERROR, 512));
-                $mapping = base64_encode(json_encode($configuration->getMapping(), JSON_THROW_ON_ERROR, 512));
+                $mapping   = base64_encode(json_encode($configuration->getMapping(), JSON_THROW_ON_ERROR, 512));
             } catch (JsonException $e) {
                 Log::error($e->getMessage());
-                $roles = base64_encode('[]');
+                $roles     = base64_encode('[]');
                 $doMapping = base64_encode('[]');
-                $mapping = base64_encode('[]');
+                $mapping   = base64_encode('[]');
             }
         }
 
@@ -158,9 +159,9 @@ class ConfigurationController extends Controller
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
         // store config on drive.
-        $fromRequest = $request->getAll();
+        $fromRequest   = $request->getAll();
         $configuration = Configuration::fromRequest($fromRequest);
-        $json = '[]';
+        $json          = '[]';
         try {
             $json = json_encode($configuration, JSON_THROW_ON_ERROR, 512);
         } catch (JsonException $e) {

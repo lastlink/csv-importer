@@ -42,6 +42,7 @@ Route::get('/back/mapping', 'NavController@toRoles')->name('back.mapping');
 
 // clear session
 Route::get('/flush','IndexController@flush')->name('flush');
+Route::get('/reset','IndexController@reset')->name('reset');
 
 // start import thing.
 Route::get('/import/start', ['uses' => 'Import\StartController@index', 'as' => 'import.start']);

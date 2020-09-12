@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace App\Services\Import\Routine;
 
-use App\Exceptions\ImportException;
 use App\Services\Import\Support\ProgressInformation;
+use App\Support\Token;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Transaction;
 use GrumpyDictator\FFIIIApiSupport\Model\TransactionGroup;
@@ -58,10 +58,8 @@ class APISubmitter
         $count         = count($lines);
         Log::info(sprintf('Going to submit %d transactions to your Firefly III instance.', $count));
 
-        $this->rootURI = config('csv_importer.uri');
-        if ('' !== (string) config('csv_importer.vanity_uri')) {
-            $this->rootURI = config('csv_importer.vanity_uri');
-        }
+        $this->rootURI = Token::getURL();
+
         Log::debug(sprintf('The root URI is "%s"', $this->rootURI));
 
         // create the tag, to be used later on.
@@ -117,8 +115,8 @@ class APISubmitter
                 'tags'                   => $currentTags,
             ];
         }
-        $uri     = (string) config('csv_importer.uri');
-        $token   = (string) config('csv_importer.access_token');
+        $uri     = Token::getURL();
+        $token   = Token::getAccessToken();
         $request = new PutTransactionRequest($uri, $token, $groupId);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
@@ -181,8 +179,8 @@ class APISubmitter
 
             return;
         }
-        $uri     = (string) config('csv_importer.uri');
-        $token   = (string) config('csv_importer.access_token');
+        $uri     = Token::getURL();
+        $token   = Token::getAccessToken();
         $request = new PostTagRequest($uri, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
@@ -221,8 +219,8 @@ class APISubmitter
     private function processTransaction(int $index, array $line): array
     {
         $return  = [];
-        $uri     = (string) config('csv_importer.uri');
-        $token   = (string) config('csv_importer.access_token');
+        $uri     = Token::getURL();
+        $token   = Token::getAccessToken();
         $request = new PostTransactionRequest($uri, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));

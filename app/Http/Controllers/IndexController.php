@@ -23,6 +23,7 @@
 declare(strict_types=1);
 
 namespace App\Http\Controllers;
+
 use Artisan;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
@@ -47,16 +48,44 @@ class IndexController extends Controller
     }
 
     /**
-     * @return Factory|View
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|Factory|RedirectResponse|Redirector|View
      */
     public function index(Request $request)
     {
+        Log::debug(sprintf('Now at %s', __METHOD__));
         // check for access token cookie. if not, redirect to flow to get it.
-        if(null === $request->cookie('access_token')) {
+        $accessToken  = (string) $request->cookie('access_token');
+        $refreshToken = (string) $request->cookie('refresh_token');
+        $baseURL      = (string) $request->cookie('base_url');
+
+        Log::debug(sprintf('Base URL: "%s"', $baseURL));
+
+        if ('' === $accessToken && '' === $refreshToken && '' === $baseURL) {
+            Log::debug('No access token cookie, redirect to token.index');
             return redirect(route('token.index'));
         }
+        Log::debug('Has access token cookie.');
 
         return view('index');
+    }
+
+    /**
+     * @return RedirectResponse|Redirector
+     */
+    public function reset()
+    {
+        Log::debug(sprintf('Now at %s', __METHOD__));
+        session()->flush();
+        Artisan::call('cache:clear');
+
+        $cookies = [
+            cookie('access_token', ''),
+            cookie('base_url', ''),
+            cookie('refresh_token', ''),
+        ];
+
+        return redirect(route('index'))->withCookies($cookies);
     }
 
     /**
@@ -68,7 +97,7 @@ class IndexController extends Controller
         session()->flush();
         Artisan::call('cache:clear');
 
-        return redirect(route('index'))->cookie('access_token', null);
+        return redirect(route('index'));
     }
 
 }

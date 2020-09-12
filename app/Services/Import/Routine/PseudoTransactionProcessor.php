@@ -26,6 +26,7 @@ namespace App\Services\Import\Routine;
 use App\Exceptions\ImportException;
 use App\Services\Import\Support\ProgressInformation;
 use App\Services\Import\Task\AbstractTask;
+use App\Support\Token;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
 use GrumpyDictator\FFIIIApiSupport\Model\TransactionCurrency;
@@ -95,8 +96,8 @@ class PseudoTransactionProcessor
      */
     private function getDefaultAccount(?int $accountId): void
     {
-        $uri     = (string)config('csv_importer.uri');
-        $token   = (string)config('csv_importer.access_token');
+        $uri     = Token::getURL();
+        $token   = Token::getAccessToken();
 
         if (null !== $accountId) {
             $accountRequest = new GetAccountRequest($uri, $token);
@@ -119,8 +120,8 @@ class PseudoTransactionProcessor
      */
     private function getDefaultCurrency(): void
     {
-        $uri     = (string)config('csv_importer.uri');
-        $token   = (string)config('csv_importer.access_token');
+        $uri     = Token::getURL();
+        $token   = Token::getAccessToken();
 
         $prefRequest = new GetPreferenceRequest($uri, $token);
         $prefRequest->setVerify(config('csv_importer.connection.verify'));
