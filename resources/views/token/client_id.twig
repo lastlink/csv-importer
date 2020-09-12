@@ -1,0 +1,35 @@
+{% extends "./layout/default" %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Client ID input form</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">v{{ version }}</h6>
+                        <p class="card-text">
+                            In order to get access to your Firefly III installation at <a href="{{ baseURL }}">{{ baseURL }}</a>,
+                            you will need to submit a valid Client ID. This is usually a number, like <code>5</code> or <code>17</code>.
+                        </p>
+                        <p>
+                            If you don't have one, you can create on <a href="{{ baseURL }}/profile">in your profile</a> under "OAuth". Make sure you <em>remove</em> the checkbox under "Confidential".
+                        </p>
+                        <form action="{{ route('token.submitClientId') }}" method="POST">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                            <div class="form-group">
+                                <label for="input_client_id">Client ID</label>
+                                <input type="number" step="1" min="1" class="form-control" id="input_client_id" autocomplete="off" name="client_id">
+                            </div>
+                            <input type="submit" name="submit" value="Submit" class="float-right btn btn-success" />
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <p>
+    </p>
+{% endblock %}
+

@@ -26,7 +26,11 @@ Route::get('/', 'IndexController@index')->name('index');
 
 // validate access token:
 Route::get('/token', 'TokenController@index')->name('token.index');
+Route::post('/token/client_id', 'TokenController@submitClientId')->name('token.submitClientId');
 Route::get('/token/validate', 'TokenController@doValidate')->name('token.validate');
+Route::get('/callback', 'TokenController@callback')->name('token.callback');
+
+
 
 // routes to go back to other steps (also takes care of session vars)
 Route::get('/back/start', 'NavController@toStart')->name('back.start');

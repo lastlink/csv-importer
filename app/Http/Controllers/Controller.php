@@ -43,20 +43,14 @@ class Controller extends BaseController
      */
     public function __construct()
     {
-
-        $variables = [
-            'FIREFLY_III_ACCESS_TOKEN' => 'csv_importer.access_token',
-            'FIREFLY_III_URI'          => 'csv_importer.uri',
-        ];
-        foreach ($variables as $env => $config) {
-
-            $value = (string)config($config);
-            if ('' === $value) {
-                echo sprintf('Please set a valid value for "%s" in the env file.', $env);
-                Artisan::call('config:clear');
-                exit;
-            }
+        $value = (string) config('csv_importer.uri');
+        if ('' === $value) {
+            echo 'Please set a valid value for "FIREFLY_III_URI" in the env file or Docker parameters (-e).';
+            Artisan::call('config:clear');
+            exit;
         }
+
+
         $path     = config('csv_importer.upload_path');
         $writable = is_dir($path) && is_writable($path);
         if (false === $writable) {
@@ -66,5 +60,6 @@ class Controller extends BaseController
 
         app('view')->share('version', config('csv_importer.version'));
     }
+
 
 }

@@ -42,6 +42,7 @@ return [
     'version'             => '2.1.1',
     'access_token'        => env('FIREFLY_III_ACCESS_TOKEN'),
     'uri'                 => env('FIREFLY_III_URI'),
+    'client_id'           => env('FIREFLY_III_CLIENT_ID'),
     'upload_path'         => storage_path('uploads'),
     'minimum_version'     => '5.3.0',
     'cache_api_calls'     => false,

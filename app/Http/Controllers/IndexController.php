@@ -26,6 +26,7 @@ namespace App\Http\Controllers;
 use Artisan;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\View\View;
 use Log;
@@ -48,9 +49,12 @@ class IndexController extends Controller
     /**
      * @return Factory|View
      */
-    public function index()
+    public function index(Request $request)
     {
-        Log::debug(sprintf('Now at %s', __METHOD__));
+        // check for access token cookie. if not, redirect to flow to get it.
+        if(null === $request->cookie('access_token')) {
+            return redirect(route('token.index'));
+        }
 
         return view('index');
     }
@@ -64,7 +68,7 @@ class IndexController extends Controller
         session()->flush();
         Artisan::call('cache:clear');
 
-        return redirect(route('index'));
+        return redirect(route('index'))->cookie('access_token', null);
     }
 
 }
