@@ -2,11 +2,29 @@
 {% block content %}
     <div class="container">
         <div class="row">
+            <div class="col-lg-12">
+                &nbsp;
+            </div>
+        </div>
+        <div class="row">
             <div class="col-lg-6 offset-lg-3">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Client ID input form</h5>
+                        <h5 class="card-title">Firefly III CSV Import Tool</h5>
                         <h6 class="card-subtitle mb-2 text-muted">v{{ version }}</h6>
+                        <p class="card-text">
+                            Welcome! This tool will help you import CSV files into Firefly III. It works by reading your
+                            CSV
+                            file <span
+                                class="text-muted">(possibly, according to a pre-generated configuration file)</span>
+                            which
+                            will be submitted to the API endpoints of your Firefly III installation.
+                        </p>
+                        <p>
+                            This tool is sparsely documented, you can find all the details you need
+                            in the <a href="https://firefly-iii.gitbook.io/firefly-iii-csv-importer/" target="_blank">
+                                documentation</a>. Any links you see to the docs will open in a new window or tab.
+                        </p>
                         <p class="card-text">
                             {% if '' != baseURL %}
                                 In order to get access to your Firefly III installation at <a
@@ -24,6 +42,9 @@
                                 If you don't have one, you must create in your profile under "OAuth". Make sure you <em>remove</em> the checkbox under "Confidential".
                             {% endif %}
                         </p>
+                        <p>
+                            The callback URL for this installation is<br> <code>{{ route('token.callback') }}</code>
+                        </p>
                         <form action="{{ route('token.submitClientId') }}" method="POST">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
                             {% if '' == baseURL %}
@@ -37,6 +58,8 @@
                                 <input type="number" step="1" min="1" class="form-control" id="input_client_id"
                                        autocomplete="off" name="client_id" value="{{ clientId }}">
                             </div>
+                            <a class="btn btn-danger btn-sm" href="{{ route('flush') }}">Start over</a>
+                            <a class="btn btn-danger btn-sm" href="{{ route('reset') }}">Reauthenticate</a>
                             <input type="submit" name="submit" value="Submit" class="float-right btn btn-success"/>
                         </form>
 

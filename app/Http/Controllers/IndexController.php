@@ -67,7 +67,26 @@ class IndexController extends Controller
         }
         Log::debug('Has access token cookie.');
 
-        return view('index');
+        // display to user the method of authentication
+        $pat = false;
+        if ('' !== (string) env('FIREFLY_III_ACCESS_TOKEN')) {
+            $pat = true;
+        }
+        $clientIdWithURL = false;
+        if ('' !== (string) env('FIREFLY_III_URI') && '' !== (string) env('FIREFLY_III_CLIENT_ID')) {
+            $clientIdWithURL = true;
+        }
+        $URLonly = false;
+        if ('' !== (string) env('FIREFLY_III_URI') && '' === (string) env('FIREFLY_III_CLIENT_ID')) {
+            $URLonly = true;
+        }
+        $flexible = false;
+        if ('' === (string) env('FIREFLY_III_URI') && '' === (string) env('FIREFLY_III_CLIENT_ID')) {
+            $flexible = true;
+        }
+
+
+        return view('index', compact('pat', 'clientIdWithURL', 'URLonly', 'flexible'));
     }
 
     /**

@@ -47,6 +47,7 @@ class TokenController extends Controller
      */
     public function index(Request $request)
     {
+        $pageTitle = 'CSV importer';
         Log::debug(sprintf('Now at %s', __METHOD__));
         $configToken = (string) config('csv_importer.access_token');
         $clientId    = (int) config('csv_importer.client_id');
@@ -81,7 +82,7 @@ class TokenController extends Controller
         // Option 3: either is empty, ask for client ID and/or base URL:
         $baseURL  = config('csv_importer.uri');
         $clientId = 0 === $clientId ? '' : $clientId;
-        return view('token.client_id', compact('baseURL', 'clientId'));
+        return view('token.client_id', compact('baseURL', 'clientId', 'pageTitle'));
     }
 
 

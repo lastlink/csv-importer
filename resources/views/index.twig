@@ -25,6 +25,30 @@
                             in the <a href="https://firefly-iii.gitbook.io/firefly-iii-csv-importer/" target="_blank">
                                 documentation</a>. Any links you see to the docs will open in a new window or tab.
                         </p>
+                        {% if pat %}
+                            <p>
+                                You're using a valid Personal Access Token to <span
+                                    class="text-success">authenticate</span> to Firefly III.
+                            </p>
+                        {% endif %}
+                        {% if clientIdWithURL %}
+                            <p>
+                                You're using a valid fixed Client ID and a fixed Firefly III URL to <span
+                                    class="text-success">authenticate</span> to Firefly III.
+                            </p>
+                        {% endif %}
+                        {% if URLonly %}
+                            <p>
+                                You're using a valid Client ID and a fixed Firefly III URL to <span
+                                    class="text-success">authenticate</span> to Firefly III.
+                            </p>
+                        {% endif %}
+                        {% if flexible %}
+                            <p>
+                                You're using a self-submitted Client ID and Firefly III URL to <span
+                                    class="text-success">authenticate</span> to Firefly III.
+                            </p>
+                        {% endif %}
                         <p id="error_txt" style="display: none;" class="text-danger">
 
                         </p>
