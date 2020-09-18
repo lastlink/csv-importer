@@ -53,6 +53,11 @@ class TokenController extends Controller
         $clientId    = (int) config('csv_importer.client_id');
         $baseURL     = (string) config('csv_importer.uri');
 
+        Log::info('The following configuration information was found:');
+        Log::info(sprintf('Personal Access Token: "%s". (limited to 25 chars if present)', substr($configToken,0,25)));
+        Log::info(sprintf('Client ID            : "%s".', $clientId));
+        Log::info(sprintf('Base URL             : "%s".', $baseURL));
+
         // Option 1: access token and url are present:
         if ('' !== $configToken && '' !== $baseURL) {
             Log::debug(sprintf('Found personal access token + URL "%s" in config, set cookie and return to index.', $baseURL));
