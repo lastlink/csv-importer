@@ -54,7 +54,7 @@ class TokenController extends Controller
         $baseURL     = (string) config('csv_importer.uri');
 
         Log::info('The following configuration information was found:');
-        Log::info(sprintf('Personal Access Token: "%s". (limited to 25 chars if present)', substr($configToken,0,25)));
+        Log::info(sprintf('Personal Access Token: "%s". (limited to 25 chars if present)', substr($configToken, 0, 25)));
         Log::info(sprintf('Client ID            : "%s".', $clientId));
         Log::info(sprintf('Base URL             : "%s".', $baseURL));
 
@@ -103,6 +103,11 @@ class TokenController extends Controller
                 'base_url'  => 'url',
             ]);
         Log::debug('Submitted data: ', $data);
+
+        if (true === config('csv_importer.expect_secure_uri') && 'https://' !== substr($data['base_url'], 0, 8)) {
+            return redirect(route('token.index'));
+        }
+
 
         $data['client_id'] = (int) $data['client_id'];
 
