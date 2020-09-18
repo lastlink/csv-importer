@@ -41,7 +41,7 @@ class ShowVersion extends Command
      *
      * @var string
      */
-    protected $signature = 'csv:version';
+    protected $signature = 'importer:version';
 
     /**
      * Execute the console command.
