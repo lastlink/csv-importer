@@ -45,18 +45,25 @@
                         <p>
                             The callback URL for this installation is<br> <code>{{ route('token.callback') }}</code>
                         </p>
+                        {% for error in errors.all %}
+                            <p class="text-danger">{{ error }}</p>
+                        {% endfor %}
+
                         <form action="{{ route('token.submitClientId') }}" method="POST">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
                             {% if '' == baseURL %}
                                 <div class="form-group">
                                     <label for="input_base_url">Firefly III URL</label>
                                     <input type="url" placeholder="https://" value="{{ baseURL }}" class="form-control" id="input_base_url" autocomplete="off" name="base_url">
+                                    {% if errors.has('base_url') %}<span class="text-danger">{{ errors.first('base_url') }}</span>{% endif %}
+                                    {% if Session.has('secure_url') %}<span class="text-danger">{{ Session.get('secure_url') }}</span>{% endif %}
                                 </div>
                             {% endif %}
                             <div class="form-group">
                                 <label for="input_client_id">Client ID</label>
                                 <input type="number" step="1" min="1" class="form-control" id="input_client_id"
                                        autocomplete="off" name="client_id" value="{{ clientId }}">
+                                {% if errors.has('client_id') %}<span class="text-danger">{{ errors.first('client_id') }}</span>{% endif %}
                             </div>
                             <a class="btn btn-danger btn-sm" href="{{ route('flush') }}">Start over</a>
                             <a class="btn btn-danger btn-sm" href="{{ route('reset') }}">Reauthenticate</a>
