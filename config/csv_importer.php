@@ -39,14 +39,14 @@ use App\Services\Import\Task\PositiveAmount;
 use App\Services\Import\Task\Tags;
 
 return [
-    'version'             => '2.2.0-alpha.1',
+    'version'             => '2.2.0',
     'access_token'        => env('FIREFLY_III_ACCESS_TOKEN'),
     'uri'                 => env('FIREFLY_III_URI'),
     'client_id'           => env('FIREFLY_III_CLIENT_ID'),
     'upload_path'         => storage_path('uploads'),
     'expect_secure_uri'   => env('EXPECT_SECURE_URL', false),
     'is_external'         => env('IS_EXTERNAL', false),
-    'minimum_version'     => '5.4.0-alpha.3',
+    'minimum_version'     => '5.4.0',
     'cache_api_calls'     => false,
     'vanity_uri'          => envNonEmpty('VANITY_URI'),
     'connection'          => [

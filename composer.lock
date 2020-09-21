@@ -660,16 +660,16 @@
         },
         {
             "name": "egulias/email-validator",
-            "version": "2.1.21",
+            "version": "2.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/egulias/EmailValidator.git",
-                "reference": "563d0cdde5d862235ffe24a158497f4d490191b5"
+                "reference": "840d5603eb84cc81a6a0382adac3293e57c1c64c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/563d0cdde5d862235ffe24a158497f4d490191b5",
-                "reference": "563d0cdde5d862235ffe24a158497f4d490191b5",
+                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/840d5603eb84cc81a6a0382adac3293e57c1c64c",
+                "reference": "840d5603eb84cc81a6a0382adac3293e57c1c64c",
                 "shasum": ""
             },
             "require": {
@@ -714,7 +714,7 @@
                 "validation",
                 "validator"
             ],
-            "time": "2020-09-19T14:37:56+00:00"
+            "time": "2020-08-08T21:28:19+00:00"
         },
         {
             "name": "fideloper/proxy",
@@ -776,12 +776,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/JC5/api-support-classes.git",
-                "reference": "c24b7f5457964315e6ab70fdc898ad2f7d5aef6f"
+                "reference": "22711cc80fcafe74cf23ec7e9efc4ef101f5a3a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JC5/api-support-classes/zipball/c24b7f5457964315e6ab70fdc898ad2f7d5aef6f",
-                "reference": "c24b7f5457964315e6ab70fdc898ad2f7d5aef6f",
+                "url": "https://api.github.com/repos/JC5/api-support-classes/zipball/22711cc80fcafe74cf23ec7e9efc4ef101f5a3a1",
+                "reference": "22711cc80fcafe74cf23ec7e9efc4ef101f5a3a1",
                 "shasum": ""
             },
             "require": {
@@ -865,13 +865,9 @@
                 {
                     "url": "https://www.patreon.com/JC5",
                     "type": "patreon"
-                },
-                {
-                    "url": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=L62W7DVD5ETPC&source=url",
-                    "type": "paypal"
                 }
             ],
-            "time": "2020-08-10T08:15:21+00:00"
+            "time": "2020-09-21T06:13:23+00:00"
         },
         {
             "name": "fruitcake/laravel-cors",

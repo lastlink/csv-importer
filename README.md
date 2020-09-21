@@ -65,7 +65,7 @@ You can use this tool in several ways.
 
 1. [Install it on your server using composer](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/self_hosted).
 2. [Use the Docker-image](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/installing-and-running/docker).
-3. [Use the public instance](#).
+3. [Use the public instance](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/v/main/help/public).
 
 Generally speaking, it's easiest to use and install this tool the same way as you use Firefly III. And although it features an excellent web-interface, you can also use the command line to import your data.
 
@@ -117,10 +117,10 @@ This work [is licensed](https://github.com/firefly-iii/csv-importer/blob/master/
 
 ### Contact
 
-You can contact me at [james@firefly-iii.org](mailto:james@firefly-iii.org), you may open an issue or contact me through the various social media pages there are: [reddit](https://www.reddit.com/r/FireflyIII/) and [Twitter](https://twitter.com/Firefly_III).
+You can contact me at [james@firefly-iii.org](mailto:james@firefly-iii.org), you may open an issue in the [main repository](https://github.com/firefly-iii/firefly-iii) or contact me through the various social media pages there are: [reddit](https://www.reddit.com/r/FireflyIII/) and [Twitter](https://twitter.com/Firefly_III).
 
 [![Scrutinizer][scrutinizer-shield]][scrutinizer-uri]
-[![Requires PHP7.3][php-shield]][php-uri]
+[![Requires PHP7.4][php-shield]][php-uri]
 [![Quality Gate Status](gate-shield)](gate-uri)
 
 [scrutinizer-shield]: https://img.shields.io/scrutinizer/g/firefly-iii/csv-importer.svg?style=flat-square
