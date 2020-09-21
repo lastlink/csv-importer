@@ -95,6 +95,7 @@ class IndexController extends Controller
     public function reset()
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
+        session()->forget(['csv_file_path', 'config_file_path', 'import_job_id']);
         session()->flush();
         Artisan::call('cache:clear');
 
@@ -113,6 +114,7 @@ class IndexController extends Controller
     public function flush()
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
+        session()->forget(['csv_file_path', 'config_file_path', 'import_job_id']);
         session()->flush();
         Artisan::call('cache:clear');
 
