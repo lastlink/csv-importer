@@ -24,11 +24,13 @@ declare(strict_types=1);
 namespace App\Services\CSV\Mapper;
 
 use App\Exceptions\ImportException;
+use App\Support\Token;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
 use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
 use GrumpyDictator\FFIIIApiSupport\Response\GetAccountsResponse;
 use Log;
+
 /**
  * Trait GetAccounts
  */
@@ -38,15 +40,15 @@ trait GetAccounts
     /**
      * Returns a combined list of asset accounts and all liability accounts.
      *
-     * @throws ImportException
      * @return array
+     * @throws ImportException
      */
     protected function getAllAccounts(): array
     {
         // get list of asset accounts:
         $accounts = [];
-        $uri      = (string) config('csv_importer.uri');
-        $token    = (string) config('csv_importer.access_token');
+        $uri      = Token::getURL();
+        $token    = Token::getAccessToken();
         $request  = new GetAccountsRequest($uri, $token);
 
         $request->setVerify(config('csv_importer.connection.verify'));
@@ -76,16 +78,16 @@ trait GetAccounts
     /**
      * Returns a combined list of asset accounts and all liability accounts.
      *
-     * @throws ImportException
      * @return array
+     * @throws ImportException
      */
     protected function getAssetAccounts(): array
     {
         // get list of asset accounts:
         $accounts    = [];
         $liabilities = [];
-        $uri         = (string) config('csv_importer.uri');
-        $token       = (string) config('csv_importer.access_token');
+        $uri         = Token::getURL();
+        $token       = Token::getAccessToken();
         $request     = new GetAccountsRequest($uri, $token);
 
         $request->setType(GetAccountsRequest::ASSET);

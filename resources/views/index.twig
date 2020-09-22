@@ -13,27 +13,61 @@
                         <h5 class="card-title">Firefly III CSV Import Tool</h5>
                         <h6 class="card-subtitle mb-2 text-muted">v{{ version }}</h6>
                         <p class="card-text">
-                            Welcome! This tool will help you import CSV files into Firefly III. It works by reading your CSV
-                            file <span class="text-muted">(possibly, according to a pre-generated configuration file)</span> which
+                            Welcome! This tool will help you import CSV files into Firefly III. It works by reading your
+                            CSV
+                            file <span
+                                class="text-muted">(possibly, according to a pre-generated configuration file)</span>
+                            which
                             will be submitted to the API endpoints of your Firefly III installation.
                         </p>
                         <p>
                             This tool is sparsely documented, you can find all the details you need
                             in the <a href="https://firefly-iii.gitbook.io/firefly-iii-csv-importer/" target="_blank">
-                                official documentation</a>. Any links you see to the docs will open in a new window or tab.
+                                documentation</a>. Any links you see to the docs will open in a new window or tab.
                         </p>
-                        <a class="float-right btn btn-primary disabled" id="start" href="{{ route('import.start') }}"><i class="fas fa-cog fa-spin"></i></a>
+                        {% if pat %}
+                            <p>
+                                You're using a valid Personal Access Token to <span
+                                    class="text-success">authenticate</span> to Firefly III.
+                            </p>
+                        {% endif %}
+                        {% if clientIdWithURL %}
+                            <p>
+                                You're using a valid fixed Client ID and a fixed Firefly III URL to <span
+                                    class="text-success">authenticate</span> to Firefly III.
+                            </p>
+                        {% endif %}
+                        {% if URLonly %}
+                            <p>
+                                You're using a valid Client ID and a fixed Firefly III URL to <span
+                                    class="text-success">authenticate</span> to Firefly III.
+                            </p>
+                        {% endif %}
+                        {% if flexible %}
+                            <p>
+                                You're using a self-submitted Client ID and Firefly III URL to <span
+                                    class="text-success">authenticate</span> to Firefly III.
+                            </p>
+                        {% endif %}
+                        <p id="error_txt" style="display: none;" class="text-danger">
+
+                        </p>
+                        <p>
+                            <a class="btn btn-danger btn-sm" href="{{ route('flush') }}">Start over</a>
+                            <a class="btn btn-danger btn-sm" href="{{ route('reset') }}">Reauthenticate</a>
+                            <a class="float-right btn btn-primary disabled" id="start"
+                               href="{{ route('import.start') }}"><i class="fas fa-cog fa-spin"></i></a>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
 
     </div>
-<p>
-</p>
+    <p>
+    </p>
 {% endblock %}
 {% block scripts %}
-
     <script type="text/javascript">
         var uri = '{{ route('token.validate') }}';
         var tokenPageUri = '{{ route('token.index') }}';
@@ -42,11 +76,13 @@
                 $('#start').removeClass('disabled').html('Start here &rarr;');
             } else {
                 $('#start').hide();
-                window.location = tokenPageUri;
+                $('#error_txt').show().text(data.message);
+                // window.location = tokenPageUri;
             }
-        }).fail(function() {
+        }).fail(function () {
             $('#start').hide();
-            window.location = tokenPageUri;
+            $('#error_txt').show().text(data.message);
+            // window.location = tokenPageUri;
         });
     </script>
 {% endblock %}

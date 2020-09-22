@@ -51,7 +51,7 @@ class AutoImport extends Command
      *
      * @var string
      */
-    protected $signature = 'csv:auto-import {directory : The directory from which to import automatically.}';
+    protected $signature = 'importer:auto-import {directory : The directory from which to import automatically.}';
     /** @var string */
     private $directory = './';
 

@@ -39,11 +39,14 @@ use App\Services\Import\Task\PositiveAmount;
 use App\Services\Import\Task\Tags;
 
 return [
-    'version'             => '2.1.1',
+    'version'             => '2.2.0',
     'access_token'        => env('FIREFLY_III_ACCESS_TOKEN'),
     'uri'                 => env('FIREFLY_III_URI'),
+    'client_id'           => env('FIREFLY_III_CLIENT_ID'),
     'upload_path'         => storage_path('uploads'),
-    'minimum_version'     => '5.3.0',
+    'expect_secure_uri'   => env('EXPECT_SECURE_URL', false),
+    'is_external'         => env('IS_EXTERNAL', false),
+    'minimum_version'     => '5.4.1',
     'cache_api_calls'     => false,
     'vanity_uri'          => envNonEmpty('VANITY_URI'),
     'connection'          => [
@@ -95,7 +98,7 @@ return [
         PresidentsChoice::class,
         SnsDescription::class,
     ],
-    'transaction_tasks' => [
+    'transaction_tasks'   => [
         Amount::class,
         Tags::class,
         Currency::class,
@@ -213,7 +216,7 @@ return [
             'field'           => 'external-id',
             'append_value'    => false,
         ],
-        'currency-symbol'      => [
+        'currency-symbol'       => [
             'mappable'        => true,
             'pre-process-map' => false,
             'converter'       => 'CleanString',
@@ -221,63 +224,63 @@ return [
             'mapper'          => 'TransactionCurrencies',
             'append_value'    => false,
         ],
-        'description'          => [
+        'description'           => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'CleanString',
             'field'           => 'description',
             'append_value'    => true,
         ],
-        'date_transaction'     => [
+        'date_transaction'      => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date',
             'append_value'    => false,
         ],
-        'date_interest'        => [
+        'date_interest'         => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date-interest',
             'append_value'    => false,
         ],
-        'date_book'            => [
+        'date_book'             => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date-book',
             'append_value'    => false,
         ],
-        'date_process'         => [
+        'date_process'          => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date-process',
             'append_value'    => false,
         ],
-        'date_due'             => [
+        'date_due'              => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date-due',
             'append_value'    => false,
         ],
-        'date_payment'         => [
+        'date_payment'          => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date-payment',
             'append_value'    => false,
         ],
-        'date_invoice'         => [
+        'date_invoice'          => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Date',
             'field'           => 'date-invoice',
             'append_value'    => false,
         ],
-        'budget-id'            => [
+        'budget-id'             => [
             'mappable'        => true,
             'pre-process-map' => false,
             'converter'       => 'CleanId',
@@ -285,7 +288,7 @@ return [
             'mapper'          => 'Budgets',
             'append_value'    => false,
         ],
-        'budget-name'          => [
+        'budget-name'           => [
             'mappable'        => true,
             'pre-process-map' => false,
             'converter'       => 'CleanString',
@@ -293,28 +296,28 @@ return [
             'mapper'          => 'Budgets',
             'append_value'    => false,
         ],
-        'rabo-debit-credit'    => [
+        'rabo-debit-credit'     => [
             'mappable   '     => false,
             'pre-process-map' => false,
             'converter'       => 'BankDebitCredit',
             'field'           => 'amount-modifier',
             'append_value'    => false,
         ],
-        'ing-debit-credit'     => [
+        'ing-debit-credit'      => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'BankDebitCredit',
             'field'           => 'amount-modifier',
             'append_value'    => false,
         ],
-        'generic-debit-credit' => [
+        'generic-debit-credit'  => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'BankDebitCredit',
             'field'           => 'amount-modifier',
             'append_value'    => false,
         ],
-        'category-id'          => [
+        'category-id'           => [
             'mappable'        => true,
             'pre-process-map' => false,
             'converter'       => 'CleanId',
@@ -322,7 +325,7 @@ return [
             'mapper'          => 'Categories',
             'append_value'    => false,
         ],
-        'category-name'        => [
+        'category-name'         => [
             'mappable'        => true,
             'pre-process-map' => false,
             'converter'       => 'CleanString',
@@ -330,7 +333,7 @@ return [
             'mapper'          => 'Categories',
             'append_value'    => false,
         ],
-        'tags-comma'           => [
+        'tags-comma'            => [
             'mappable'           => false,
             'pre-process-map'    => true,
             'pre-process-mapper' => 'TagsComma',
@@ -339,7 +342,7 @@ return [
             'mapper'             => 'Tags',
             'append_value'       => true,
         ],
-        'tags-space'           => [
+        'tags-space'            => [
             'mappable'           => false,
             'pre-process-map'    => true,
             'pre-process-mapper' => 'TagsSpace',
@@ -348,7 +351,7 @@ return [
             'mapper'             => 'Tags',
             'append_value'       => true,
         ],
-        'account-id'           => [
+        'account-id'            => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'asset-account-id',
@@ -356,7 +359,7 @@ return [
             'mapper'          => 'AssetAccounts',
             'append_value'    => false,
         ],
-        'account-name'         => [
+        'account-name'          => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'asset-account-name',
@@ -364,7 +367,7 @@ return [
             'mapper'          => 'AssetAccounts',
             'append_value'    => false,
         ],
-        'account-iban'         => [
+        'account-iban'          => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'asset-account-iban',
@@ -373,7 +376,7 @@ return [
             'append_value'    => false,
 
         ],
-        'account-number'       => [
+        'account-number'        => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'asset-account-number',
@@ -381,14 +384,14 @@ return [
             'mapper'          => 'AssetAccounts',
             'append_value'    => false,
         ],
-        'account-bic'          => [
+        'account-bic'           => [
             'mappable'        => false,
             'pre-process-map' => false,
             'field'           => 'asset-account-bic',
             'converter'       => 'CleanString',
             'append_value'    => false,
         ],
-        'opposing-id'          => [
+        'opposing-id'           => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'opposing-account-id',
@@ -396,14 +399,14 @@ return [
             'mapper'          => 'OpposingAccounts',
             'append_value'    => false,
         ],
-        'opposing-bic'         => [
+        'opposing-bic'          => [
             'mappable'        => false,
             'pre-process-map' => false,
             'field'           => 'opposing-account-bic',
             'converter'       => 'CleanString',
             'append_value'    => false,
         ],
-        'opposing-name'        => [
+        'opposing-name'         => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'opposing-account-name',
@@ -411,7 +414,7 @@ return [
             'mapper'          => 'OpposingAccounts',
             'append_value'    => false,
         ],
-        'opposing-iban'        => [
+        'opposing-iban'         => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'opposing-account-iban',
@@ -419,7 +422,7 @@ return [
             'mapper'          => 'OpposingAccounts',
             'append_value'    => false,
         ],
-        'opposing-number'      => [
+        'opposing-number'       => [
             'mappable'        => true,
             'pre-process-map' => false,
             'field'           => 'opposing-account-number',
@@ -427,98 +430,98 @@ return [
             'mapper'          => 'OpposingAccounts',
             'append_value'    => false,
         ],
-        'amount'               => [
+        'amount'                => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Amount',
             'field'           => 'amount',
             'append_value'    => false,
         ],
-        'amount_debit'         => [
+        'amount_debit'          => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'AmountDebit',
             'field'           => 'amount_debit',
             'append_value'    => false,
         ],
-        'amount_credit'        => [
+        'amount_credit'         => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'AmountCredit',
             'field'           => 'amount_credit',
             'append_value'    => false,
         ],
-        'amount_negated'       => [
+        'amount_negated'        => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'AmountNegated',
             'field'           => 'amount_negated',
             'append_value'    => false,
         ],
-        'amount_foreign'       => [
+        'amount_foreign'        => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Amount',
             'field'           => 'amount_foreign',
             'append_value'    => false,
         ],
-        'sepa_ct_id'           => [
+        'sepa_ct_id'            => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_ct_id',
             'append_value'    => false,
         ],
-        'sepa_ct_op'           => [
+        'sepa_ct_op'            => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_ct_op',
             'append_value'    => false,
         ],
-        'sepa_db'              => [
+        'sepa_db'               => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_db',
             'append_value'    => false,
         ],
-        'sepa_cc'              => [
+        'sepa_cc'               => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_cc',
             'append_value'    => false,
         ],
-        'sepa_country'         => [
+        'sepa_country'          => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_country',
             'append_value'    => false,
         ],
-        'sepa_ep'              => [
+        'sepa_ep'               => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_ep',
             'append_value'    => false,
         ],
-        'sepa_ci'              => [
+        'sepa_ci'               => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_ci',
             'append_value'    => false,
         ],
-        'sepa_batch_id'        => [
+        'sepa_batch_id'         => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',
             'field'           => 'sepa_batch',
             'append_value'    => false,
         ],
-        'internal_reference'   => [
+        'internal_reference'    => [
             'mappable'        => false,
             'pre-process-map' => false,
             'converter'       => 'Description',

@@ -34,8 +34,7 @@ namespace App\Services\CSV\Specifics;
  */
 class AbnAmroDescription implements SpecificInterface
 {
-    /** @var array The current row. */
-    public $row;
+    public array $row;
 
     /**
      * Description of this specific fix.
@@ -250,6 +249,7 @@ class AbnAmroDescription implements SpecificInterface
      */
     public function runOnHeaders(array $headers): array
     {
+        $headers[8] = 'Opposing name';
         return $headers;
     }
 }

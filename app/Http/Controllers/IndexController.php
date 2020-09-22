@@ -23,9 +23,11 @@
 declare(strict_types=1);
 
 namespace App\Http\Controllers;
+
 use Artisan;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\View\View;
 use Log;
@@ -46,13 +48,64 @@ class IndexController extends Controller
     }
 
     /**
-     * @return Factory|View
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|Factory|RedirectResponse|Redirector|View
      */
-    public function index()
+    public function index(Request $request)
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
+        // check for access token cookie. if not, redirect to flow to get it.
+        $accessToken  = (string) $request->cookie('access_token');
+        $refreshToken = (string) $request->cookie('refresh_token');
+        $baseURL      = (string) $request->cookie('base_url');
 
-        return view('index');
+        Log::debug(sprintf('Base URL: "%s"', $baseURL));
+
+        if ('' === $accessToken && '' === $refreshToken && '' === $baseURL) {
+            Log::debug('No access token cookie, redirect to token.index');
+            return redirect(route('token.index'));
+        }
+        Log::debug('Has access token cookie.');
+
+        // display to user the method of authentication
+        $pat = false;
+        if ('' !== (string) env('FIREFLY_III_ACCESS_TOKEN')) {
+            $pat = true;
+        }
+        $clientIdWithURL = false;
+        if ('' !== (string) env('FIREFLY_III_URI') && '' !== (string) env('FIREFLY_III_CLIENT_ID')) {
+            $clientIdWithURL = true;
+        }
+        $URLonly = false;
+        if ('' !== (string) env('FIREFLY_III_URI') && '' === (string) env('FIREFLY_III_CLIENT_ID')) {
+            $URLonly = true;
+        }
+        $flexible = false;
+        if ('' === (string) env('FIREFLY_III_URI') && '' === (string) env('FIREFLY_III_CLIENT_ID')) {
+            $flexible = true;
+        }
+
+
+        return view('index', compact('pat', 'clientIdWithURL', 'URLonly', 'flexible'));
+    }
+
+    /**
+     * @return RedirectResponse|Redirector
+     */
+    public function reset()
+    {
+        Log::debug(sprintf('Now at %s', __METHOD__));
+        session()->forget(['csv_file_path', 'config_file_path', 'import_job_id']);
+        session()->flush();
+        Artisan::call('cache:clear');
+
+        $cookies = [
+            cookie('access_token', ''),
+            cookie('base_url', ''),
+            cookie('refresh_token', ''),
+        ];
+
+        return redirect(route('index'))->withCookies($cookies);
     }
 
     /**
@@ -61,6 +114,7 @@ class IndexController extends Controller
     public function flush()
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
+        session()->forget(['csv_file_path', 'config_file_path', 'import_job_id']);
         session()->flush();
         Artisan::call('cache:clear');
 

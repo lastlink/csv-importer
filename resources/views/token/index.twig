@@ -12,7 +12,14 @@
                     <div class="card-body">
                         <h5 class="card-title text-danger">Error :(</h5>
                         <p class="card-text">
-                            The Personal Access Token you added to the <code>.env</code> file is invalid. The error returned is:
+
+                            The Personal Access Token or the Client ID is invalid.
+                        </p>
+                        <p class="card-text">
+                        Either you added the wrong value to the <code>.env</code> file or your Docker
+                            parameters (<code>-e</code>) are wrong.
+
+                            The error returned is:
                         </p>
                         <p class="card-text text-info">
                             {{ errorMessage }}
@@ -26,6 +33,7 @@
                         <ul>
                             <li>Do not use the "command line token". That's the wrong one.</li>
                             <li>Do not use the "APP_KEY". That's the wrong one.</li>
+                            <li>Use a public client ID.</li>
                         </ul>
                     </div>
                 </div>

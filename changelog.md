@@ -2,6 +2,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.2.0 - 2020-09-21
+
+⚠️ Several changes in this release may break Firefly III's duplication detection or are backwards incompatible.
+
+### Added
+- Support for public clients. Check out the docs.
+- Created a [public installation](https://firefly-iii.gitbook.io/firefly-iii-csv-importer/v/main/help/public).
+
+### Changed
+- ⚠️ This version of the CSV importer requires PHP 7.4.
+- ⚠️ The import commands now start with `importer:` instead of `csv:`
+
+### Fixed
+- ABN AMRO specific was broken.
+
 ## 2.1.1 - 2020-09-05
 
 ### Added

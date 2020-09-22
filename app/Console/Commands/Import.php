@@ -47,7 +47,7 @@ class Import extends Command
      *
      * @var string
      */
-    protected $signature = 'csv:import
+    protected $signature = 'importer:import
     {file : The CSV file you want to import}
     {config : The associated configuration file}';
 

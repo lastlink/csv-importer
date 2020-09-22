@@ -25,6 +25,7 @@ namespace App\Services\Import\Task;
 
 use App\Exceptions\ImportException;
 use App\Services\Import\DeterminesTransactionType;
+use App\Support\Token;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException as GrumpyApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Account;
@@ -201,8 +202,8 @@ class Accounts extends AbstractTask
     private function findById(string $value): ?Account
     {
         Log::debug(sprintf('Going to search account with ID "%s"', $value));
-        $uri     = (string) config('csv_importer.uri');
-        $token   = (string) config('csv_importer.access_token');
+        $uri     = Token::getURL();
+        $token   = Token::getAccessToken();
         $request = new GetSearchAccountRequest($uri, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
@@ -243,8 +244,8 @@ class Accounts extends AbstractTask
     private function findByIban(string $iban, string $transactionType): ?Account
     {
         Log::debug(sprintf('Going to search account with IBAN "%s"', $iban));
-        $uri     = (string) config('csv_importer.uri');
-        $token   = (string) config('csv_importer.access_token');
+        $uri     = Token::getURL();
+        $token   = Token::getAccessToken();
         $request = new GetSearchAccountRequest($uri, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
@@ -304,8 +305,8 @@ class Accounts extends AbstractTask
     private function findByName(string $name): ?Account
     {
         Log::debug(sprintf('Going to search account with name "%s"', $name));
-        $uri     = (string) config('csv_importer.uri');
-        $token   = (string) config('csv_importer.access_token');
+        $uri     = Token::getURL();
+        $token   = Token::getAccessToken();
         $request = new GetSearchAccountRequest($uri, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
