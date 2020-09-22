@@ -46,7 +46,7 @@ return [
     'upload_path'         => storage_path('uploads'),
     'expect_secure_uri'   => env('EXPECT_SECURE_URL', false),
     'is_external'         => env('IS_EXTERNAL', false),
-    'minimum_version'     => '5.4.0',
+    'minimum_version'     => '5.4.1',
     'cache_api_calls'     => false,
     'vanity_uri'          => envNonEmpty('VANITY_URI'),
     'connection'          => [
