@@ -39,6 +39,9 @@ Route::get('/back/config', 'NavController@toConfig')->name('back.config');
 Route::get('/back/roles', 'NavController@toRoles')->name('back.roles');
 Route::get('/back/mapping', 'NavController@toRoles')->name('back.mapping');
 
+// import by POST
+Route::post('/autoimport', 'AutoImportController@index')->name('autoimport');
+
 
 // clear session
 Route::get('/flush','IndexController@flush')->name('flush');
