@@ -37,5 +37,24 @@
 <script src="{{ asset('js/popper.min.js') }}?version={{ version }}"></script>
 <script src="{{ asset('js/bootstrap.min.js') }}?version={{ version }}"></script>
 {% block scripts %}{% endblock %}
+
+
+{% if config('csv_importer.tracker_site_id') != '' and config('csv_importer.tracker_url') != '' %}
+    <!-- This tracker tag is only here because this instance of the Firefly III CSV importer was purposefully configured to include it -->
+    <!-- Your own installation will NOT include it, unless you explicitely configure it to have it. -->
+    <script type="text/javascript" nonce="{{ JS_NONCE }}">
+        var _paq = window._paq || [];
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+            var u="//{{ config('csv_importer.tracker_url') }}/";
+            _paq.push(['setTrackerUrl', u+'matomo.php']);
+            _paq.push(['setSiteId', '{{ config('csv_importer.tracker_site_id') }}']);
+            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+        })();
+    </script>
+    <noscript><p><img src="//{{ config('csv_importer.tracker_url') }}/matomo.php?idsite={{ config('csv_importer.tracker_site_id') }}}&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+{% endif %}
 </body>
 </html>

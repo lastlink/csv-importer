@@ -232,7 +232,7 @@ class APISubmitter
         } catch (ApiHttpException $e) {
             Log::error($e->getMessage());
             Log::error($e->getTraceAsString());
-            $message = sprintf(sprintf('Submission HTTP error: %s', $e->getMessage()));
+            $message = sprintf('Submission HTTP error: %s', $e->getMessage());
             $this->addError($index, $message);
 
             return $return;

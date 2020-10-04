@@ -23,12 +23,12 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Console\AutoImports;
 use App\Console\HaveAccess;
 use App\Console\StartImport;
 use App\Console\VerifyJSON;
 use App\Exceptions\ImportException;
 use Illuminate\Console\Command;
-use JsonException;
 use Log;
 
 /**
@@ -36,10 +36,8 @@ use Log;
  */
 class AutoImport extends Command
 {
-    use HaveAccess, VerifyJSON, StartImport;
+    use HaveAccess, VerifyJSON, StartImport, AutoImports;
 
-    /** @var array */
-    private const IGNORE = ['.', '..'];
     /**
      * The console command description.
      *
@@ -69,8 +67,9 @@ class AutoImport extends Command
             return 1;
         }
 
-        $this->directory = (string) ($this->argument('directory') ?? './');
-        $this->line(sprintf('Going to automatically import everything found in %s', $this->directory));
+        $argument = (string) ($this->argument('directory') ?? './');
+        $this->directory = realpath($argument);
+        $this->line(sprintf('Going to automatically import everything found in %s (%s)', $this->directory, $argument));
 
         $files = $this->getFiles();
         if (0 === count($files)) {
@@ -91,115 +90,4 @@ class AutoImport extends Command
         return 0;
     }
 
-    /**
-     * @param string $file
-     *
-     * @return string
-     */
-    private function getExtension(string $file): string
-    {
-        $parts = explode('.', $file);
-        if (1 === count($parts)) {
-            return '';
-        }
-
-        return $parts[count($parts) - 1];
-    }
-
-    /**
-     * @return array
-     */
-    private function getFiles(): array
-    {
-        if (null === $this->directory || '' === $this->directory) {
-            $this->error(sprintf('Directory "%s" is empty or invalid.', $this->directory));
-
-            return [];
-        }
-        $array = scandir($this->directory);
-        if (!is_array($array)) {
-            $this->error(sprintf('Directory "%s" is empty or invalid.', $this->directory));
-
-            return [];
-        }
-        $files  = array_diff($array, self::IGNORE);
-        $return = [];
-        foreach ($files as $file) {
-            if ('csv' === $this->getExtension($file) && $this->hasJsonConfiguration($file)) {
-                $return[] = $file;
-            }
-        }
-
-        return $return;
-    }
-
-    /**
-     * @param string $file
-     *
-     * @return bool
-     */
-    private function hasJsonConfiguration(string $file): bool
-    {
-        $short    = substr($file, 0, -4);
-        $jsonFile = sprintf('%s.json', $short);
-        $fullJson = sprintf('%s/%s', $this->directory, $jsonFile);
-        if (!file_exists($fullJson)) {
-            $this->warn(sprintf('Can\'t find JSON file "%s" expected to go with CSV file "%s". CSV file will be ignored.', $fullJson, $file));
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string $file
-     *
-     * @throws ImportException
-     */
-    private function importFile(string $file): void
-    {
-        $csvFile  = sprintf('%s/%s', $this->directory, $file);
-        $jsonFile = sprintf('%s/%s.json', $this->directory, substr($file, 0, -4));
-
-        // do JSON check
-        $jsonResult = $this->verifyJSON($jsonFile);
-        if (false === $jsonResult) {
-            $message = sprintf('The importer can\'t import %s: could not decode the JSON in config file %s.', $csvFile, $jsonFile);
-            $this->error($message);
-
-            return;
-        }
-        try {
-            $configuration = json_decode(file_get_contents($jsonFile), true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
-            Log::error($e->getMessage());
-            throw new ImportException(sprintf('Bad JSON in configuration file: %s', $e->getMessage()));
-        }
-        $this->line(sprintf('Going to import from file %s using configuration %s.', $csvFile, $jsonFile));
-        // create importer
-        $csv    = file_get_contents($csvFile);
-        $result = $this->startImport($csv, $configuration);
-        if (0 === $result) {
-            $this->line('Import complete.');
-        }
-        if (0 !== $result) {
-            $this->warn('The import finished with errors.');
-        }
-
-        $this->line(sprintf('Done importing from file %s using configuration %s.', $csvFile, $jsonFile));
-    }
-
-    /**
-     * @param array $files
-     *
-     * @throws ImportException
-     */
-    private function importFiles(array $files): void
-    {
-        /** @var string $file */
-        foreach ($files as $file) {
-            $this->importFile($file);
-        }
-    }
 }
