@@ -117,6 +117,7 @@ class IndexController extends Controller
         session()->forget(['csv_file_path', 'config_file_path', 'import_job_id']);
         session()->flush();
         Artisan::call('cache:clear');
+        Artisan::call('config:clear');
 
         return redirect(route('index'));
     }
