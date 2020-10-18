@@ -77,7 +77,8 @@ class IndexController extends Controller
             $clientIdWithURL = true;
         }
         $URLonly = false;
-        if ('' !== (string) env('FIREFLY_III_URI') && '' === (string) env('FIREFLY_III_CLIENT_ID')) {
+        if ('' !== (string) env('FIREFLY_III_URI') && '' === (string) env('FIREFLY_III_CLIENT_ID') && '' === (string) env('FIREFLY_III_ACCESS_TOKEN')
+        ) {
             $URLonly = true;
         }
         $flexible = false;
