@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ApiException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Request\SystemInformationRequest;
 use GuzzleHttp\Client;
@@ -33,6 +34,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\View\View;
 use InvalidArgumentException;
+use JsonException;
 use Log;
 use Str;
 
@@ -105,7 +107,7 @@ class TokenController extends Controller
         Log::debug('Submitted data: ', $data);
 
         if (true === config('csv_importer.expect_secure_uri') && 'https://' !== substr($data['base_url'], 0, 8)) {
-            $request->session()->flash('secure_url','URL must start with https://');
+            $request->session()->flash('secure_url', 'URL must start with https://');
             return redirect(route('token.index'));
         }
 
@@ -196,8 +198,13 @@ class TokenController extends Controller
 
 
         $response = (new Client)->post($finalURL, $params);
-        $data     = json_decode((string) $response->getBody(), true);
-
+        try {
+            $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            Log::error(sprintf('JSON exception when decoding response: %s', $e->getMessage()));
+            Log::error($e->getTraceAsString());
+            throw new ApiException(sprintf('JSON exception when decoding response: %s', $e->getMessage()));
+        }
         Log::debug('Response', $data);
 
         // set cookies.
