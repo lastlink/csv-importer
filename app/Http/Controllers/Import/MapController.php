@@ -55,16 +55,17 @@ class MapController extends Controller
     }
 
     /**
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     * @throws \League\Csv\Exception
      * @return Factory|View
+     * @throws \League\Csv\Exception
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function index()
     {
         $mainTitle = 'Map data';
         $subTitle  = 'Map values in CSV file to actual data in Firefly III';
 
-        Log::debug('Now im mapController index');
+        Log::debug('Now in mapController index');
+
 
         // get configuration object.
         $configuration   = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
@@ -83,7 +84,7 @@ class MapController extends Controller
                 continue;
             }
             $mapColumn = $doMapping[$index] ?? false;
-            if(false === $mapColumn) {
+            if (false === $mapColumn) {
                 continue;
             }
             Log::debug(sprintf('Mappable role is "%s"', $role));
@@ -125,14 +126,12 @@ class MapController extends Controller
      */
     public function postIndex(Request $request): RedirectResponse
     {
-        $values  = $request->get('values') ?? [];
-        $mapping = $request->get('mapping') ?? [];
-        $values  = !is_array($values) ? [] : $values;
-        $mapping = !is_array($mapping) ? [] : $mapping;
-        $data    = [];
-        $configuration   = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
-
-
+        $values        = $request->get('values') ?? [];
+        $mapping       = $request->get('mapping') ?? [];
+        $values        = !is_array($values) ? [] : $values;
+        $mapping       = !is_array($mapping) ? [] : $mapping;
+        $data          = [];
+        $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
 
         /**
          * Loop array with available columns.
@@ -150,7 +149,7 @@ class MapController extends Controller
             foreach ($column as $valueIndex => $value) {
                 $mappedValue = $mapping[$columnIndex][$valueIndex] ?? null;
                 if (null !== $mappedValue && 0 !== $mappedValue && '0' !== $mappedValue) {
-                    $data[$columnIndex][$value] = (int)$mappedValue;
+                    $data[$columnIndex][$value] = (int) $mappedValue;
                 }
 
             }

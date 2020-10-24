@@ -92,7 +92,25 @@ class MapperService
         foreach ($data as $index => $columnInfo) {
             $data[$index]['values'] = array_unique($data[$index]['values']);
             asort($data[$index]['values']);
+
+
+            /*
+             * The config may contain mapped values that arent in this CSV file. They're submitted as
+             * hidden values (under unused_maps).
+            */
+            $mappedValues = array_keys($columnInfo['mapped'] ?? []);
+            $foundValues = $columnInfo['values'] ?? [];
+            $missingValues = array_diff($mappedValues, $foundValues);
+            // get them from mapped.
+            $missingMap = [];
+            foreach($missingValues as $missingValue) {
+                if(array_key_exists($missingValue, $columnInfo['mapped'])) {
+                    $missingMap[$missingValue] = $columnInfo['mapped'][$missingValue];
+                }
+            }
+            $data[$index]['missing_map'] = $missingMap;
         }
+
         return $data;
     }
 
