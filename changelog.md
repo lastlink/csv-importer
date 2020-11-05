@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.2.3 - 2020-11-05
+
+### Fixed
+- [Issue 4209](https://github.com/firefly-iii/firefly-iii/issues/4209) Bad error parsing wasn't really user friendly.
+
 ## 2.2.2 - 2020-10-23
 
 ### Fixed
