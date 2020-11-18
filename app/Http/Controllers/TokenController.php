@@ -45,15 +45,17 @@ class TokenController extends Controller
 {
     /**
      * @param Request $request
+     *
      * @return \Illuminate\Contracts\Foundation\Application|Factory|RedirectResponse|Redirector|View
      */
     public function index(Request $request)
     {
         $pageTitle = 'CSV importer';
         Log::debug(sprintf('Now at %s', __METHOD__));
-        $configToken = (string) config('csv_importer.access_token');
-        $clientId    = (int) config('csv_importer.client_id');
-        $baseURL     = (string) config('csv_importer.uri');
+        $configToken = (string)config('csv_importer.access_token');
+        $clientId    = (int)config('csv_importer.client_id');
+        $baseURL     = (string)config('csv_importer.uri');
+        $tokenURL    = (string)config('csv_importer.uri');
 
         Log::info('The following configuration information was found:');
         Log::info(sprintf('Personal Access Token: "%s". (limited to 25 chars if present)', substr($configToken, 0, 25)));
@@ -79,16 +81,17 @@ class TokenController extends Controller
             Log::debug(sprintf('Found client ID "%d" + URL "%s" in config, redirect to Firefly III for permission.', $clientId, $baseURL));
 
             // send user to vanity URL!
-            if ('' !== (string) config('csv_importer.vanity_uri')) {
+            if ('' !== (string)config('csv_importer.vanity_uri')) {
                 $baseURL = config('csv_importer.vanity_uri');
             }
 
-            return $this->redirectForPermission($request, $baseURL, $clientId);
+            return $this->redirectForPermission($request, $baseURL, $tokenURL, $clientId);
         }
 
         // Option 3: either is empty, ask for client ID and/or base URL:
         $baseURL  = config('csv_importer.uri');
         $clientId = 0 === $clientId ? '' : $clientId;
+
         return view('token.client_id', compact('baseURL', 'clientId', 'pageTitle'));
     }
 
@@ -103,20 +106,22 @@ class TokenController extends Controller
             [
                 'client_id' => 'required|numeric|min:1|max:65536',
                 'base_url'  => 'url',
-            ]);
+            ]
+        );
         Log::debug('Submitted data: ', $data);
 
         if (true === config('csv_importer.expect_secure_uri') && 'https://' !== substr($data['base_url'], 0, 8)) {
             $request->session()->flash('secure_url', 'URL must start with https://');
+
             return redirect(route('token.index'));
         }
 
 
-        $data['client_id'] = (int) $data['client_id'];
+        $data['client_id'] = (int)$data['client_id'];
 
         // grab base URL from config first, otherwise from submitted data:
         $baseURL = config('csv_importer.uri');
-        if ('' !== (string) config('csv_importer.vanity_uri')) {
+        if ('' !== (string)config('csv_importer.vanity_uri')) {
             $baseURL = config('csv_importer.vanity_uri');
         }
         if (array_key_exists('base_url', $data) && '' !== $data['base_url']) {
@@ -137,8 +142,8 @@ class TokenController extends Controller
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
         $response = ['result' => 'OK', 'message' => null];
-        $uri      = (string) $request->cookie('base_url');
-        $token    = (string) $request->cookie('access_token');
+        $uri      = (string)$request->cookie('base_url');
+        $token    = (string)$request->cookie('access_token');
         $request  = new SystemInformationRequest($uri, $token);
 
         $request->setVerify(config('csv_importer.connection.verify'));
@@ -153,7 +158,7 @@ class TokenController extends Controller
         // 0 = OK (same version)
         // 1 = NOK (too low a version)
 
-        $minimum = (string) config('csv_importer.minimum_version');
+        $minimum = (string)config('csv_importer.minimum_version');
         $compare = version_compare($minimum, $result->version);
         if (1 === $compare) {
             $errorMessage = sprintf(
@@ -172,17 +177,18 @@ class TokenController extends Controller
     public function callback(Request $request)
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
-        $state        = (string) $request->session()->pull('state');
-        $codeVerifier = (string) $request->session()->pull('code_verifier');
-        $clientId     = (int) $request->session()->pull('form_client_id');
-        $baseURL      = (string) $request->session()->pull('form_base_url');
+        $state        = (string)$request->session()->pull('state');
+        $codeVerifier = (string)$request->session()->pull('code_verifier');
+        $clientId     = (int)$request->session()->pull('form_client_id');
+        $baseURL      = (string)$request->session()->pull('form_base_url');
+        $tokenURL     = (string)$request->session()->pull('form_token_url');
         $code         = $request->get('code');
 
         throw_unless(
             strlen($state) > 0 && $state === $request->state,
             InvalidArgumentException::class
         );
-        $finalURL = sprintf('%s/oauth/token', $baseURL);
+        $finalURL = sprintf('%s/oauth/token', $tokenURL);
         $params   = [
             'form_params' => [
                 'grant_type'    => 'authorization_code',
@@ -199,10 +205,10 @@ class TokenController extends Controller
 
         $response = (new Client)->post($finalURL, $params);
         try {
-            $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+            $data = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             Log::error(sprintf('JSON exception when decoding response: %s', $e->getMessage()));
-            Log::error(sprintf('Response from server: "%s"', (string) $response->getBody()));
+            Log::error(sprintf('Response from server: "%s"', (string)$response->getBody()));
             Log::error($e->getTraceAsString());
             throw new ApiException(sprintf('JSON exception when decoding response: %s', $e->getMessage()));
         }
@@ -210,9 +216,9 @@ class TokenController extends Controller
 
         // set cookies.
         $cookies = [
-            cookie('access_token', (string) $data['access_token']),
+            cookie('access_token', (string)$data['access_token']),
             cookie('base_url', $baseURL),
-            cookie('refresh_token', (string) $data['refresh_token']),
+            cookie('refresh_token', (string)$data['refresh_token']),
         ];
         Log::debug(sprintf('Return redirect with cookies to "%s"', route('index')));
 
@@ -222,10 +228,12 @@ class TokenController extends Controller
     /**
      * @param Request $request
      * @param string  $baseURL
+     * @param string  $tokenURL
      * @param int     $clientId
+     *
      * @return RedirectResponse
      */
-    private function redirectForPermission(Request $request, string $baseURL, int $clientId): RedirectResponse
+    private function redirectForPermission(Request $request, string $baseURL, string $tokenURL, int $clientId): RedirectResponse
     {
         $state        = Str::random(40);
         $codeVerifier = Str::random(128);
@@ -233,6 +241,7 @@ class TokenController extends Controller
         $request->session()->put('code_verifier', $codeVerifier);
         $request->session()->put('form_client_id', $clientId);
         $request->session()->put('form_base_url', $baseURL);
+        $request->session()->put('form_token_url', $baseURL);
 
         $codeChallenge = strtr(rtrim(base64_encode(hash('sha256', $codeVerifier, true)), '='), '+/', '-_');
         $params        = [
