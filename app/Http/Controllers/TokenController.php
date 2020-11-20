@@ -241,7 +241,7 @@ class TokenController extends Controller
         $request->session()->put('code_verifier', $codeVerifier);
         $request->session()->put('form_client_id', $clientId);
         $request->session()->put('form_base_url', $baseURL);
-        $request->session()->put('form_token_url', $baseURL);
+        $request->session()->put('form_token_url', $tokenURL);
 
         $codeChallenge = strtr(rtrim(base64_encode(hash('sha256', $codeVerifier, true)), '='), '+/', '-_');
         $params        = [
