@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.2.4 - 2020-11-20
+
+### Fixed
+
+- [Issue 3975](https://github.com/firefly-iii/firefly-iii/issues/3975) Better error handling when Firefly III responds with invalid JSON.
+- [Issue 4069](https://github.com/firefly-iii/firefly-iii/issues/4069) CSV importer would contact the wrong URL to get an access token if you configure a vanity URL.
+
 ## 2.2.3 - 2020-11-05
 
 ### Fixed
