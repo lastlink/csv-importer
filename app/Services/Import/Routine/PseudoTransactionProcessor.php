@@ -96,11 +96,11 @@ class PseudoTransactionProcessor
      */
     private function getDefaultAccount(?int $accountId): void
     {
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
 
         if (null !== $accountId) {
-            $accountRequest = new GetAccountRequest($uri, $token);
+            $accountRequest = new GetAccountRequest($url, $token);
             $accountRequest->setVerify(config('csv_importer.connection.verify'));
             $accountRequest->setTimeOut(config('csv_importer.connection.timeout'));
             $accountRequest->setId($accountId);
@@ -120,10 +120,10 @@ class PseudoTransactionProcessor
      */
     private function getDefaultCurrency(): void
     {
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
 
-        $prefRequest = new GetPreferenceRequest($uri, $token);
+        $prefRequest = new GetPreferenceRequest($url, $token);
         $prefRequest->setVerify(config('csv_importer.connection.verify'));
         $prefRequest->setTimeOut(config('csv_importer.connection.timeout'));
         $prefRequest->setName('currencyPreference');
@@ -136,7 +136,7 @@ class PseudoTransactionProcessor
             throw new ImportException('Could not load the users currency preference.');
         }
         $code            = $response->getPreference()->data ?? 'EUR';
-        $currencyRequest = new GetCurrencyRequest($uri,$token);
+        $currencyRequest = new GetCurrencyRequest($url,$token);
         $currencyRequest->setVerify(config('csv_importer.connection.verify'));
         $currencyRequest->setTimeOut(config('csv_importer.connection.timeout'));
         $currencyRequest->setCode($code);

@@ -24,7 +24,7 @@ trait ManageMessages
 
         $func = $functions[$key] ?? 'line';
 
-        if (count($messages) > 0) {
+        if (!empty($messages)) {
             /**
              * @var int   $index
              * @var array $error

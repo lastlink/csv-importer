@@ -25,6 +25,9 @@ namespace App\Console;
 
 use App\Exceptions\ImportException;
 
+Use Log;
+use JsonException;
+
 /**
  * Trait AutoImports
  */

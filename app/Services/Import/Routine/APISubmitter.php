@@ -46,7 +46,7 @@ class APISubmitter
     private string $tag;
     private string $tagDate;
     private bool   $addTag;
-    private string $rootURI;
+    private string $rootURL;
 
     /**
      * @param array $lines
@@ -58,9 +58,9 @@ class APISubmitter
         $count         = count($lines);
         Log::info(sprintf('Going to submit %d transactions to your Firefly III instance.', $count));
 
-        $this->rootURI = Token::getURL();
+        $this->rootURL = Token::getURL();
 
-        Log::debug(sprintf('The root URI is "%s"', $this->rootURI));
+        Log::debug(sprintf('The root URL is "%s"', $this->rootURL));
 
         // create the tag, to be used later on.
         $this->createTag();
@@ -115,9 +115,9 @@ class APISubmitter
                 'tags'                   => $currentTags,
             ];
         }
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request = new PutTransactionRequest($uri, $token, $groupId);
+        $request = new PutTransactionRequest($url, $token, $groupId);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setBody($body);
@@ -179,9 +179,9 @@ class APISubmitter
 
             return;
         }
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request = new PostTagRequest($uri, $token);
+        $request = new PostTagRequest($url, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         $body = [
@@ -219,9 +219,9 @@ class APISubmitter
     private function processTransaction(int $index, array $line): array
     {
         $return  = [];
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request = new PostTransactionRequest($uri, $token);
+        $request = new PostTransactionRequest($url, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         Log::debug('Submitting to Firefly III:', $line);
@@ -270,7 +270,7 @@ class APISubmitter
                 $message = sprintf(
                     'Created %s <a target="_blank" href="%s">#%d "%s"</a> (%s %s)',
                     $transaction->type,
-                    sprintf('%s/transactions/show/%d', $this->rootURI, $group->id),
+                    sprintf('%s/transactions/show/%d', $this->rootURL, $group->id),
                     $group->id,
                     e($transaction->description),
                     $transaction->currencyCode,

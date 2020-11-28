@@ -202,9 +202,9 @@ class Accounts extends AbstractTask
     private function findById(string $value): ?Account
     {
         Log::debug(sprintf('Going to search account with ID "%s"', $value));
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request = new GetSearchAccountRequest($uri, $token);
+        $request = new GetSearchAccountRequest($url, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setField('id');
@@ -244,9 +244,9 @@ class Accounts extends AbstractTask
     private function findByIban(string $iban, string $transactionType): ?Account
     {
         Log::debug(sprintf('Going to search account with IBAN "%s"', $iban));
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request = new GetSearchAccountRequest($uri, $token);
+        $request = new GetSearchAccountRequest($url, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setField('iban');
@@ -305,9 +305,9 @@ class Accounts extends AbstractTask
     private function findByName(string $name): ?Account
     {
         Log::debug(sprintf('Going to search account with name "%s"', $name));
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request = new GetSearchAccountRequest($uri, $token);
+        $request = new GetSearchAccountRequest($url, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setField('name');

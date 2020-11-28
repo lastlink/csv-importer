@@ -81,9 +81,9 @@ class ConfigurationController extends Controller
         }
 
         // get list of asset accounts:
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request = new GetAccountsRequest($uri, $token);
+        $request = new GetAccountsRequest($url, $token);
         $request->setType(GetAccountsRequest::ASSET);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
@@ -98,9 +98,9 @@ class ConfigurationController extends Controller
         }
 
         // also get liabilities
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request = new GetAccountsRequest($uri, $token);
+        $request = new GetAccountsRequest($url, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setType(GetAccountsRequest::LIABILITIES);
@@ -141,7 +141,7 @@ class ConfigurationController extends Controller
      */
     public function phpDate(Request $request): JsonResponse
     {
-        Log::debug(sprintf('Now at %s', __METHOD__));
+        Log::debug(sprintf('Method %s', __METHOD__));
 
         $dateObj = new Date;
         [$locale, $format] = $dateObj->splitLocaleFormat($request->get('format'));
@@ -157,7 +157,7 @@ class ConfigurationController extends Controller
      */
     public function postIndex(ConfigurationPostRequest $request): RedirectResponse
     {
-        Log::debug(sprintf('Now at %s', __METHOD__));
+        Log::debug(sprintf('Now running %s', __METHOD__));
         // store config on drive.
         $fromRequest   = $request->getAll();
         $configuration = Configuration::fromRequest($fromRequest);
