@@ -79,7 +79,7 @@ class SpecificService
     public static function runSpecifics(array $row, array $specifics): array
     {
         // if the array keys are strings, pluck those.
-        if (0 === count($specifics)) {
+        if (empty($specifics)) {
             Log::debug('Not configured to do any specifics.');
             return $row;
         }

@@ -100,14 +100,14 @@ class Date implements ConverterInterface
      */
     public function splitLocaleFormat(string $format): array
     {
-        $dateLocale = 'en';
-        $dateFormat = 'Y-m-d';
+        $currentDateLocale = 'en';
+        $currentDateFormat = 'Y-m-d';
         $dateFormatConfiguration = [];
         preg_match($this->dateFormatPattern, $format, $dateFormatConfiguration);
         if (3 === count($dateFormatConfiguration)) {
-            $dateLocale = $dateFormatConfiguration[1] ?: $dateLocale;
-            $dateFormat = $dateFormatConfiguration[2];
+            $currentDateLocale = $dateFormatConfiguration[1] ?: $currentDateLocale;
+            $currentDateFormat = $dateFormatConfiguration[2];
         }
-        return [$dateLocale, $dateFormat];
+        return [$currentDateLocale, $currentDateFormat];
     }
 }

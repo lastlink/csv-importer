@@ -32,37 +32,20 @@ use UnexpectedValueException;
  */
 class Configuration
 {
-    /** @var string */
-    private $date;
-    /** @var int */
-    private $defaultAccount;
-    /** @var string */
-    private $delimiter;
-    /** @var bool */
-    private $headers;
-    /** @var bool When set to true, the importer will ignore existing duplicate transactions found in Firefly III. */
-    private $ignoreDuplicateTransactions;
-    /** @var bool When set to true, the importer will ignore duplicate lines in the CSV file. */
-    private $ignoreDuplicateLines;
-    /** @var bool */
-    private $rules;
-    /** @var bool */
-    private $skipForm;
-    /** @var array */
-    private $specifics;
-    /** @var array */
-    private $roles;
-    /** @var int */
-    private $version;
-
-    /** @var array */
-    private $doMapping;
-
-    /** @var bool */
-    private $addImportTag;
-
-    /** @var array */
-    private $mapping;
+    private string $date;
+    private int $defaultAccount;
+    private string $delimiter;
+    private bool $headers;
+    private bool $ignoreDuplicateTransactions;
+    private bool $ignoreDuplicateLines;
+    private bool $rules;
+    private bool $skipForm;
+    private array $specifics;
+    private array $roles;
+    private int $version;
+    private array $doMapping;
+    private bool $addImportTag;
+    private array $mapping;
     /** @var int */
     public const VERSION = 2;
 
