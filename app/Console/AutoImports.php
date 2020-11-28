@@ -75,7 +75,7 @@ trait AutoImports
             return '';
         }
 
-        return $parts[count($parts) - 1];
+        return strtolower($parts[count($parts) - 1]);
     }
 
 
