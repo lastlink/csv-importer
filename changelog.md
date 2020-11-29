@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## 2.3.0
+## 2.3.0 - 2020-11-29
 
 ⚠️ Several changes in this release may break Firefly III's duplication detection or are backwards incompatible.
 
@@ -12,7 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-- #4094 CSV importer would only files with a lowercase `.csv` extension.
+- [Issue 4094](https://github.com/firefly-iii/firefly-iii/issues/4094) CSV importer would only files with a lowercase `.csv` extension.
 
 ## 2.2.4 - 2020-11-20
 
