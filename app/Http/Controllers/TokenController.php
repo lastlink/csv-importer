@@ -110,7 +110,7 @@ class TokenController extends Controller
         );
         Log::debug('Submitted data: ', $data);
 
-        if (true === config('csv_importer.expect_secure_uri') && 'https://' !== substr($data['base_url'], 0, 8)) {
+        if (true === config('csv_importer.expect_secure_url') && 'https://' !== substr($data['base_url'], 0, 8)) {
             $request->session()->flash('secure_url', 'URL must start with https://');
 
             return redirect(route('token.index'));
