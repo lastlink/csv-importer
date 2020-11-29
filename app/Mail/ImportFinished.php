@@ -28,7 +28,7 @@ class ImportFinished extends Mailable
     public function __construct(array $log)
     {
         $this->time = date('Y-m-d \@ H:i:s');
-        $this->url = config('csv_importer.uri');
+        $this->url = config('csv_importer.url');
         $this->errors = $log['errors'] ?? [];
         $this->warnings = $log['warnings'] ?? [];
         $this->messages = $log['messages'] ?? [];

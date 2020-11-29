@@ -47,9 +47,9 @@ trait GetAccounts
     {
         // get list of asset accounts:
         $accounts = [];
-        $uri      = Token::getURL();
+        $url      = Token::getURL();
         $token    = Token::getAccessToken();
-        $request  = new GetAccountsRequest($uri, $token);
+        $request  = new GetAccountsRequest($url, $token);
 
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
@@ -86,9 +86,9 @@ trait GetAccounts
         // get list of asset accounts:
         $accounts    = [];
         $liabilities = [];
-        $uri         = Token::getURL();
+        $url         = Token::getURL();
         $token       = Token::getAccessToken();
-        $request     = new GetAccountsRequest($uri, $token);
+        $request     = new GetAccountsRequest($url, $token);
 
         $request->setType(GetAccountsRequest::ASSET);
         $request->setVerify(config('csv_importer.connection.verify'));
@@ -111,7 +111,7 @@ trait GetAccounts
             throw new ImportException('Could not get list of asset accounts.');
         }
 
-        $request = new GetAccountsRequest($uri, $token);
+        $request = new GetAccountsRequest($url, $token);
 
         $request->setType(GetAccountsRequest::LIABILITIES);
         $request->setVerify(config('csv_importer.connection.verify'));

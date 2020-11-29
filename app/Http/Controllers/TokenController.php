@@ -54,8 +54,8 @@ class TokenController extends Controller
         Log::debug(sprintf('Now at %s', __METHOD__));
         $configToken = (string)config('csv_importer.access_token');
         $clientId    = (int)config('csv_importer.client_id');
-        $baseURL     = (string)config('csv_importer.uri');
-        $tokenURL    = (string)config('csv_importer.uri');
+        $baseURL     = (string)config('csv_importer.url');
+        $tokenURL    = (string)config('csv_importer.url');
 
         Log::info('The following configuration information was found:');
         Log::info(sprintf('Personal Access Token: "%s". (limited to 25 chars if present)', substr($configToken, 0, 25)));
@@ -81,15 +81,15 @@ class TokenController extends Controller
             Log::debug(sprintf('Found client ID "%d" + URL "%s" in config, redirect to Firefly III for permission.', $clientId, $baseURL));
 
             // send user to vanity URL!
-            if ('' !== (string)config('csv_importer.vanity_uri')) {
-                $baseURL = config('csv_importer.vanity_uri');
+            if ('' !== (string)config('csv_importer.vanity_url')) {
+                $baseURL = config('csv_importer.vanity_url');
             }
 
             return $this->redirectForPermission($request, $baseURL, $tokenURL, $clientId);
         }
 
         // Option 3: either is empty, ask for client ID and/or base URL:
-        $baseURL  = config('csv_importer.uri');
+        $baseURL  = config('csv_importer.url');
         $clientId = 0 === $clientId ? '' : $clientId;
 
         return view('token.client_id', compact('baseURL', 'clientId', 'pageTitle'));
@@ -110,7 +110,7 @@ class TokenController extends Controller
         );
         Log::debug('Submitted data: ', $data);
 
-        if (true === config('csv_importer.expect_secure_uri') && 'https://' !== substr($data['base_url'], 0, 8)) {
+        if (true === config('csv_importer.expect_secure_url') && 'https://' !== substr($data['base_url'], 0, 8)) {
             $request->session()->flash('secure_url', 'URL must start with https://');
 
             return redirect(route('token.index'));
@@ -120,9 +120,9 @@ class TokenController extends Controller
         $data['client_id'] = (int)$data['client_id'];
 
         // grab base URL from config first, otherwise from submitted data:
-        $baseURL = config('csv_importer.uri');
-        if ('' !== (string)config('csv_importer.vanity_uri')) {
-            $baseURL = config('csv_importer.vanity_uri');
+        $baseURL = config('csv_importer.url');
+        if ('' !== (string)config('csv_importer.vanity_url')) {
+            $baseURL = config('csv_importer.vanity_url');
         }
         if (array_key_exists('base_url', $data) && '' !== $data['base_url']) {
             $baseURL = $data['base_url'];
@@ -142,9 +142,9 @@ class TokenController extends Controller
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
         $response = ['result' => 'OK', 'message' => null];
-        $uri      = (string)$request->cookie('base_url');
+        $url      = (string)$request->cookie('base_url');
         $token    = (string)$request->cookie('access_token');
-        $request  = new SystemInformationRequest($uri, $token);
+        $request  = new SystemInformationRequest($url, $token);
 
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));

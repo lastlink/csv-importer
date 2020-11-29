@@ -25,6 +25,9 @@ namespace App\Console;
 
 use App\Exceptions\ImportException;
 
+Use Log;
+use JsonException;
+
 /**
  * Trait AutoImports
  */
@@ -72,7 +75,7 @@ trait AutoImports
             return '';
         }
 
-        return $parts[count($parts) - 1];
+        return strtolower($parts[count($parts) - 1]);
     }
 
 

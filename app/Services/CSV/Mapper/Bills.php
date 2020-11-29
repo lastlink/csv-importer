@@ -43,9 +43,9 @@ class Bills implements MapperInterface
     public function getMap(): array
     {
         $result  = [];
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request = new GetBillsRequest($uri, $token);
+        $request = new GetBillsRequest($url, $token);
 
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));

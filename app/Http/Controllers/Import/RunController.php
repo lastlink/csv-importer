@@ -71,11 +71,11 @@ class RunController extends Controller
         $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
         if ([] === $configuration->getDoMapping()) {
             // no mapping, back to roles
-            $jobBackUri = route('back.roles');
+            $jobBackUrl = route('back.roles');
         }
         if ([] !== $configuration->getDoMapping()) {
             // back to mapping
-            $jobBackUri = route('back.mapping');
+            $jobBackUrl = route('back.mapping');
         }
 
         // job ID may be in session:
@@ -89,7 +89,7 @@ class RunController extends Controller
         session()->put(Constants::JOB_IDENTIFIER, $identifier);
         Log::debug(sprintf('Stored "%s" under "%s"', $identifier, Constants::JOB_IDENTIFIER));
 
-        return view('import.run.index', compact('mainTitle', 'subTitle', 'identifier', 'jobBackUri'));
+        return view('import.run.index', compact('mainTitle', 'subTitle', 'identifier', 'jobBackUrl'));
     }
 
     /**

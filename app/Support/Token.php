@@ -56,7 +56,7 @@ class Token
         $value = request()->cookie('base_url');
         if (null === $value) {
             // fall back to config:
-            $value = (string) config('csv_importer.uri');
+            $value = (string) config('csv_importer.url');
         }
         if ('' === (string) $value) {
             throw new ImportException('No valid URL value.');

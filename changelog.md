@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.3.0 - 2020-11-29
+
+⚠️ Several changes in this release may break Firefly III's duplication detection or are backwards incompatible.
+
+### Changed
+
+- ⚠️ All environment variables that used to be called "URI" are now called "URL" because I finally learned the difference between a URL and a URI.
+
+### Fixed
+
+- [Issue 4094](https://github.com/firefly-iii/firefly-iii/issues/4094) CSV importer would only files with a lowercase `.csv` extension.
+
 ## 2.2.4 - 2020-11-20
 
 ### Fixed

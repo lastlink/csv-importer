@@ -83,8 +83,8 @@ class Accounts extends AbstractTask
      *
      * @param Account|null $defaultAccount
      *
-     * @throws ImportException
      * @return array
+     * @throws ImportException
      */
     private function findAccount(array $array, ?Account $defaultAccount): array
     {
@@ -196,15 +196,15 @@ class Accounts extends AbstractTask
     /**
      * @param string $value
      *
-     * @throws ImportException
      * @return Account|null
+     * @throws ImportException
      */
     private function findById(string $value): ?Account
     {
         Log::debug(sprintf('Going to search account with ID "%s"', $value));
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request = new GetSearchAccountRequest($uri, $token);
+        $request = new GetSearchAccountRequest($url, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setField('id');
@@ -238,15 +238,15 @@ class Accounts extends AbstractTask
      * @param string $iban
      * @param string $transactionType
      *
-     * @throws ImportException
      * @return Account|null
+     * @throws ImportException
      */
     private function findByIban(string $iban, string $transactionType): ?Account
     {
         Log::debug(sprintf('Going to search account with IBAN "%s"', $iban));
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request = new GetSearchAccountRequest($uri, $token);
+        $request = new GetSearchAccountRequest($url, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setField('iban');
@@ -299,15 +299,15 @@ class Accounts extends AbstractTask
     /**
      * @param string $name
      *
-     * @throws ImportException
      * @return Account|null
+     * @throws ImportException
      */
     private function findByName(string $name): ?Account
     {
         Log::debug(sprintf('Going to search account with name "%s"', $name));
-        $uri     = Token::getURL();
+        $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request = new GetSearchAccountRequest($uri, $token);
+        $request = new GetSearchAccountRequest($url, $token);
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         $request->setField('name');
@@ -325,12 +325,10 @@ class Accounts extends AbstractTask
         }
         /** @var Account $account */
         foreach ($response as $account) {
-            if (in_array($account->type, [AccountType::ASSET, AccountType::LOAN, AccountType::DEBT, AccountType::MORTGAGE], true)) {
-                if (strtolower($account->name) === strtolower($name)) {
-                    Log::debug(sprintf('[b] Found "%s" account #%d based on name "%s"', $account->type, $account->id, $name));
+            if (in_array($account->type, [AccountType::ASSET, AccountType::LOAN, AccountType::DEBT, AccountType::MORTGAGE], true) && strtolower($account->name) === strtolower($name)) {
+                Log::debug(sprintf('[b] Found "%s" account #%d based on name "%s"', $account->type, $account->id, $name));
 
-                    return $account;
-                }
+                return $account;
             }
         }
         Log::debug(sprintf('Found %d account(s) searching for "%s" but not going to use them. Firefly III must handle the values.', count($response), $name));

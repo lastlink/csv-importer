@@ -36,9 +36,9 @@ trait HaveAccess
      */
     private function haveAccess(): bool
     {
-        $uri     = (string) config('csv_importer.uri');
+        $url     = (string) config('csv_importer.url');
         $token   = (string) config('csv_importer.access_token');
-        $request = new SystemInformationRequest($uri, $token);
+        $request = new SystemInformationRequest($url, $token);
 
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));
