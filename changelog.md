@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.3.1 - 2020-11-20
+
+### Fixed
+
+- [Issue 4100](https://github.com/firefly-iii/firefly-iii/issues/4100) Bad parameters in token call.
+
+
 ## 2.3.0 - 2020-11-29
 
 ⚠️ Several changes in this release may break Firefly III's duplication detection or are backwards incompatible.
