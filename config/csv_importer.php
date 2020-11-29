@@ -39,7 +39,7 @@ use App\Services\Import\Task\PositiveAmount;
 use App\Services\Import\Task\Tags;
 
 return [
-    'version'             => '2.2.4',
+    'version'             => '2.3.0',
     'access_token'        => env('FIREFLY_III_ACCESS_TOKEN'),
     'url'                 => env('FIREFLY_III_URL'),
     'client_id'           => env('FIREFLY_III_CLIENT_ID'),
