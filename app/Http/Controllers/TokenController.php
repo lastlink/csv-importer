@@ -121,6 +121,7 @@ class TokenController extends Controller
 
         // grab base URL from config first, otherwise from submitted data:
         $baseURL = config('csv_importer.url');
+        $tokenURL    = (string)config('csv_importer.url');
         if ('' !== (string)config('csv_importer.vanity_url')) {
             $baseURL = config('csv_importer.vanity_url');
         }
@@ -130,7 +131,7 @@ class TokenController extends Controller
         $baseURL = rtrim($baseURL, '/');
 
         // return request for permission:
-        return $this->redirectForPermission($request, $baseURL, $data['client_id']);
+        return $this->redirectForPermission($request, $baseURL, $tokenURL, $data['client_id']);
     }
 
     /**
