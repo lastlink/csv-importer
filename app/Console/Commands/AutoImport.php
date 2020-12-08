@@ -67,7 +67,7 @@ class AutoImport extends Command
             return 1;
         }
 
-        $argument = (string) ($this->argument('directory') ?? './');
+        $argument        = (string) ($this->argument('directory') ?? './');
         $this->directory = realpath($argument);
         $this->line(sprintf('Going to automatically import everything found in %s (%s)', $this->directory, $argument));
 

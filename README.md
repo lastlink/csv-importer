@@ -28,32 +28,35 @@
 <!-- MarkdownTOC autolink="true" -->
 
 - [About the Firefly III CSV importer](#about-the-firefly-iii-csv-importer)
-  - [Purpose](#purpose)
-  - [Features](#features)
-  - [Who's it for?](#whos-it-for)
+	- [Purpose](#purpose)
+	- [Features](#features)
+	- [Who's it for?](#whos-it-for)
 - [Getting Started](#getting-started)
-  - [Using the web interface](#using-the-web-interface)
-  - [Using the auto-import](#using-the-auto-import)
+	- [Using the web interface](#using-the-web-interface)
+	- [Using the auto-import](#using-the-auto-import)
 - [Known import challenges](#known-import-challenges)
 - [Other stuff](#other-stuff)
-  - [Contribute](#contribute)
-  - [Support the development of Firefly III](#support-the-development-of-firefly-iii)
-  - [Contact](#contact)
+	- [Contribute](#contribute)
+	- [Support the development of Firefly III](#support-the-development-of-firefly-iii)
+	- [Contact](#contact)
 
 <!-- /MarkdownTOC -->
 
 ## About the Firefly III CSV importer
-This is a tool to import CSV files into [Firefly III](https://github.com/firefly-iii/firefly-iii).
 
-It works with access to your Firefly III installation's API. It will then create transactions based upon the CSV files you upload.
+Welcome! You found the CSV importer, a tool to import CSV files into [Firefly III](https://github.com/firefly-iii/firefly-iii). The name kind of gave it away, didn't it?
+
+This tool is built and designed to make it easy to import data into your Firefly III installation. It uses CSV files (duh) and optionally, a config file ([from your bank perhaps?](https://github.com/firefly-iii/import-configurations/)) to make everything go smooth.
 
 ### Purpose
 
 Use this tool to (automatically) import your bank's CSV files into Firefly III. If you're a bit of a developer, feel free to use this code to generate your own import tool.
 
 ### Features
-
+	
 * This tool will let you download or generate a configuration file, so the next import will go faster.
+* It will not import duplicate transactions.
+* It can recognize all currencies, transaction types and other things that Firefly III supports.
 
 ### Who's it for?
 

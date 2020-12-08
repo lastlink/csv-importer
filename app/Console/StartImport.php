@@ -37,6 +37,10 @@ trait StartImport
 {
     use ManageMessages;
 
+    protected array $messages;
+    protected array $warnings;
+    protected array $errors;
+
     /**
      * @param string $csv
      * @param array  $configuration
@@ -59,13 +63,13 @@ trait StartImport
         $manager->setReader(FileReader::getReaderFromContent($csv));
         $manager->start();
 
-        $messages = $manager->getAllMessages();
-        $warnings = $manager->getAllWarnings();
-        $errors   = $manager->getAllErrors();
+        $this->messages = $manager->getAllMessages();
+        $this->warnings = $manager->getAllWarnings();
+        $this->errors   = $manager->getAllErrors();
 
-        $this->listMessages('ERROR', $errors);
-        $this->listMessages('Warning', $warnings);
-        $this->listMessages('Message', $messages);
+        $this->listMessages('ERROR', $this->errors);
+        $this->listMessages('Warning', $this->warnings);
+        $this->listMessages('Message', $this->messages);
 
         return 0;
     }
