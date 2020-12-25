@@ -204,7 +204,7 @@ class TokenController extends Controller
         Log::debug(sprintf('Will contact "%s" for a token.', $finalURL));
 
 
-        $response = (new Client)->post($finalURL, $params);
+        $response = (new Client(['verify' => config('csv_importer.connection.verify')]))->post($finalURL, $params);
         try {
             $data = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
