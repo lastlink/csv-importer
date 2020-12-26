@@ -72,7 +72,7 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": ">=7.4",
         "ext-bcmath": "*",
         "ext-json": "*",
         "doctrine/dbal": "^2.9",

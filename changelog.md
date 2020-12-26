@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.3.2 - 2020-12-26
+
+### Added
+- [Issue 4134](https://github.com/firefly-iii/firefly-iii/issues/4134) CSV importer will also send emails when running on command line.
+
+### Fixed
+- [Issue 4106](https://github.com/firefly-iii/firefly-iii/issues/4106) Make sure amounts like "EUR 1.234,56" can be parsed.
+- [Issue 4183](https://github.com/firefly-iii/firefly-iii/issues/4183) Make sure all calls use the verify settings, thx @zjean.
+
+### Security
+- Lots of library updates as usual.
+
 ## 2.3.1 - 2020-11-20
 
 ### Fixed
