@@ -61,6 +61,7 @@ class TokenController extends Controller
         Log::info(sprintf('Personal Access Token: "%s". (limited to 25 chars if present)', substr($configToken, 0, 25)));
         Log::info(sprintf('Client ID            : "%s".', $clientId));
         Log::info(sprintf('Base URL             : "%s".', $baseURL));
+        Log::info(sprintf('Token URL            : "%s".', $tokenURL));
 
         // Option 1: access token and url are present:
         if ('' !== $configToken && '' !== $baseURL) {
@@ -115,7 +116,6 @@ class TokenController extends Controller
 
             return redirect(route('token.index'));
         }
-
 
         $data['client_id'] = (int)$data['client_id'];
 
@@ -240,6 +240,7 @@ class TokenController extends Controller
      */
     private function redirectForPermission(Request $request, string $baseURL, string $tokenURL, int $clientId): RedirectResponse
     {
+        Log::debug(sprintf('Now in %s(request, "%s", "%s", %d)', __METHOD__, $baseURL, $tokenURL, $clientId));
         $state        = Str::random(40);
         $codeVerifier = Str::random(128);
         $request->session()->put('state', $state);
