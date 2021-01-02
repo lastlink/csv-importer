@@ -24,9 +24,10 @@ declare(strict_types=1);
 namespace App\Console;
 
 use App\Exceptions\ImportException;
-
-Use Log;
+use App\Mail\ImportFinished;
 use JsonException;
+use Log;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * Trait AutoImports
@@ -121,6 +122,7 @@ trait AutoImports
         // create importer
         $csv    = file_get_contents($csvFile);
         $result = $this->startImport($csv, $configuration);
+
         if (0 === $result) {
             $this->line('Import complete.');
         }
@@ -129,6 +131,21 @@ trait AutoImports
         }
 
         $this->line(sprintf('Done importing from file %s using configuration %s.', $csvFile, $jsonFile));
+
+        // send mail:
+        $log
+            = [
+            'messages' => $this->messages,
+            'warnings' => $this->warnings,
+            'errors'   => $this->errors,
+        ];
+
+        $send = config('mail.enable_mail_report');
+        Log::debug('Log log', $log);
+        if (true === $send) {
+            Log::debug('SEND MAIL');
+            Mail::to(config('mail.destination'))->send(new ImportFinished($log));
+        }
     }
 
 

@@ -26,7 +26,9 @@ namespace App\Console\Commands;
 use App\Console\HaveAccess;
 use App\Console\StartImport;
 use App\Console\VerifyJSON;
+use App\Mail\ImportFinished;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 use JsonException;
 use Log;
 
@@ -113,6 +115,23 @@ class Import extends Command
         if (0 !== $result) {
             $this->warn('The import finished with errors.');
         }
+
+        // send mail:
+        $log
+            = [
+            'messages' => $this->messages,
+            'warnings' => $this->warnings,
+            'errors'   => $this->errors,
+        ];
+
+        $send = config('mail.enable_mail_report');
+        Log::debug('Log log', $log);
+        if (true === $send) {
+            Log::debug('SEND MAIL');
+            Mail::to(config('mail.destination'))->send(new ImportFinished($log));
+        }
+
+
 
         return $result;
     }

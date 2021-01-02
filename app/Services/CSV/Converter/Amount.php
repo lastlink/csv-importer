@@ -245,12 +245,15 @@ class Amount implements ConverterInterface
             $value = substr($value, 2);
         }
         // have to strip the € because apparantly the Postbank (DE) thinks "1.000,00 €" is a normal way to format a number.
-        $value = trim((string)str_replace(['€'], '', $value));
+        // 2020-12-01 added "EUR" because another German bank doesn't know what a data format is.
+        // TODO this way of stripping exceptions is unsustainable.
+        $value = trim((string)str_replace(['€', 'EUR'], '', $value));
         $str   = preg_replace('/[^\-().,0-9 ]/', '', $value);
         $len   = strlen($str);
         if (0 === strpos($str, '(') && ')' === $str[$len - 1]) {
             $str = '-' . substr($str, 1, $len - 2);
         }
+        $str = trim($str);
 
         Log::debug(sprintf('Stripped "%s" away to "%s"', $value, $str));
 

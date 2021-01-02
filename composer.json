@@ -59,7 +59,7 @@
         "issues": "https://github.com/firefly-iii/firefly-iii/issues",
         "forum": "https://reddit.com/r/FireflyIII",
         "source": "https://github.com/firefly-iii/csv-importer",
-        "docs": "https://csv-docs.firefly-iii.org/"
+        "docs": "https://docs.firefly-iii.org/csv/"
     },
     "funding": [
         {
@@ -72,7 +72,7 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": ">=7.4",
         "ext-bcmath": "*",
         "ext-json": "*",
         "doctrine/dbal": "^2.9",
