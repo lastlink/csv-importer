@@ -75,7 +75,7 @@ class AutoImport extends Command
         if (0 === count($files)) {
             $this->info(sprintf('There are no files in directory %s', $this->directory));
             $this->info('To learn more about this process, read the docs:');
-            $this->info('https://csv-docs.firefly-iii.org/installing-and-running/docker');
+            $this->info('https://docs.firefly-iii.org/csv/install/docker/');
 
             return 1;
         }

@@ -65,7 +65,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Support for public clients. Check out the docs.
-- Created a [public installation](https://csv-docs.firefly-iii.org/help/public).
+- Created a [public installation](https://docs.firefly-iii.org/csv/help/public/).
 
 ### Changed
 - ⚠️ This version of the CSV importer requires PHP 7.4.
@@ -77,7 +77,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.1.1 - 2020-09-05
 
 ### Added
-- Can now parse locale dates, see the [documentation](https://csv-docs.firefly-iii.org/importing-data/configure)
+- Can now parse locale dates, see the [documentation](https://docs.firefly-iii.org/csv/install/configure/)
 
 ### Fixed
 - [Issue 3706](https://github.com/firefly-iii/firefly-iii/issues/3706) Bug in amount parsing.
@@ -86,7 +86,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.1.0 - 2020-09-05
 
 ### Added
-- Can now parse locale dates, see the [documentation](https://csv-docs.firefly-iii.org/importing-data/configure)
+- Can now parse locale dates, see the [documentation](https://docs.firefly-iii.org/csv/install/configure/)
 
 ### Fixed
 - [Issue 3706](https://github.com/firefly-iii/firefly-iii/issues/3706) Bug in amount parsing.
