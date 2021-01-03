@@ -28,6 +28,7 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+import ImportStatus from "./components/import/ImportStatus";
 
 /**
  * The following block of code may be used to automatically register your
@@ -41,7 +42,7 @@ window.Vue = require('vue');
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('import-messages', require('./components/import/ImportMessages.vue').default);
-Vue.component('import-status', require('./components/import/ImportStatus.vue').default);
+Vue.component('import-status', ImportStatus);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
