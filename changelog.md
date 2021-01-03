@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.3.3 - 2021-01-03
+
+### Fixed
+
+- [Issue 4215](https://github.com/firefly-iii/firefly-iii/issues/4215) Sloppy programming on my side broke the CSV importer, my apologies.
+
 ## 2.3.2 - 2021-01-02
 
 ### Added
