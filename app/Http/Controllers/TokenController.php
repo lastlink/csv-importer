@@ -126,8 +126,10 @@ class TokenController extends Controller
             $baseURL = config('csv_importer.vanity_url');
         }
         if (array_key_exists('base_url', $data) && '' !== $data['base_url']) {
-            $baseURL = $data['base_url'];
+            $baseURL  = $data['base_url'];
+            $tokenURL = $data['base_url'];
         }
+
         $baseURL = rtrim($baseURL, '/');
 
         // return request for permission:
