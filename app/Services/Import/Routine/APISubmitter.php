@@ -274,7 +274,7 @@ class APISubmitter
                     $group->id,
                     e($transaction->description),
                     $transaction->currencyCode,
-                    round($transaction->amount, $transaction->currencyDecimalPlaces)
+                    round((float) $transaction->amount, (int) $transaction->currencyDecimalPlaces)
                 );
                 // plus 1 to keep the count.
                 $this->addMessage($index, $message);
