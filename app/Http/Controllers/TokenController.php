@@ -131,6 +131,7 @@ class TokenController extends Controller
         }
 
         $baseURL = rtrim($baseURL, '/');
+        $tokenURL = rtrim($tokenURL, '/');
 
         // return request for permission:
         return $this->redirectForPermission($request, $baseURL, $tokenURL, $data['client_id']);
