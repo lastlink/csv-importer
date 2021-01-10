@@ -27,7 +27,6 @@ use App\Exceptions\ImportException;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\File\FileReader;
 use App\Services\Import\ImportRoutineManager;
-use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use Log;
 
 /**
@@ -49,6 +48,10 @@ trait StartImport
      */
     private function startImport(string $csv, array $configuration): int
     {
+        $this->messages = [];
+        $this->warnings = [];
+        $this->errors   = [];
+
         Log::debug(sprintf('Now in %s', __METHOD__));
         $configObject = Configuration::fromFile($configuration);
         $manager      = new ImportRoutineManager;

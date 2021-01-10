@@ -60,6 +60,7 @@ class Import extends Command
      */
     public function handle(): int
     {
+
         $access = $this->haveAccess();
         if (false === $access) {
             $this->error('Could not connect to your local Firefly III instance.');
