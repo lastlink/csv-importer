@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.3.4 - 2021-01-20
+
+### Fixed
+- Fix issue with uninitialized variables.
+- Fix issue found in https://github.com/YunoHost-Apps/firefly-iii/issues/29
+
+### Changed
+
+- Update Laravel and other libraries.
+- New Docker build!
+
 ## 2.3.3 - 2021-01-03
 
 ### Fixed
