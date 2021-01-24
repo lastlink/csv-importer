@@ -41,7 +41,7 @@ Route::get('/back/mapping', 'NavController@toRoles')->name('back.mapping');
 
 // import by POST
 Route::post('/autoimport', 'AutoImportController@index')->name('autoimport');
-
+Route::post('/autoupload', 'AutoUploadController@index')->name('autoupload');
 
 // clear session
 Route::get('/flush','IndexController@flush')->name('flush');

@@ -148,6 +148,57 @@ trait AutoImports
         }
     }
 
+    /**
+     * @param string $file
+     *
+     * @throws ImportException
+     */
+    private function importUpload(string $csvFile, string $jsonFile): void
+    {
+        // do JSON check
+        $jsonResult = $this->verifyJSON($jsonFile);
+        if (false === $jsonResult) {
+            $message = sprintf('The importer can\'t import %s: could not decode the JSON in config file %s.', $csvFile, $jsonFile);
+            $this->error($message);
+
+            return;
+        }
+        try {
+            $configuration = json_decode(file_get_contents($jsonFile), true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            Log::error($e->getMessage());
+            throw new ImportException(sprintf('Bad JSON in configuration file: %s', $e->getMessage()));
+        }
+        $this->line(sprintf('Going to import from file %s using configuration %s.', $csvFile, $jsonFile));
+        // create importer
+        $csv    = file_get_contents($csvFile);
+        $result = $this->startImport($csv, $configuration);
+
+        if (0 === $result) {
+            $this->line('Import complete.');
+        }
+        if (0 !== $result) {
+            $this->warn('The import finished with errors.');
+        }
+
+        $this->line(sprintf('Done importing from file %s using configuration %s.', $csvFile, $jsonFile));
+
+        // send mail:
+        $log
+            = [
+            'messages' => $this->messages,
+            'warnings' => $this->warnings,
+            'errors'   => $this->errors,
+        ];
+
+        $send = config('mail.enable_mail_report');
+        Log::debug('Log log', $log);
+        if (true === $send) {
+            Log::debug('SEND MAIL');
+            Mail::to(config('mail.destination'))->send(new ImportFinished($log));
+        }
+    }
+
 
     /**
      * @param string $file
