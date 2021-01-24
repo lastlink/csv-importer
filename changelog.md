@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.4.0 - 2021-01-24
+
+### Added
+- [Issue 4297](https://github.com/firefly-iii/firefly-iii/issues/4297) You can now POST upload new imports. See [the documentation](https://docs.firefly-iii.org/csv/usage/post/) for more info.
+
+### Fixed
+- [Issue 4298](https://github.com/firefly-iii/firefly-iii/issues/4298) Tags would not append, only overwrite when using multiple tag columns.
+
 ## 2.3.4 - 2021-01-20
 
 ### Fixed
