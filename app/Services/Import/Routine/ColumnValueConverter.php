@@ -97,53 +97,13 @@ class ColumnValueConverter
                     'date'             => '',
                     'currency_id'      => null,
                     'currency_code'    => null,
-                    //'foreign_currency_id'   => null,
-                    //'foreign_currency_code' => null,
                     'amount'           => null,
                     'amount_modifier'  => '1', // 1 or -1
-                    //'foreign_amount'        => null,
                     'description'      => null,
                     'source_id'        => null,
                     'source_name'      => null,
-                    //'source_iban'           => null,
-                    //'source_number'         => null,
-                    //'source_bic'            => null,
                     'destination_id'   => null,
                     'destination_name' => null,
-                    //'destination_iban'      => null,
-                    //'destination_number'    => null,
-                    //'destination_bic'       => null,
-                    //'budget_id'             => null,
-                    //'budget_name'           => null,
-                    //'category_id'           => null,
-                    //'category_name'         => null,
-                    //'bill_id'               => null,
-                    //'bill_name'             => null,
-                    //'piggy_bank_id'         => null,
-                    //'piggy_bank_name'       => null,
-                    //'reconciled'            => false,
-                    //'notes'                 => null,
-                    //'tags'                  => [],
-                    //'internal_reference'    => null,
-                    //'external_id'           => null,
-                    //'original_source'       => null,
-                    //'recurrence_id'         => null,
-                    //'bunq_payment_id'       => null,
-                    //'importHashV2'          => null,
-                    //'sepa_cc'               => null,
-                    //'sepa_ct_op'            => null,
-                    //'sepa_ct_id'            => null,
-                    //'sepa_db'               => null,
-                    //'sepa_country'          => null,
-                    //'sepa_ep'               => null,
-                    //'sepa_ci'               => null,
-                    //'sepa_batch_id'         => null,
-                    //'interest_date'         => null,
-                    //'book_date'             => null,
-                    //'process_date'          => null,
-                    //'due_date'              => null,
-                    //'payment_date'          => null,
-                    //'invoice_date'          => null,
                     'tags_comma'       => [],
                     'tags_space'       => [],
                     // extra fields for amounts:
@@ -174,9 +134,11 @@ class ColumnValueConverter
 
             // if append, append.
             if (true === $value->isAppendValue()) {
+                Log::debug(sprintf('Column #%d with role "%s" (in field "%s") must be appended to the previous value.', $columnIndex+1, $role, $transactionField), [$parsedValue]);
                 if (is_array($parsedValue)) {
                     $transaction['transactions'][0][$transactionField] = $transaction['transactions'][0][$transactionField] ?? [];
-                    $transaction['transactions'][0][$transactionField] += $parsedValue;
+                    $transaction['transactions'][0][$transactionField] = array_merge($transaction['transactions'][0][$transactionField], $parsedValue);
+                    Log::debug(sprintf('Value for [transactions][#0][%s] is now ', $transactionField), $transaction['transactions'][0][$transactionField]);
                 }
                 if (!is_array($parsedValue)) {
                     $transaction['transactions'][0][$transactionField] = $transaction['transactions'][0][$transactionField] ?? '';
@@ -188,6 +150,7 @@ class ColumnValueConverter
             }
             // if not, not.
             if (false === $value->isAppendValue()) {
+                Log::debug(sprintf('Column #%d with role "%s" (in field "%s") must NOT be appended to the previous value.', $columnIndex+1, $role, $transactionField));
                 $transaction['transactions'][0][$transactionField] = $parsedValue;
             }
         }
