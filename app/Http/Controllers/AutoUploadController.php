@@ -20,8 +20,6 @@ class AutoUploadController extends Controller
 {
     use HaveAccess, AutoImports, VerifyJSON, StartImport;
 
-    private string $directory;
-
     /**
      *
      */

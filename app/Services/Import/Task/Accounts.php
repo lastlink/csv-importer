@@ -287,7 +287,7 @@ class Accounts extends AbstractTask
             // to fix issue #4293, Firefly III will ignore this account if its an expense or a revenue account.
             if (in_array($account->type, ['expense', 'revenue'], true)) {
                 Log::debug('[a] CSV importer will pretend not to have found anything. Firefly III must handle the IBAN.');
-                
+
                 return null;
             }
 
