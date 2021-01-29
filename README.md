@@ -124,11 +124,10 @@ You can contact me at [james@firefly-iii.org](mailto:james@firefly-iii.org), you
 
 [![Scrutinizer][scrutinizer-shield]][scrutinizer-uri]
 [![Requires PHP7.4][php-shield]][php-uri]
-[![Quality Gate Status](gate-shield)](gate-uri)
 
 [scrutinizer-shield]: https://img.shields.io/scrutinizer/g/firefly-iii/csv-importer.svg?style=flat-square
 [scrutinizer-uri]: https://scrutinizer-ci.com/g/firefly-iii/csv-importer/
-[php-shield]: https://img.shields.io/badge/php-7.3-red.svg?style=flat-square
+[php-shield]: https://img.shields.io/badge/php-7.4-red.svg?style=flat-square
 [php-uri]: https://secure.php.net/downloads.php
 [packagist-shield]: https://img.shields.io/packagist/v/firefly-iii/csv-importer.svg?style=flat-square
 [packagist-uri]: https://packagist.org/packages/firefly-iii/csv-importer
@@ -138,5 +137,3 @@ You can contact me at [james@firefly-iii.org](mailto:james@firefly-iii.org), you
 [stars-url]: https://github.com/firefly-iii/csv-importer/stargazers
 [donate-shield]: https://img.shields.io/badge/donate-%24%20%E2%82%AC-brightgreen?style=flat-square
 [donate-uri]: #support
-[gate-shield]: https://sonarcloud.io/api/project_badges/measure?project=firefly-iii_csv-importer&metric=alert_status
-[gate-uri]: https://sonarcloud.io/dashboard?id=firefly-iii_csv-importer
