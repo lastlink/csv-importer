@@ -58,8 +58,10 @@ class IndexController extends Controller
         $accessToken  = (string) $request->cookie('access_token');
         $refreshToken = (string) $request->cookie('refresh_token');
         $baseURL      = (string) $request->cookie('base_url');
+        $vanityURL    = (string) $request->cookie('vanity_url');
 
-        Log::debug(sprintf('Base URL: "%s"', $baseURL));
+        Log::debug(sprintf('Base URL   : "%s"', $baseURL));
+        Log::debug(sprintf('Vanity URL : "%s"', $vanityURL));
 
         if ('' === $accessToken && '' === $refreshToken && '' === $baseURL) {
             Log::debug('No access token cookie, redirect to token.index');
