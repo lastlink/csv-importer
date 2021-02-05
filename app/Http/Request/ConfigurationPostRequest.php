@@ -102,6 +102,10 @@ class ConfigurationPostRequest extends Request
             'roles'                         => $roles,
             'mapping'                       => $mapping,
             'do_mapping'                    => $doMapping,
+            // duplicate detection:
+            'duplicate_detection_method'    => $this->string('duplicate_detection_method'),
+            'unique_column_index'           => $this->integer('unique_column_index'),
+            'unique_column_type'            => $this->string('unique_column_type'),
         ];
         // rules for specifics:
         $specifics = SpecificService::getSpecifics();
@@ -128,6 +132,11 @@ class ConfigurationPostRequest extends Request
             'ignore_duplicate_transactions' => 'numeric|between:0,1',
             'skip_form'                     => 'numeric|between:0,1',
             'add_import_tag'                => 'numeric|between:0,1',
+
+            // duplicate detection:
+            'duplicate_detection_method'    => 'required|in:cell,none,classic',
+            'unique_column_index'           => 'numeric',
+            'unique_column_type'            => sprintf('required|in:%s', join(',', array_keys(config('csv_importer.unique_column_options')))),
         ];
         // rules for specifics:
         $specifics = SpecificService::getSpecifics();

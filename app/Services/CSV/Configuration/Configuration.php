@@ -33,19 +33,30 @@ use UnexpectedValueException;
 class Configuration
 {
     private string $date;
-    private int $defaultAccount;
+    private int    $defaultAccount;
     private string $delimiter;
-    private bool $headers;
+    private bool   $headers;
+    private bool   $rules;
+    private bool   $skipForm;
+    private array  $specifics;
+    private array  $roles;
+    private int    $version;
+    private array  $doMapping;
+    private bool   $addImportTag;
+    private array  $mapping;
+
+    // how to do double transaction detection?
+    private string $duplicateDetectionMethod; // 'classic' or 'cell'
+
+    // configuration for "classic" method:
     private bool $ignoreDuplicateTransactions;
     private bool $ignoreDuplicateLines;
-    private bool $rules;
-    private bool $skipForm;
-    private array $specifics;
-    private array $roles;
-    private int $version;
-    private array $doMapping;
-    private bool $addImportTag;
-    private array $mapping;
+
+    // configuration for "cell" method:
+    private int    $uniqueColumnIndex;
+    private string $uniqueColumnType;
+
+
     /** @var int */
     public const VERSION = 2;
 
@@ -55,20 +66,30 @@ class Configuration
      */
     private function __construct()
     {
-        $this->date                        = 'Y-m-d';
-        $this->defaultAccount              = 1;
-        $this->delimiter                   = 'comma';
-        $this->headers                     = false;
+        $this->date           = 'Y-m-d';
+        $this->defaultAccount = 1;
+        $this->delimiter      = 'comma';
+        $this->headers        = false;
+        $this->rules          = true;
+        $this->skipForm       = false;
+        $this->addImportTag   = true;
+        $this->specifics      = [];
+        $this->roles          = [];
+        $this->mapping        = [];
+        $this->doMapping      = [];
+
+        // double transaction detection:
+        $this->duplicateDetectionMethod = 'classic';
+
+        // config for "classic":
         $this->ignoreDuplicateTransactions = true;
         $this->ignoreDuplicateLines        = true;
-        $this->rules                       = true;
-        $this->skipForm                    = false;
-        $this->addImportTag                = true;
-        $this->specifics                   = [];
-        $this->roles                       = [];
-        $this->mapping                     = [];
-        $this->doMapping                   = [];
-        $this->version                     = self::VERSION;
+
+        // config for "cell":
+        $this->uniqueColumnIndex = 0;
+        $this->uniqueColumnType  = 'internal_reference';
+
+        $this->version = self::VERSION;
     }
 
     /**
@@ -81,6 +102,7 @@ class Configuration
 
     /**
      * @param string $name
+     *
      * @return bool
      */
     public function hasSpecific(string $name): bool
@@ -103,23 +125,37 @@ class Configuration
      */
     public static function fromArray(array $array): self
     {
-        $version                             = $array['version'] ?? 1;
-        $delimiters                          = config('csv_importer.delimiters_reversed');
-        $object                              = new self;
-        $object->headers                     = $array['headers'];
-        $object->date                        = $array['date'];
-        $object->defaultAccount              = $array['default_account'];
-        $object->delimiter                   = $delimiters[$array['delimiter']] ?? 'comma';
+        $version                = $array['version'] ?? 1;
+        $delimiters             = config('csv_importer.delimiters_reversed');
+        $object                 = new self;
+        $object->headers        = $array['headers'];
+        $object->date           = $array['date'];
+        $object->defaultAccount = $array['default_account'];
+        $object->delimiter      = $delimiters[$array['delimiter']] ?? 'comma';
+        $object->rules          = $array['rules'];
+        $object->skipForm       = $array['skip_form'];
+        $object->addImportTag   = $array['add_import_tag'] ?? true;
+        $object->specifics      = $array['specifics'];
+        $object->roles          = $array['roles'];
+        $object->mapping        = $array['mapping'];
+        $object->doMapping      = $array['do_mapping'];
+        $object->version        = $version;
+
+        // duplicate transaction detection
+        $object->duplicateDetectionMethod = $array['duplicate_detection_method'] ?? 'classic';
+
+        // config for "classic":
         $object->ignoreDuplicateLines        = $array['ignore_duplicate_lines'];
         $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
-        $object->rules                       = $array['rules'];
-        $object->skipForm                    = $array['skip_form'];
-        $object->addImportTag                = $array['add_import_tag'] ?? true;
-        $object->specifics                   = $array['specifics'];
-        $object->roles                       = $array['roles'];
-        $object->mapping                     = $array['mapping'];
-        $object->doMapping                   = $array['do_mapping'];
-        $object->version                     = $version;
+
+        // overrule a setting:
+        if ('none' === $object->duplicateDetectionMethod) {
+            $object->ignoreDuplicateTransactions = false;
+        }
+
+        // config for "cell":
+        $object->uniqueColumnIndex = $array['unique_column_index'] ?? 0;
+        $object->uniqueColumnType  = $array['unique_column_type'] ?? '';
 
         $firstValue = count(array_values($array['specifics'])) > 0 ? array_values($array['specifics'])[0] : null;
         $firstKey   = count(array_values($array['specifics'])) > 0 ? array_keys($array['specifics'])[0] : null;
@@ -180,22 +216,37 @@ class Configuration
      */
     public static function fromRequest(array $array): self
     {
-        $delimiters                          = config('csv_importer.delimiters_reversed');
-        $object                              = new self;
-        $object->version                     = self::VERSION;
-        $object->headers                     = $array['headers'];
-        $object->date                        = $array['date'];
-        $object->defaultAccount              = $array['default_account'];
-        $object->delimiter                   = $delimiters[$array['delimiter']] ?? 'comma';
+        $delimiters             = config('csv_importer.delimiters_reversed');
+        $object                 = new self;
+        $object->version        = self::VERSION;
+        $object->headers        = $array['headers'];
+        $object->date           = $array['date'];
+        $object->defaultAccount = $array['default_account'];
+        $object->delimiter      = $delimiters[$array['delimiter']] ?? 'comma';
+        $object->rules          = $array['rules'];
+        $object->skipForm       = $array['skip_form'];
+        $object->addImportTag   = $array['add_import_tag'] ?? true;
+        $object->roles          = $array['roles'];
+        $object->mapping        = $array['mapping'];
+        $object->doMapping      = $array['do_mapping'];
+
+        // duplicate transaction detection
+        $object->duplicateDetectionMethod = $array['duplicate_detection_method'] ?? 'classic';
+
+        // config for "classic":
         $object->ignoreDuplicateLines        = $array['ignore_duplicate_lines'];
-        $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
-        $object->rules                       = $array['rules'];
-        $object->skipForm                    = $array['skip_form'];
-        $object->addImportTag                = $array['add_import_tag'] ?? true;
-        $object->roles                       = $array['roles'];
-        $object->mapping                     = $array['mapping'];
-        $object->doMapping                   = $array['do_mapping'];
-        $object->specifics                   = [];
+        $object->ignoreDuplicateTransactions = true;
+
+        // config for "cell":
+        $object->uniqueColumnIndex = $array['unique_column_index'] ?? 0;
+        $object->uniqueColumnType  = $array['unique_column_type'] ?? '';
+
+        // overrule a setting:
+        if ('none' === $object->duplicateDetectionMethod) {
+            $object->ignoreDuplicateTransactions = false;
+        }
+
+        $object->specifics = [];
         foreach ($array['specifics'] as $key => $enabled) {
             if (true === $enabled) {
                 $object->specifics[] = $key;
@@ -226,7 +277,15 @@ class Configuration
         if (isset($data['ignore_duplicates']) && true === $data['ignore_duplicates']) {
             Log::debug('Will ignore duplicates.');
             $object->ignoreDuplicateTransactions = true;
+            $object->duplicateDetectionMethod    = 'classic';
         }
+
+        if (isset($data['ignore_duplicates']) && false === $data['ignore_duplicates']) {
+            Log::debug('Will NOT ignore duplicates.');
+            $object->ignoreDuplicateTransactions = false;
+            $object->duplicateDetectionMethod    = 'none';
+        }
+
         if (isset($data['ignore_lines']) && true === $data['ignore_lines']) {
             Log::debug('Will ignore duplicate lines.');
             $object->ignoreDuplicateLines = true;
@@ -264,14 +323,14 @@ class Configuration
         // loop do mapping from classic file.
         $doMapping = $data['column-do-mapping'] ?? [];
         foreach ($doMapping as $index => $map) {
-            $index                     = (int) $index;
+            $index                     = (int)$index;
             $object->doMapping[$index] = $map;
         }
 
         // loop mapping from classic file.
         $mapping = $data['column-mapping-config'] ?? [];
         foreach ($mapping as $index => $map) {
-            $index                   = (int) $index;
+            $index                   = (int)$index;
             $object->mapping[$index] = $map;
         }
         // set version to "2" and return.
@@ -295,7 +354,8 @@ class Configuration
             return self::fromClassicFile($data);
         }
         if (2 === $version) {
-            Log::debug('v2.');
+            Log::debug('v2 config file!');
+
             return self::fromVersionTwo($data);
         }
         throw new UnexpectedValueException(sprintf('Configuration file version "%s" cannot be parsed.', $version));
@@ -332,13 +392,11 @@ class Configuration
      */
     public function toArray(): array
     {
-        return [
+        $array                                  = [
             'date'                          => $this->date,
             'default_account'               => $this->defaultAccount,
             'delimiter'                     => $this->delimiter,
             'headers'                       => $this->headers,
-            'ignore_duplicate_lines'        => $this->ignoreDuplicateLines,
-            'ignore_duplicate_transactions' => $this->ignoreDuplicateTransactions,
             'rules'                         => $this->rules,
             'skip_form'                     => $this->skipForm,
             'add_import_tag'                => $this->addImportTag,
@@ -347,7 +405,21 @@ class Configuration
             'do_mapping'                    => $this->doMapping,
             'mapping'                       => $this->mapping,
             'version'                       => $this->version,
+            'duplicate_detection_method'    => $this->duplicateDetectionMethod,
+            'ignore_duplicate_lines'        => $this->ignoreDuplicateLines,
+            'ignore_duplicate_transactions' => $this->ignoreDuplicateTransactions,
+            'unique_column_index'           => $this->uniqueColumnIndex,
+            'unique_column_type'            => $this->uniqueColumnType,
         ];
+
+        // make sure that "ignore duplicate transactions" is turned off
+        // to deliver a consistent file.
+        $array['ignore_duplicate_transactions'] = false;
+        if ('classic' === $this->duplicateDetectionMethod) {
+            $array['ignore_duplicate_transactions'] = true;
+        }
+
+        return $array;
     }
 
     /**
@@ -412,6 +484,30 @@ class Configuration
     public function getSpecifics(): array
     {
         return $this->specifics;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDuplicateDetectionMethod(): string
+    {
+        return $this->duplicateDetectionMethod;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUniqueColumnIndex(): int
+    {
+        return $this->uniqueColumnIndex;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUniqueColumnType(): string
+    {
+        return $this->uniqueColumnType;
     }
 
 

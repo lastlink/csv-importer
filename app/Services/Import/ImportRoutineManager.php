@@ -112,6 +112,8 @@ class ImportRoutineManager
 
         // set config:
         $this->apiSubmitter->setAddTag($this->configuration->isAddImportTag());
+        // TODO the line above is no longer necessary.
+        $this->apiSubmitter->setConfiguration($this->configuration);
 
     }
 

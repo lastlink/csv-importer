@@ -161,6 +161,7 @@ class ConfigurationController extends Controller
         // store config on drive.
         $fromRequest   = $request->getAll();
         $configuration = Configuration::fromRequest($fromRequest);
+
         $json          = '[]';
         try {
             $json = json_encode($configuration, JSON_THROW_ON_ERROR, 512);
@@ -168,6 +169,8 @@ class ConfigurationController extends Controller
             Log::error($e->getMessage());
         }
         StorageService::storeContent($json);
+
+
 
         session()->put(Constants::CONFIGURATION, $configuration->toArray());
 

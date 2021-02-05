@@ -23,14 +23,17 @@ declare(strict_types=1);
 
 namespace App\Services\Import\Routine;
 
+use App\Services\CSV\Configuration\Configuration;
 use App\Services\Import\Support\ProgressInformation;
 use App\Support\Token;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Transaction;
 use GrumpyDictator\FFIIIApiSupport\Model\TransactionGroup;
+use GrumpyDictator\FFIIIApiSupport\Request\GetSearchTransactionsRequest;
 use GrumpyDictator\FFIIIApiSupport\Request\PostTagRequest;
 use GrumpyDictator\FFIIIApiSupport\Request\PostTransactionRequest;
 use GrumpyDictator\FFIIIApiSupport\Request\PutTransactionRequest;
+use GrumpyDictator\FFIIIApiSupport\Response\GetTransactionsResponse;
 use GrumpyDictator\FFIIIApiSupport\Response\PostTagResponse;
 use GrumpyDictator\FFIIIApiSupport\Response\PostTransactionResponse;
 use GrumpyDictator\FFIIIApiSupport\Response\ValidationErrorResponse;
@@ -43,10 +46,11 @@ class APISubmitter
 {
     use ProgressInformation;
 
-    private string $tag;
-    private string $tagDate;
-    private bool   $addTag;
-    private string $rootURL;
+    private string        $tag;
+    private string        $tagDate;
+    private bool          $addTag;
+    private string        $rootURL;
+    private Configuration $configuration;
 
     /**
      * @param array $lines
@@ -70,8 +74,12 @@ class APISubmitter
          * @var array $line
          */
         foreach ($lines as $index => $line) {
-            $groupInfo = $this->processTransaction($index, $line);
-            $this->addTagToGroups($groupInfo);
+
+            // first do local duplicate transaction check (the "cell" method):
+            if ($this->uniqueTransaction($index, $line)) {
+                $groupInfo = $this->processTransaction($index, $line);
+                $this->addTagToGroups($groupInfo);
+            }
         }
         Log::info(sprintf('Done submitting %d transactions to your Firefly III instance.', $count));
     }
@@ -96,10 +104,11 @@ class APISubmitter
         }
         if (false === $this->addTag) {
             Log::debug('Will not add import tag.');
+
             return;
         }
 
-        $groupId = (int) $groupInfo['group_id'];
+        $groupId = (int)$groupInfo['group_id'];
         Log::debug(sprintf('Going to add import tag to transaction group #%d', $groupId));
         $body = [
             'transactions' => [],
@@ -143,13 +152,13 @@ class APISubmitter
         foreach ($group->transactions as $index => $transaction) {
             // compare currency ID
             if (null !== $line['transactions'][$index]['currency_id']
-                && (int) $line['transactions'][$index]['currency_id'] !== (int) $transaction->currencyId
+                && (int)$line['transactions'][$index]['currency_id'] !== (int)$transaction->currencyId
             ) {
                 $this->addWarning(
                     $lineIndex,
                     sprintf(
                         'Line #%d may have had its currency changed (from ID #%d to ID #%d). This happens because the associated asset account overrules the currency of the transaction.',
-                        $lineIndex, $line['transactions'][$index]['currency_id'], (int) $transaction->currencyId
+                        $lineIndex, $line['transactions'][$index]['currency_id'], (int)$transaction->currencyId
                     )
                 );
             }
@@ -198,6 +207,7 @@ class APISubmitter
             Log::error($message);
             Log::error($e->getTraceAsString());
             $this->addError(0, $message);
+
             return;
         }
         if ($response instanceof ValidationErrorResponse) {
@@ -208,6 +218,84 @@ class APISubmitter
         if (null !== $response->getTag()) {
             Log::info(sprintf('Created tag #%d "%s"', $response->getTag()->id, $response->getTag()->tag));
         }
+    }
+
+    /**
+     * Verify if the transaction is unique, based on the configuration
+     * and the content of the transaction.
+     *
+     * @param int   $index
+     * @param array $line
+     *
+     * @return bool
+     */
+    private function uniqueTransaction(int $index, array $line): bool
+    {
+        if ('cell' !== $this->configuration->getDuplicateDetectionMethod()) {
+            Log::debug(
+                sprintf('Duplicate detection method is "%s", so this method is skipped (return true).', $this->configuration->getDuplicateDetectionMethod())
+            );
+
+            return true;
+        }
+        // do a search for the value and the field:
+        $transactions = $line['transactions'] ?? [];
+        $field        = $this->configuration->getUniqueColumnType();
+        $value        = '';
+        foreach ($transactions as $transactionIndex => $transaction) {
+            $value = (string)($transaction[$field] ?? '');
+            if ('' === $value) {
+                Log::debug(
+                    sprintf(
+                        'Identifier-based duplicate detection found no value ("") for field "%s" in transaction #%d (index #%d).', $field, $index,
+                        $transactionIndex
+                    )
+                );
+                continue;
+            }
+            if (0 !== $this->searchField($field, $value)) {
+                Log::debug(sprintf('Looks like field "%s" with value "%s" is not unique, return false.', $field, $value));
+                $message = sprintf('There is already a transaction with %s "%s".', $field, $value);
+                $this->addError($index, $message);
+                // break and return false
+                return false;
+            }
+        }
+        Log::debug(sprintf('Looks like field "%s" with value "%s" is unique, return true.', $field, $value));
+
+        return true;
+    }
+
+    /**
+     * Do a search at Firefly III and return the number of results.
+     *
+     * @param string $field
+     * @param string $value
+     *
+     * @return int
+     */
+    private function searchField(string $field, string $value): int
+    {
+        Log::debug(sprintf('Going to search for %s:%s', $field, $value));
+        // search for the exact description and not just a part of it:
+        $field   = 'description' === $field ? 'description_is' : $field;
+        $query   = sprintf('%s:"%s"', $field, $value);
+        $url     = Token::getURL();
+        $token   = Token::getAccessToken();
+        $request = new GetSearchTransactionsRequest($url, $token);
+        $request->setQuery($query);
+        try {
+            /** @var GetTransactionsResponse $response */
+            $response = $request->get();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+
+            return 0;
+        }
+        $count = $response->count();
+        Log::debug(sprintf('Found %d transaction(s). Return it.', $count));
+
+        return $count;
     }
 
     /**
@@ -226,7 +314,6 @@ class APISubmitter
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         Log::debug('Submitting to Firefly III:', $line);
         $request->setBody($line);
-
         try {
             $response = $request->post();
         } catch (ApiHttpException $e) {
@@ -274,7 +361,7 @@ class APISubmitter
                     $group->id,
                     e($transaction->description),
                     $transaction->currencyCode,
-                    round((float) $transaction->amount, (int) $transaction->currencyDecimalPlaces)
+                    round((float)$transaction->amount, (int)$transaction->currencyDecimalPlaces)
                 );
                 // plus 1 to keep the count.
                 $this->addMessage($index, $message);
@@ -302,9 +389,18 @@ class APISubmitter
         if (3 !== count($parts)) {
             return '(unknown)';
         }
-        $index = (int) $parts[1];
+        $index = (int)$parts[1];
 
-        return (string) ($transaction['transactions'][$index][$parts[2]] ?? '(not found)');
+        return (string)($transaction['transactions'][$index][$parts[2]] ?? '(not found)');
     }
+
+    /**
+     * @param Configuration $configuration
+     */
+    public function setConfiguration(Configuration $configuration): void
+    {
+        $this->configuration = $configuration;
+    }
+
 
 }

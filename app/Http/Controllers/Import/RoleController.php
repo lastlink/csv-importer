@@ -84,7 +84,7 @@ class RoleController extends Controller
 
         return view(
             'import.roles.index',
-            compact('mainTitle', 'subTitle', 'columns', 'examples', 'roles', 'configuredRoles', 'configuredDoMapping', 'mapping')
+            compact('mainTitle','configuration', 'subTitle', 'columns', 'examples', 'roles', 'configuredRoles', 'configuredDoMapping', 'mapping')
         );
     }
 

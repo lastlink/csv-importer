@@ -39,24 +39,24 @@ use App\Services\Import\Task\PositiveAmount;
 use App\Services\Import\Task\Tags;
 
 return [
-    'version'             => '2.4.0',
-    'access_token'        => env('FIREFLY_III_ACCESS_TOKEN'),
-    'url'                 => env('FIREFLY_III_URL'),
-    'client_id'           => env('FIREFLY_III_CLIENT_ID'),
-    'upload_path'         => storage_path('uploads'),
-    'expect_secure_url'   => env('EXPECT_SECURE_URL', false),
-    'is_external'         => env('IS_EXTERNAL', false),
-    'minimum_version'     => '5.4.1',
-    'cache_api_calls'     => false,
-    'tracker_site_id'     => env('TRACKER_SITE_ID', ''),
-    'tracker_url'         => env('TRACKER_URL', ''),
-    'vanity_url'          => envNonEmpty('VANITY_URL'),
-    'connection'          => [
+    'version'               => '2.4.0',
+    'access_token'          => env('FIREFLY_III_ACCESS_TOKEN'),
+    'url'                   => env('FIREFLY_III_URL'),
+    'client_id'             => env('FIREFLY_III_CLIENT_ID'),
+    'upload_path'           => storage_path('uploads'),
+    'expect_secure_url'     => env('EXPECT_SECURE_URL', false),
+    'is_external'           => env('IS_EXTERNAL', false),
+    'minimum_version'       => '5.4.1',
+    'cache_api_calls'       => false,
+    'tracker_site_id'       => env('TRACKER_SITE_ID', ''),
+    'tracker_url'           => env('TRACKER_URL', ''),
+    'vanity_url'            => envNonEmpty('VANITY_URL'),
+    'connection'            => [
         'verify'  => env('VERIFY_TLS_SECURITY', true),
-        'timeout' => 0.0 === (float) env('CONNECTION_TIMEOUT', 31.415) ? 31.415 : (float) env('CONNECTION_TIMEOUT', 31.415),
+        'timeout' => 0.0 === (float)env('CONNECTION_TIMEOUT', 31.415) ? 31.415 : (float)env('CONNECTION_TIMEOUT', 31.415),
     ],
-    'trusted_proxies'     => env('TRUSTED_PROXIES', ''),
-    'delimiters'          => [
+    'trusted_proxies'       => env('TRUSTED_PROXIES', ''),
+    'delimiters'            => [
         'comma'     => ',',
         'semicolon' => ';',
         'tab'       => "\t",
@@ -64,7 +64,7 @@ return [
         ';'         => ';',
         "\t"        => "\t",
     ],
-    'delimiters_reversed' => [
+    'delimiters_reversed'   => [
         'comma'     => 'comma',
         'semicolon' => 'semicolon',
         'tab'       => 'tab',
@@ -72,7 +72,7 @@ return [
         ';'         => 'semicolon',
         "\t"        => 'tab',
     ],
-    'classic_roles'       => [
+    'classic_roles'         => [
         'original-source'    => 'original_source',
         'sepa-cc'            => 'sepa_cc',
         'sepa-ct-op'         => 'sepa_ct_op',
@@ -91,7 +91,7 @@ return [
         'date-due'           => 'date_due',
         'date-transaction'   => 'date_transaction',
     ],
-    'specifics'           => [
+    'specifics'             => [
         AbnAmroDescription::class,
         AppendHash::class,
         Belfius::class,
@@ -100,7 +100,7 @@ return [
         PresidentsChoice::class,
         SnsDescription::class,
     ],
-    'transaction_tasks'   => [
+    'transaction_tasks'     => [
         Amount::class,
         Tags::class,
         Currency::class,
@@ -147,7 +147,7 @@ return [
      *
      *
      */
-    'import_roles'        => [
+    'import_roles'          => [
         '_ignore'               => [
             'mappable'        => false,
             'pre-process-map' => false,
@@ -531,7 +531,7 @@ return [
             'append_value'    => true,
         ],
     ],
-    'role_to_transaction' => [
+    'role_to_transaction'   => [
         'account-id'            => 'source_id',
         'account-iban'          => 'source_iban',
         'account-name'          => 'source_name',
@@ -584,6 +584,11 @@ return [
         'date_payment'          => 'payment_date',
         'date_invoice'          => 'invoice_date',
         'currency-code'         => 'currency_code',
-
+    ],
+    'unique_column_options' => [
+        'note'               => 'The notes',
+        'external-id'        => 'External identifier',
+        'description'        => 'Transaction description',
+        'internal_reference' => 'Internal reference',
     ],
 ];
