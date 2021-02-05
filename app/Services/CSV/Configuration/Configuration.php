@@ -137,7 +137,7 @@ class Configuration
         $object->addImportTag   = $array['add_import_tag'] ?? true;
         $object->specifics      = $array['specifics'];
         $object->roles          = $array['roles'];
-        $object->mapping        = $array['mapping'];
+        $object->mapping        = $array['mapping'] ?? [];
         $object->doMapping      = $array['do_mapping'];
         $object->version        = $version;
 
