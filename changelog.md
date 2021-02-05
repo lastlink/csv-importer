@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.5.0 - 2021-02-06
+
+### Fixed
+
+- #4333 Bad coding on my part mixed up the vanity URL and the normal URL.
+
 ## 2.4.0 - 2021-01-29
 
 ### Added
