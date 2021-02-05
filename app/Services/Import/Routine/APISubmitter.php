@@ -241,6 +241,7 @@ class APISubmitter
         // do a search for the value and the field:
         $transactions = $line['transactions'] ?? [];
         $field        = $this->configuration->getUniqueColumnType();
+        $field        = 'external-id' === $field ? 'external_id' : $field;
         $value        = '';
         foreach ($transactions as $transactionIndex => $transaction) {
             $value = (string)($transaction[$field] ?? '');
@@ -257,6 +258,7 @@ class APISubmitter
                 Log::debug(sprintf('Looks like field "%s" with value "%s" is not unique, return false.', $field, $value));
                 $message = sprintf('There is already a transaction with %s "%s".', $field, $value);
                 $this->addError($index, $message);
+
                 // break and return false
                 return false;
             }
@@ -279,6 +281,7 @@ class APISubmitter
         Log::debug(sprintf('Going to search for %s:%s', $field, $value));
         // search for the exact description and not just a part of it:
         $field   = 'description' === $field ? 'description_is' : $field;
+        $field   = 'external-id' === $field ? 'external_id' : $field;
         $query   = sprintf('%s:"%s"', $field, $value);
         $url     = Token::getURL();
         $token   = Token::getAccessToken();
