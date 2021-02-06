@@ -408,6 +408,7 @@ class APISubmitter
     public function setConfiguration(Configuration $configuration): void
     {
         $this->configuration = $configuration;
+        $this->setAddTag($configuration->isAddImportTag());
     }
 
 

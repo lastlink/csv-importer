@@ -5,11 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.5.0 - 2021-02-06
 
 ### Added
-- #3788 It's now possible to change the way the CSV importer detects duplicates. Please read [the documentation](https://docs.firefly-iii.org/csv/usage/configure/).
+- [Issue 3788](https://github.com/firefly-iii/firefly-iii/issues/3788) It's now possible to change the way the CSV importer detects duplicates. Please read [the documentation](https://docs.firefly-iii.org/csv/usage/configure/).
 
 ### Fixed
 
-- #4333 Bad coding on my part mixed up the vanity URL and the normal URL.
+- [Issue 4333](https://github.com/firefly-iii/firefly-iii/issues/4333) Bad coding on my part mixed up the vanity URL and the normal URL.
 
 ## 2.4.0 - 2021-01-29
 
