@@ -160,7 +160,7 @@
                                 <label for="default_account" class="col-sm-3 col-form-label">Detection method</label>
                                 <div class="col-sm-9">
                                     <select id="duplicate_detection_method" name="duplicate_detection_method" class="form-control" aria-describedby="duplicate_detection_method_help">
-                                        <option label="No duplicate detection" {% if configuration.getDuplicateDetectionMethod == 'none' %}selected{% endif %} value="classic">No duplicate detection</option>
+                                        <option label="No duplicate detection" {% if configuration.getDuplicateDetectionMethod == 'none' %}selected{% endif %} value="none">No duplicate detection</option>
                                         <option label="Content-based" {% if configuration.getDuplicateDetectionMethod == 'classic' %}selected{% endif %} value="classic">Content-based detection</option>
                                         <option label="Identifier-based" {% if configuration.getDuplicateDetectionMethod == 'cell' %}selected{% endif %} value="cell">Identifier-based detection</option>
                                     </select>

@@ -591,4 +591,12 @@ return [
         'description'        => 'Transaction description',
         'internal_reference' => 'Internal reference',
     ],
+    'search_modifier' => [
+        'note'               => 'notes_are',
+        'external-id'        => 'external_id',
+        'external_id'        => 'external_id',
+        'description'        => 'description_id',
+        'internal_reference' => 'internal_reference',
+        'internal-reference' => 'internal_reference',
+    ],
 ];

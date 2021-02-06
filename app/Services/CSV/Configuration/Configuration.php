@@ -119,6 +119,16 @@ class Configuration
     }
 
     /**
+     * Create a standard empty configuration.
+     *
+     * @return static
+     */
+    public static function make(): self
+    {
+        return new self;
+    }
+
+    /**
      * @param array $array
      *
      * @return static
@@ -323,14 +333,14 @@ class Configuration
         // loop do mapping from classic file.
         $doMapping = $data['column-do-mapping'] ?? [];
         foreach ($doMapping as $index => $map) {
-            $index                     = (int)$index;
+            $index                     = (int) $index;
             $object->doMapping[$index] = $map;
         }
 
         // loop mapping from classic file.
         $mapping = $data['column-mapping-config'] ?? [];
         foreach ($mapping as $index => $map) {
-            $index                   = (int)$index;
+            $index                   = (int) $index;
             $object->mapping[$index] = $map;
         }
         // set version to "2" and return.
@@ -392,7 +402,7 @@ class Configuration
      */
     public function toArray(): array
     {
-        $array                                  = [
+        $array = [
             'date'                          => $this->date,
             'default_account'               => $this->defaultAccount,
             'delimiter'                     => $this->delimiter,
@@ -404,12 +414,12 @@ class Configuration
             'roles'                         => $this->roles,
             'do_mapping'                    => $this->doMapping,
             'mapping'                       => $this->mapping,
-            'version'                       => $this->version,
             'duplicate_detection_method'    => $this->duplicateDetectionMethod,
             'ignore_duplicate_lines'        => $this->ignoreDuplicateLines,
             'ignore_duplicate_transactions' => $this->ignoreDuplicateTransactions,
             'unique_column_index'           => $this->uniqueColumnIndex,
             'unique_column_type'            => $this->uniqueColumnType,
+            'version'                       => $this->version,
         ];
 
         // make sure that "ignore duplicate transactions" is turned off

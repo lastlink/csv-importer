@@ -76,7 +76,7 @@ class APISubmitter
         foreach ($lines as $index => $line) {
 
             // first do local duplicate transaction check (the "cell" method):
-            if ($this->uniqueTransaction($index, $line)) {
+            if (true === $this->uniqueTransaction($index, $line)) {
                 $groupInfo = $this->processTransaction($index, $line);
                 $this->addTagToGroups($groupInfo);
             }
@@ -108,7 +108,7 @@ class APISubmitter
             return;
         }
 
-        $groupId = (int)$groupInfo['group_id'];
+        $groupId = (int) $groupInfo['group_id'];
         Log::debug(sprintf('Going to add import tag to transaction group #%d', $groupId));
         $body = [
             'transactions' => [],
@@ -119,10 +119,11 @@ class APISubmitter
          */
         foreach ($groupInfo['journals'] as $journalId => $currentTags) {
             $currentTags[]          = $this->tag;
-            $body['transactions'][] = [
-                'transaction_journal_id' => $journalId,
-                'tags'                   => $currentTags,
-            ];
+            $body['transactions'][] =
+                [
+                    'transaction_journal_id' => $journalId,
+                    'tags'                   => $currentTags,
+                ];
         }
         $url     = Token::getURL();
         $token   = Token::getAccessToken();
@@ -152,13 +153,13 @@ class APISubmitter
         foreach ($group->transactions as $index => $transaction) {
             // compare currency ID
             if (null !== $line['transactions'][$index]['currency_id']
-                && (int)$line['transactions'][$index]['currency_id'] !== (int)$transaction->currencyId
+                && (int) $line['transactions'][$index]['currency_id'] !== (int) $transaction->currencyId
             ) {
                 $this->addWarning(
                     $lineIndex,
                     sprintf(
                         'Line #%d may have had its currency changed (from ID #%d to ID #%d). This happens because the associated asset account overrules the currency of the transaction.',
-                        $lineIndex, $line['transactions'][$index]['currency_id'], (int)$transaction->currencyId
+                        $lineIndex, $line['transactions'][$index]['currency_id'], (int) $transaction->currencyId
                     )
                 );
             }
@@ -222,7 +223,7 @@ class APISubmitter
 
     /**
      * Verify if the transaction is unique, based on the configuration
-     * and the content of the transaction.
+     * and the content of the transaction. Returns a boolean.
      *
      * @param int   $index
      * @param array $line
@@ -244,7 +245,7 @@ class APISubmitter
         $field        = 'external-id' === $field ? 'external_id' : $field;
         $value        = '';
         foreach ($transactions as $transactionIndex => $transaction) {
-            $value = (string)($transaction[$field] ?? '');
+            $value = (string) ($transaction[$field] ?? '');
             if ('' === $value) {
                 Log::debug(
                     sprintf(
@@ -254,22 +255,22 @@ class APISubmitter
                 );
                 continue;
             }
-            if (0 !== $this->searchField($field, $value)) {
-                Log::debug(sprintf('Looks like field "%s" with value "%s" is not unique, return false.', $field, $value));
-                $message = sprintf('There is already a transaction with %s "%s".', $field, $value);
+            $searchResult = $this->searchField($field, $value);
+            if (0 !== $searchResult) {
+                Log::debug(sprintf('Looks like field "%s" with value "%s" is not unique, found in group #%d. Return false', $field, $value, $searchResult));
+                $message = sprintf('There is already a transaction with %s "%s" (<a href="%s/transactions/show/%d">link</a>).', $field, $value, $this->rootURL, $searchResult);
                 $this->addError($index, $message);
 
-                // break and return false
                 return false;
             }
         }
-        Log::debug(sprintf('Looks like field "%s" with value "%s" is unique, return true.', $field, $value));
+        Log::debug(sprintf('Looks like field "%s" with value "%s" is unique, return false.', $field, $value));
 
         return true;
     }
 
     /**
-     * Do a search at Firefly III and return the number of results.
+     * Do a search at Firefly III and return the ID of the group found.
      *
      * @param string $field
      * @param string $value
@@ -278,11 +279,12 @@ class APISubmitter
      */
     private function searchField(string $field, string $value): int
     {
-        Log::debug(sprintf('Going to search for %s:%s', $field, $value));
         // search for the exact description and not just a part of it:
-        $field   = 'description' === $field ? 'description_is' : $field;
-        $field   = 'external-id' === $field ? 'external_id' : $field;
-        $query   = sprintf('%s:"%s"', $field, $value);
+        $searchModifier = config(sprintf('csv_importer.search_modifier.%s', $field));
+        $query          = sprintf('%s:"%s"', $searchModifier, $value);
+
+        Log::debug(sprintf('Going to search for %s:%s using query %s', $field, $value, $query));
+
         $url     = Token::getURL();
         $token   = Token::getAccessToken();
         $request = new GetSearchTransactionsRequest($url, $token);
@@ -295,10 +297,13 @@ class APISubmitter
 
             return 0;
         }
-        $count = $response->count();
-        Log::debug(sprintf('Found %d transaction(s). Return it.', $count));
+        if (0 === $response->count()) {
+            return 0;
+        }
+        $first = $response->current();
+        Log::debug(sprintf('Found %d transaction(s). Return group ID #%d.', $response->count(), $first->id));
 
-        return $count;
+        return $first->id;
     }
 
     /**
@@ -364,7 +369,7 @@ class APISubmitter
                     $group->id,
                     e($transaction->description),
                     $transaction->currencyCode,
-                    round((float)$transaction->amount, (int)$transaction->currencyDecimalPlaces)
+                    round((float) $transaction->amount, (int) $transaction->currencyDecimalPlaces)
                 );
                 // plus 1 to keep the count.
                 $this->addMessage($index, $message);
@@ -392,9 +397,9 @@ class APISubmitter
         if (3 !== count($parts)) {
             return '(unknown)';
         }
-        $index = (int)$parts[1];
+        $index = (int) $parts[1];
 
-        return (string)($transaction['transactions'][$index][$parts[2]] ?? '(not found)');
+        return (string) ($transaction['transactions'][$index][$parts[2]] ?? '(not found)');
     }
 
     /**

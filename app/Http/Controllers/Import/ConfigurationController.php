@@ -110,7 +110,6 @@ class ConfigurationController extends Controller
             $accounts['Liabilities'][$account->id] = $account;
         }
 
-
         // send other values through the form. A bit of a hack but OK.
         $roles     = '{}';
         $doMapping = '{}';
@@ -126,6 +125,10 @@ class ConfigurationController extends Controller
                 $doMapping = base64_encode('[]');
                 $mapping   = base64_encode('[]');
             }
+        }
+        // created default configuration object for sensible defaults:
+        if(null === $configuration) {
+            $configuration = Configuration::make();
         }
 
         return view(
