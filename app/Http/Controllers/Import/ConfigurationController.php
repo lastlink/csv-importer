@@ -110,7 +110,6 @@ class ConfigurationController extends Controller
             $accounts['Liabilities'][$account->id] = $account;
         }
 
-
         // send other values through the form. A bit of a hack but OK.
         $roles     = '{}';
         $doMapping = '{}';
@@ -126,6 +125,10 @@ class ConfigurationController extends Controller
                 $doMapping = base64_encode('[]');
                 $mapping   = base64_encode('[]');
             }
+        }
+        // created default configuration object for sensible defaults:
+        if(null === $configuration) {
+            $configuration = Configuration::make();
         }
 
         return view(
@@ -161,6 +164,7 @@ class ConfigurationController extends Controller
         // store config on drive.
         $fromRequest   = $request->getAll();
         $configuration = Configuration::fromRequest($fromRequest);
+
         $json          = '[]';
         try {
             $json = json_encode($configuration, JSON_THROW_ON_ERROR, 512);
@@ -168,6 +172,8 @@ class ConfigurationController extends Controller
             Log::error($e->getMessage());
         }
         StorageService::storeContent($json);
+
+
 
         session()->put(Constants::CONFIGURATION, $configuration->toArray());
 

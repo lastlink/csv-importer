@@ -44,6 +44,11 @@ use Str;
 class TokenController extends Controller
 {
     /**
+     * Start page where the user will always end up on. Will do either of 3 things:
+     *
+     * 1. All info is present. Set some cookies and continue.
+     * 2. Has client ID + URL. Will send user to Firefly III for permission.
+     * 3. Has either 1 of those. Will show user some input form.
      * @param Request $request
      *
      * @return \Illuminate\Contracts\Foundation\Application|Factory|RedirectResponse|Redirector|View
@@ -52,16 +57,19 @@ class TokenController extends Controller
     {
         $pageTitle = 'CSV importer';
         Log::debug(sprintf('Now at %s', __METHOD__));
-        $configToken = (string)config('csv_importer.access_token');
-        $clientId    = (int)config('csv_importer.client_id');
-        $baseURL     = (string)config('csv_importer.url');
-        $tokenURL    = (string)config('csv_importer.url');
+        $configToken = (string) config('csv_importer.access_token');
+        $clientId    = (int) config('csv_importer.client_id');
+        $baseURL     = (string) config('csv_importer.url');
+        $vanityURL   = $baseURL;
+        if ('' !== (string) config('csv_importer.vanity_url')) {
+            $vanityURL = config('csv_importer.vanity_url');
+        }
 
         Log::info('The following configuration information was found:');
-        Log::info(sprintf('Personal Access Token: "%s". (limited to 25 chars if present)', substr($configToken, 0, 25)));
-        Log::info(sprintf('Client ID            : "%s".', $clientId));
-        Log::info(sprintf('Base URL             : "%s".', $baseURL));
-        Log::info(sprintf('Token URL            : "%s".', $tokenURL));
+        Log::info(sprintf('Personal Access Token: "%s" (limited to 25 chars if present)', substr($configToken, 0, 25)));
+        Log::info(sprintf('Client ID            : "%s"', $clientId));
+        Log::info(sprintf('Base URL             : "%s"', $baseURL));
+        Log::info(sprintf('Vanity URL           : "%s"', $vanityURL));
 
         // Option 1: access token and url are present:
         if ('' !== $configToken && '' !== $baseURL) {
@@ -71,6 +79,7 @@ class TokenController extends Controller
             $cookies = [
                 cookie('access_token', $configToken),
                 cookie('base_url', $baseURL),
+                cookie('vanity_url', $vanityURL),
                 cookie('refresh_token', ''),
             ];
 
@@ -80,17 +89,10 @@ class TokenController extends Controller
         // Option 2: client ID + base URL.
         if (0 !== $clientId && '' !== $baseURL) {
             Log::debug(sprintf('Found client ID "%d" + URL "%s" in config, redirect to Firefly III for permission.', $clientId, $baseURL));
-
-            // send user to vanity URL!
-            if ('' !== (string)config('csv_importer.vanity_url')) {
-                $baseURL = config('csv_importer.vanity_url');
-            }
-
-            return $this->redirectForPermission($request, $baseURL, $tokenURL, $clientId);
+            return $this->redirectForPermission($request, $baseURL, $vanityURL, $clientId);
         }
 
         // Option 3: either is empty, ask for client ID and/or base URL:
-        $baseURL  = config('csv_importer.url');
         $clientId = 0 === $clientId ? '' : $clientId;
 
         return view('token.client_id', compact('baseURL', 'clientId', 'pageTitle'));
@@ -98,7 +100,11 @@ class TokenController extends Controller
 
 
     /**
+     * User submits the client ID + optionally the base URL.
+     * Whatever happens, we redirect the user to Firefly III and beg for permission.
+     *
      * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|RedirectResponse|Redirector
      */
     public function submitClientId(Request $request)
     {
@@ -117,37 +123,39 @@ class TokenController extends Controller
             return redirect(route('token.index'));
         }
 
-        $data['client_id'] = (int)$data['client_id'];
+        $data['client_id'] = (int) $data['client_id'];
 
         // grab base URL from config first, otherwise from submitted data:
-        $baseURL  = config('csv_importer.url');
-        $tokenURL = (string)config('csv_importer.url');
-        if ('' !== (string)config('csv_importer.vanity_url')) {
-            $baseURL = config('csv_importer.vanity_url');
-        }
-        if (array_key_exists('base_url', $data) && '' !== $data['base_url']) {
-            $baseURL  = $data['base_url'];
-            $tokenURL = $data['base_url'];
+        $baseURL   = config('csv_importer.url');
+        $vanityURL = $baseURL;
+
+        // if the config has a vanity URL it will always overrule.
+        if ('' !== (string) config('csv_importer.vanity_url')) {
+            $vanityURL = config('csv_importer.vanity_url');
         }
 
-        $baseURL = rtrim($baseURL, '/');
-        $tokenURL = rtrim($tokenURL, '/');
+        // otherwise take base URL from the submitted data:
+        if (array_key_exists('base_url', $data) && '' !== $data['base_url']) {
+            $baseURL = $data['base_url'];
+        }
 
         // return request for permission:
-        return $this->redirectForPermission($request, $baseURL, $tokenURL, $data['client_id']);
+        return $this->redirectForPermission($request, $baseURL, $vanityURL, $data['client_id']);
     }
 
     /**
-     * Check if the Firefly III API responds properly.
+     * This method will check if Firefly III accepts the access_token from the cookie
+     * and the base URL (also from the cookie). The base_url is NEVER the vanity URL.§
      *
+     * @param Request $request
      * @return JsonResponse
      */
     public function doValidate(Request $request): JsonResponse
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
         $response = ['result' => 'OK', 'message' => null];
-        $url      = (string)$request->cookie('base_url');
-        $token    = (string)$request->cookie('access_token');
+        $url      = (string) $request->cookie('base_url');
+        $token    = (string) $request->cookie('access_token');
         $request  = new SystemInformationRequest($url, $token);
 
         $request->setVerify(config('csv_importer.connection.verify'));
@@ -162,7 +170,7 @@ class TokenController extends Controller
         // 0 = OK (same version)
         // 1 = NOK (too low a version)
 
-        $minimum = (string)config('csv_importer.minimum_version');
+        $minimum = (string) config('csv_importer.minimum_version');
         $compare = version_compare($minimum, $result->version);
         if (1 === $compare) {
             $errorMessage = sprintf(
@@ -175,24 +183,28 @@ class TokenController extends Controller
         return response()->json($response);
     }
 
+
     /**
+     * The user ends up here when they come back from Firefly III.
+     *
      * @param Request $request
      */
     public function callback(Request $request)
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
-        $state        = (string)$request->session()->pull('state');
-        $codeVerifier = (string)$request->session()->pull('code_verifier');
-        $clientId     = (int)$request->session()->pull('form_client_id');
-        $baseURL      = (string)$request->session()->pull('form_base_url');
-        $tokenURL     = (string)$request->session()->pull('form_token_url');
+        $state        = (string) $request->session()->pull('state');
+        $codeVerifier = (string) $request->session()->pull('code_verifier');
+        $clientId     = (int) $request->session()->pull('form_client_id');
+        $baseURL      = (string) $request->session()->pull('form_base_url');
+        $vanityURL    = (string) $request->session()->pull('form_vanity_url');
         $code         = $request->get('code');
 
         throw_unless(
             strlen($state) > 0 && $state === $request->state,
             InvalidArgumentException::class
         );
-        $finalURL = sprintf('%s/oauth/token', $tokenURL);
+        // always POST to the base URL, never the vanity URL.
+        $finalURL = sprintf('%s/oauth/token', $baseURL);
         $params   = [
             'form_params' => [
                 'grant_type'    => 'authorization_code',
@@ -213,10 +225,10 @@ class TokenController extends Controller
 
         $response = (new Client($opts))->post($finalURL, $params);
         try {
-            $data = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+            $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             Log::error(sprintf('JSON exception when decoding response: %s', $e->getMessage()));
-            Log::error(sprintf('Response from server: "%s"', (string)$response->getBody()));
+            Log::error(sprintf('Response from server: "%s"', (string) $response->getBody()));
             Log::error($e->getTraceAsString());
             throw new ApiException(sprintf('JSON exception when decoding response: %s', $e->getMessage()));
         }
@@ -224,9 +236,10 @@ class TokenController extends Controller
 
         // set cookies.
         $cookies = [
-            cookie('access_token', (string)$data['access_token']),
+            cookie('access_token', (string) $data['access_token']),
             cookie('base_url', $baseURL),
-            cookie('refresh_token', (string)$data['refresh_token']),
+            cookie('vanity_url', $vanityURL),
+            cookie('refresh_token', (string) $data['refresh_token']),
         ];
         Log::debug(sprintf('Return redirect with cookies to "%s"', route('index')));
 
@@ -234,23 +247,29 @@ class TokenController extends Controller
     }
 
     /**
+     * This method forwards the user to Firefly III. Some parameters are stored in the user's session.
+     *
      * @param Request $request
      * @param string  $baseURL
-     * @param string  $tokenURL
+     * @param string  $vanityURL
      * @param int     $clientId
      *
      * @return RedirectResponse
      */
-    private function redirectForPermission(Request $request, string $baseURL, string $tokenURL, int $clientId): RedirectResponse
+    private function redirectForPermission(Request $request, string $baseURL, string $vanityURL, int $clientId): RedirectResponse
     {
-        Log::debug(sprintf('Now in %s(request, "%s", "%s", %d)', __METHOD__, $baseURL, $tokenURL, $clientId));
+        $baseURL   = rtrim($baseURL, '/');
+        $vanityURL = rtrim($vanityURL, '/');
+
+
+        Log::debug(sprintf('Now in %s(request, "%s", "%s", %d)', __METHOD__, $baseURL, $vanityURL, $clientId));
         $state        = Str::random(40);
         $codeVerifier = Str::random(128);
         $request->session()->put('state', $state);
         $request->session()->put('code_verifier', $codeVerifier);
         $request->session()->put('form_client_id', $clientId);
         $request->session()->put('form_base_url', $baseURL);
-        $request->session()->put('form_token_url', $tokenURL);
+        $request->session()->put('form_vanity_url', $vanityURL);
 
         $codeChallenge = strtr(rtrim(base64_encode(hash('sha256', $codeVerifier, true)), '='), '+/', '-_');
         $params        = [
@@ -263,11 +282,11 @@ class TokenController extends Controller
             'code_challenge_method' => 'S256',
         ];
         $query         = http_build_query($params);
-        $finalURL      = sprintf('%s/oauth/authorize?', $baseURL);
+        // we redirect the user to the vanity URL, which is the same as the base_url, unless the user actually set a vanity URL.
+        $finalURL = sprintf('%s/oauth/authorize?', $vanityURL);
         Log::debug('Query parameters are', $params);
         Log::debug(sprintf('Now redirecting to "%s" (params omitted)', $finalURL));
 
         return redirect($finalURL . $query);
     }
-
 }

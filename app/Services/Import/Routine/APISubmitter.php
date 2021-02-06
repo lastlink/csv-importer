@@ -23,14 +23,17 @@ declare(strict_types=1);
 
 namespace App\Services\Import\Routine;
 
+use App\Services\CSV\Configuration\Configuration;
 use App\Services\Import\Support\ProgressInformation;
 use App\Support\Token;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Transaction;
 use GrumpyDictator\FFIIIApiSupport\Model\TransactionGroup;
+use GrumpyDictator\FFIIIApiSupport\Request\GetSearchTransactionsRequest;
 use GrumpyDictator\FFIIIApiSupport\Request\PostTagRequest;
 use GrumpyDictator\FFIIIApiSupport\Request\PostTransactionRequest;
 use GrumpyDictator\FFIIIApiSupport\Request\PutTransactionRequest;
+use GrumpyDictator\FFIIIApiSupport\Response\GetTransactionsResponse;
 use GrumpyDictator\FFIIIApiSupport\Response\PostTagResponse;
 use GrumpyDictator\FFIIIApiSupport\Response\PostTransactionResponse;
 use GrumpyDictator\FFIIIApiSupport\Response\ValidationErrorResponse;
@@ -43,10 +46,11 @@ class APISubmitter
 {
     use ProgressInformation;
 
-    private string $tag;
-    private string $tagDate;
-    private bool   $addTag;
-    private string $rootURL;
+    private string        $tag;
+    private string        $tagDate;
+    private bool          $addTag;
+    private string        $rootURL;
+    private Configuration $configuration;
 
     /**
      * @param array $lines
@@ -70,8 +74,12 @@ class APISubmitter
          * @var array $line
          */
         foreach ($lines as $index => $line) {
-            $groupInfo = $this->processTransaction($index, $line);
-            $this->addTagToGroups($groupInfo);
+
+            // first do local duplicate transaction check (the "cell" method):
+            if (true === $this->uniqueTransaction($index, $line)) {
+                $groupInfo = $this->processTransaction($index, $line);
+                $this->addTagToGroups($groupInfo);
+            }
         }
         Log::info(sprintf('Done submitting %d transactions to your Firefly III instance.', $count));
     }
@@ -96,6 +104,7 @@ class APISubmitter
         }
         if (false === $this->addTag) {
             Log::debug('Will not add import tag.');
+
             return;
         }
 
@@ -110,10 +119,11 @@ class APISubmitter
          */
         foreach ($groupInfo['journals'] as $journalId => $currentTags) {
             $currentTags[]          = $this->tag;
-            $body['transactions'][] = [
-                'transaction_journal_id' => $journalId,
-                'tags'                   => $currentTags,
-            ];
+            $body['transactions'][] =
+                [
+                    'transaction_journal_id' => $journalId,
+                    'tags'                   => $currentTags,
+                ];
         }
         $url     = Token::getURL();
         $token   = Token::getAccessToken();
@@ -198,6 +208,7 @@ class APISubmitter
             Log::error($message);
             Log::error($e->getTraceAsString());
             $this->addError(0, $message);
+
             return;
         }
         if ($response instanceof ValidationErrorResponse) {
@@ -208,6 +219,91 @@ class APISubmitter
         if (null !== $response->getTag()) {
             Log::info(sprintf('Created tag #%d "%s"', $response->getTag()->id, $response->getTag()->tag));
         }
+    }
+
+    /**
+     * Verify if the transaction is unique, based on the configuration
+     * and the content of the transaction. Returns a boolean.
+     *
+     * @param int   $index
+     * @param array $line
+     *
+     * @return bool
+     */
+    private function uniqueTransaction(int $index, array $line): bool
+    {
+        if ('cell' !== $this->configuration->getDuplicateDetectionMethod()) {
+            Log::debug(
+                sprintf('Duplicate detection method is "%s", so this method is skipped (return true).', $this->configuration->getDuplicateDetectionMethod())
+            );
+
+            return true;
+        }
+        // do a search for the value and the field:
+        $transactions = $line['transactions'] ?? [];
+        $field        = $this->configuration->getUniqueColumnType();
+        $field        = 'external-id' === $field ? 'external_id' : $field;
+        $value        = '';
+        foreach ($transactions as $transactionIndex => $transaction) {
+            $value = (string) ($transaction[$field] ?? '');
+            if ('' === $value) {
+                Log::debug(
+                    sprintf(
+                        'Identifier-based duplicate detection found no value ("") for field "%s" in transaction #%d (index #%d).', $field, $index,
+                        $transactionIndex
+                    )
+                );
+                continue;
+            }
+            $searchResult = $this->searchField($field, $value);
+            if (0 !== $searchResult) {
+                Log::debug(sprintf('Looks like field "%s" with value "%s" is not unique, found in group #%d. Return false', $field, $value, $searchResult));
+                $message = sprintf('There is already a transaction with %s "%s" (<a href="%s/transactions/show/%d">link</a>).', $field, $value, $this->rootURL, $searchResult);
+                $this->addError($index, $message);
+
+                return false;
+            }
+        }
+        Log::debug(sprintf('Looks like field "%s" with value "%s" is unique, return false.', $field, $value));
+
+        return true;
+    }
+
+    /**
+     * Do a search at Firefly III and return the ID of the group found.
+     *
+     * @param string $field
+     * @param string $value
+     *
+     * @return int
+     */
+    private function searchField(string $field, string $value): int
+    {
+        // search for the exact description and not just a part of it:
+        $searchModifier = config(sprintf('csv_importer.search_modifier.%s', $field));
+        $query          = sprintf('%s:"%s"', $searchModifier, $value);
+
+        Log::debug(sprintf('Going to search for %s:%s using query %s', $field, $value, $query));
+
+        $url     = Token::getURL();
+        $token   = Token::getAccessToken();
+        $request = new GetSearchTransactionsRequest($url, $token);
+        $request->setQuery($query);
+        try {
+            /** @var GetTransactionsResponse $response */
+            $response = $request->get();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+
+            return 0;
+        }
+        if (0 === $response->count()) {
+            return 0;
+        }
+        $first = $response->current();
+        Log::debug(sprintf('Found %d transaction(s). Return group ID #%d.', $response->count(), $first->id));
+
+        return $first->id;
     }
 
     /**
@@ -226,7 +322,6 @@ class APISubmitter
         $request->setTimeOut(config('csv_importer.connection.timeout'));
         Log::debug('Submitting to Firefly III:', $line);
         $request->setBody($line);
-
         try {
             $response = $request->post();
         } catch (ApiHttpException $e) {
@@ -306,5 +401,15 @@ class APISubmitter
 
         return (string) ($transaction['transactions'][$index][$parts[2]] ?? '(not found)');
     }
+
+    /**
+     * @param Configuration $configuration
+     */
+    public function setConfiguration(Configuration $configuration): void
+    {
+        $this->configuration = $configuration;
+        $this->setAddTag($configuration->isAddImportTag());
+    }
+
 
 }
