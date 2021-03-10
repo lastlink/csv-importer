@@ -85,6 +85,11 @@ The [full usage instructions](https://docs.firefly-iii.org/csv) can be found in 
 5. [Map values in the CSV file to existing values in your database](https://docs.firefly-iii.org/csv/usage/map/).
 6. [Enjoy the result in Firefly III](https://github.com/firefly-iii/firefly-iii).
 
+### Using the command line
+
+1. [Set up and configure the CSV importer](https://docs.firefly-iii.org/csv/install/configure/).
+2. [Follow the command line instructions](https://docs.firefly-iii.org/csv/usage/command_line/)
+
 ### Using the auto-import
 
 1. Import at least once, so you'll have a configuration file.
