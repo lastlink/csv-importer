@@ -126,7 +126,7 @@ class TokenController extends Controller
         $data['client_id'] = (int) $data['client_id'];
 
         // grab base URL from config first, otherwise from submitted data:
-        $baseURL   = config('csv_importer.url');
+        $baseURL = config('csv_importer.url');
         Log::debug(sprintf('Base URL is "%s"', $baseURL));
         $vanityURL = $baseURL;
 
@@ -142,6 +142,10 @@ class TokenController extends Controller
         if (array_key_exists('base_url', $data) && '' !== $data['base_url']) {
             $baseURL = $data['base_url'];
             Log::debug(sprintf('Base URL is now "%s"', $baseURL));
+        }
+        if ('' === (string) $vanityURL) {
+            $vanityURL = $baseURL;
+            Log::debug(sprintf('Vanity URL is now "%s"', $vanityURL));
         }
 
         // return request for permission:
