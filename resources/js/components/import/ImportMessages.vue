@@ -24,7 +24,7 @@
         <div v-if="!this.isEmpty(this.errors)">
             <strong class="text-danger">Error(s)</strong>
             <ul>
-                <li v-for="(errorList, line) in this.errors">Line #{{ line }}:
+                <li v-for="(errorList, line) in this.errors">Line #{{ line + 1 }}:
                     <span v-if="1 === errorList.length"> {{ errorList[0] }}</span>
                     <ul v-if="errorList.length > 1">
                         <li v-for="(error) in errorList"> ({{ errorList.length }}) {{ error }}</li>
@@ -35,7 +35,7 @@
         <div v-if="!this.isEmpty(this.warnings)">
             <strong class="text-warning">Warning(s)</strong>
             <ul>
-                <li v-for="(warningList, line) in this.warnings">Line #{{ line }}:
+                <li v-for="(warningList, line) in this.warnings">Line #{{ line + 1 }}:
                     <span v-if="1 === warningList.length"> {{ warningList[0] }}</span>
                     <ul v-if="warningList.length > 1">
                         <li v-for="(warning) in warningList">({{ warningList.length }}) {{ warning }}</li>
@@ -46,7 +46,7 @@
         <div v-if="!this.isEmpty(this.messages)">
             <strong class="text-info">Message(s)</strong>
             <ul>
-                <li v-for="(messageList, line) in this.messages">Line #{{ line }}:
+                <li v-for="(messageList, line) in this.messages">Line #{{ line + 1 }}:
                     <span v-if="1 === messageList.length" v-html="messageList[0]" />
                     <ul v-if="messageList.length > 1">
                         <li v-for="(message) in messageList" v-html="message"/>
